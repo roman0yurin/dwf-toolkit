@@ -1,0 +1,14 @@
+base referer
+rect $class_w_t___contour___set.html 327,6 452,32
+rect $class_w_t___ellipse.html 344,56 435,83
+rect $class_w_t___gouraud___polyline.html 311,107 468,134
+rect $class_w_t___gouraud___polytriangle.html 299,158 480,184
+rect $class_w_t___image.html 345,208 433,235
+rect $class_w_t___macro___draw.html 327,259 452,286
+rect $class_w_t___p_n_g___group4___image.html 301,310 477,336
+rect $class_w_t___polygon.html 340,360 439,387
+rect $class_w_t___polyline.html 340,411 439,438
+rect $class_w_t___polymarker.html 329,462 449,488
+rect $class_w_t___polytriangle.html 329,512 449,539
+rect $class_w_t___text.html 352,563 427,590
+rect $class_w_t___object.html 5,284 96,311

@@ -1,0 +1,8 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_d_w_f_publishable_section.html 105,155 351,181
+rect $class_d_w_f_toolkit_1_1_d_w_f_publishable.html 5,80 205,107
+rect $class_d_w_f_toolkit_1_1_d_w_f_resource_container.html 229,80 475,107
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_owner.html 272,5 432,32
+rect $class_d_w_f_segment_handler_builder.html 375,155 569,181
+rect $class_d_w_f_geometry_handler_builder.html 593,155 793,181
+rect $class_d_w_f_feature_handler_builder.html 817,155 1004,181

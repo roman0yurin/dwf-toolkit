@@ -1,0 +1,7 @@
+base referer
+rect $class_w_t___drawable.html 128,203 235,229
+rect $class_w_t___object.html 5,112 96,139
+rect $class_w_t___logical___box.html 120,112 243,139
+rect $class_w_t___logical___point.html 204,5 335,32
+rect $class_w_t___point___set___data.html 267,112 411,139
+rect $class_w_t___point___set.html 271,203 380,229

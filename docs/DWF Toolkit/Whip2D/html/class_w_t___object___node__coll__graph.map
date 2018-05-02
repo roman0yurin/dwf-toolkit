@@ -1,0 +1,5 @@
+base referer
+rect $class_w_t___item.html 5,86 83,112
+rect $class_w_t___attribute.html 177,86 279,112
+rect $class_w_t___object.html 183,6 273,32
+rect $class_w_t___string.html 303,86 388,112

@@ -1,0 +1,9 @@
+base referer
+rect $class_w_t___drawable.html 318,219 424,245
+rect $class_w_t___object.html 210,5 300,32
+rect $class_w_t___attribute.html 6,112 107,139
+rect $class_w_t___logical___box.html 310,112 432,139
+rect $class_w_t___logical___point.html 364,5 495,32
+rect $class_w_t___opcode.html 507,219 606,245
+rect $class_w_t___color___map.html 126,219 240,245
+rect $class_w_t___r_g_b_a32.html 131,112 235,139

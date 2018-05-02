@@ -1,0 +1,6 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_d_w_f_content_reader.html 5,80 227,107
+rect $class_d_w_f_toolkit_1_1_d_w_f_content_resource_reader.html 251,80 528,107
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_ownable.html 552,80 725,107
+rect dwfcore.tag$struct_d_w_f_core_1_1_i_d_w_f_ownable.html 551,6 727,32
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_x_m_l_buildable.html 749,80 952,107

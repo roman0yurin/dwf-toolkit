@@ -1,0 +1,6 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_request_1_1_forward_reference.html 6,96 360,123
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_request_1_1_reference.html 30,6 336,32
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_request.html 384,96 622,123
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature.html 384,6 571,32
+rect $class_d_w_f_toolkit_1_1_d_w_f_resource.html 595,6 782,32

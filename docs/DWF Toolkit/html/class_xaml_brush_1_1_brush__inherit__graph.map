@@ -1,0 +1,6 @@
+base referer
+rect $class_xaml_brush_1_1_image.html 6,80 139,107
+rect $class_xaml_brush_1_1_linear_gradient.html 163,80 347,107
+rect $class_xaml_brush_1_1_radial_gradient.html 371,80 558,107
+rect $class_xaml_brush_1_1_solid_color.html 582,80 739,107
+rect $class_xaml_brush_1_1_visual.html 763,80 894,107

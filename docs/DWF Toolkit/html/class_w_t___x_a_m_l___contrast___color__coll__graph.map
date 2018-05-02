@@ -1,0 +1,8 @@
+base referer
+rect $class_xaml_drawable_attributes_1_1_stroke_1_1_provider.html 28,5 300,32
+rect $class_xaml_drawable_attributes_1_1_fill_1_1_provider.html 39,56 290,83
+rect $class_xaml_drawable_attributes_1_1_stroke_1_1_consumer.html 23,107 306,133
+rect $class_xaml_drawable_attributes_1_1_fill_1_1_consumer.html 34,157 295,184
+rect $class_xaml_drawable_attributes_1_1_path_attribute_provider.html 14,208 315,235
+rect $class_xaml_drawable_attributes_1_1_glyphs_attribute_provider.html 6,259 323,285
+rect $class_w_t___x_a_m_l___file.html 106,309 223,336

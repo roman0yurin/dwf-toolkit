@@ -1,0 +1,5 @@
+base referer
+rect $class_d_w_f_core_1_1_d_w_f_standard_file_descriptor.html 281,5 540,32
+rect $class_d_w_f_core_1_1_d_w_f_stream_file_descriptor.html 287,56 535,83
+rect $class_d_w_f_core_1_1_d_w_f_stream_output_buffer_descriptor.html 260,107 561,133
+rect $class_d_w_f_core_1_1_d_w_f_zip_file_descriptor.html 300,157 521,184

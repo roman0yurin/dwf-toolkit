@@ -1,0 +1,5 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_o_p_c_x_m_l_part.html 5,5 184,32
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_owner.html 208,5 368,32
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_ordered_vector.html 392,5 675,32
+rect $class_d_w_f_toolkit_1_1_d_w_f_section.html 699,5 875,32

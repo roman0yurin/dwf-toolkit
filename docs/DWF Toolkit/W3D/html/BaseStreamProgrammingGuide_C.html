@@ -1,0 +1,1772 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="keywords" content="Tech Soft America Hoops3D Hoops 3D Graphics System">
+   <meta name="copyright" content="Copyright 2000 Tech Soft America">
+   <meta name="GENERATOR" content="Mozilla/4.61 [en] (WinNT; U) [Netscape]">
+   <meta name="Author" content="Robert Mazeffa">
+<link rel="stylesheet" href="../tsa_docs.css">
+
+   <title>Base Classes Programming Guide</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EE" vlink="#551A8B" alink="#FF0000">
+<h2 align="left"><b><a href="#Introduction">1. Introduction</a></b> </h2>
+<blockquote> 
+  <h3><b><a href="#compiling">1.1 Compiling and Linking</a></b> <a href="#supported platforms"><br>
+    </a></h3>
+</blockquote>
+<div align="left"> 
+  <h2><b><a href="#reading and writing HOOPS Stream Files">2. Writing and Reading 
+    HOOPS Stream Files</a></b> </h2>
+  <blockquote> 
+    <h3><b><a href="#writing">2.1 Writing</a></b></h3>
+    <blockquote> 
+      <h4 align="left"><a href="#writing overview">2.1.1 Overview</a><br>
+        <a href="#multi-purpose opcode handlers">2.1.2 Multi-Purpose Opcode Handlers</a><br>
+        <a href="#compression">2.1.3 Compression</a> <br>
+        <a href="#using_TKE_View">2.1.4 Using the TKE_View opcode</a> <br>
+        <a href="#referencing_external_data">2.1.5 Referencing External Data Sources</a> 
+        <br>
+        <a href="#controlling quality of streamed entities using BaseStream">2.1.6 
+        Controlling the Quality of the Streaming Process</a> <br>
+        <a href="#creating an HSF with LODs using BaseStream">2.1.7 Creating an 
+        HSF with LODs<br>
+        </a><a href="#writing_examples">2.1.8 Writing Examples<br>
+        </a><a href="#write_options">2.1.9 Writing Options</a></h4>
+    </blockquote>
+  </blockquote>
+  <div align="left"> 
+    <blockquote> 
+      <h3><b><a href="#reading">2.2 Reading</a></b> </h3>
+    </blockquote>
+  </div>
+  <blockquote> 
+    <h3 align="left"><b><a href="#controlling the reading/writing process">2.3 
+      Controlling the Reading and Writing Process</a></b> </h3>
+    <div align="left"> 
+      <blockquote> 
+        <h4><a href="#overview of controlling reading and writing process">2.3.1 
+          Overview</a> <br>
+          <a href="#controlling reading">2.3.2 Controlling Reading</a> <br>
+          <a href="#controlling writing">2.3.3 Controlling Writing</a></h4>
+      </blockquote>
+      <h3><b><a href="#verifying HSF files">2.4 Verifying HSF files</a></b> </h3>
+    </div>
+    <h3 align="left"><b><a href="#HOOPS/3dGS classes">2.5 HOOPS/3dGS Classes</a></b> 
+    </h3>
+  </blockquote>
+  <h2 align="left"><br>
+    <b><a href="#streaming_an_HSF_file">3. Streaming an HSF File</a></b> </h2>
+  <div align="left"> 
+    <blockquote> 
+      <h3><b><a href="#basic_streaming">3.1 Basic Streaming</a></b> </h3>
+    </blockquote>
+  </div>
+  <blockquote> 
+    <h3 align="left"><b><a href="#streaming_on_separate_thread">3.2 Performing 
+      Streaming on a Separate Thread</a></b> <br>
+      &nbsp; </h3>
+  </blockquote>
+  <div align="left"> 
+    <h2><b><a href="#customizing the HSF file">4. Customizing the HOOPS Stream 
+      File</a></b> </h2>
+    <blockquote> 
+      <h3><b><a href="#customizing HSF objects">4.1 Customizing HSF Objects</a></b> 
+      </h3>
+    </blockquote>
+  </div>
+  <blockquote> 
+    <h3 align="left"><b><a href="#storing additional user data">4.2 Versioning 
+      and Storing Additional User Data</a></b> </h3>
+    <h3 align="left"><b><a href="#using tags">4.3 Tagging HSF Objects to Associate 
+      User Data&nbsp;</a></b> <br>
+      &nbsp; </h3>
+  </blockquote>
+  <div align="left"> 
+    <h2><b><a href="#maximixing performance">5. Maximizing Performance</a></b> 
+    </h2>
+    <blockquote> 
+      <h3><b><a href="#Rendering performance">5.1 Rendering</a></b> </h3>
+      <blockquote> 
+        <h4><a href="#performance - scene-graph organization">5.1.1 Scene-graph 
+          organization<br>
+          </a><a href="#performance - shell organization">5.1.2 Shell organization</a> 
+          <br>
+          <a href="#performance - polygon handedness">5.1.3 Polygon handedness</a> 
+        </h4>
+      </blockquote>
+    </blockquote>
+  </div>
+  <hr align="left" WIDTH="100%">
+  <!-------------------Introduction------------------> 
+  <h2 align="left"><a NAME="Introduction"></a><b>1. Introduction</b> </h2>
+  <h5 align="left">This guide explains how to use the HOOPS/Stream base classes 
+    to directly export/import data to/from an HSF file.&nbsp; These classes are 
+    intended to be used to export an HSF file when the graphics information is 
+    not stored in the HOOPS 3D Graphics System scene-graph, or to import an HSF 
+    file when the graphics information is not going to be mapped to the HOOPS/3dGS 
+    scene-graph.&nbsp;&nbsp; This is useful for developers who already have their 
+    own graphics subsystem during the export phase, the import phase, or both.&nbsp; 
+  </h5>
+  <h5 align="left">If the data to be exported to an HSF file already resides in 
+    the HOOPS/3dGS scene-graph, or if data being imported from an HSF file needs 
+    to be mapped to the HOOPS/3dGS scene-graph, then the 3dGS-specific classes 
+    should be used.&nbsp; The 3dGS-specific classes and the full HOOPS 3D Graphics 
+    System are part of the HOOPS 3D Application Framework (HOOPS/3dAF). </h5>
+  <h5 align="left">The following are prerequisites to creating or importing an 
+    HSF file using the base classes: </h5>
+  <div align="left"> 
+    <blockquote> 
+      <h5>1.&nbsp;&nbsp; Because an HSF file is essentially an archive of the 
+        HOOPS/3dGS scene-graph contents (geometry, attributes, and segments) it 
+        is important to understand how the scene-graph should be organized, and 
+        what geometry and attributes are supported. Refer to the&nbsp;HOOPS/3dGS 
+        Programming Guide for information on scene-graph architecture/usage and 
+        details on supported geometry and attributes.&nbsp; The HOOPS/3dGS Reference 
+        Manual provides specific details on geometry types and multi-option attributes. 
+        (The HOOPS/3dGS Reference Manual is located in the HOOPS/3dGS section 
+        of the documentation.)</h5>
+    </blockquote>
+    <blockquote> 
+      <h5>2.&nbsp; An understanding of HSF opcodes/objects, opcode handlers, and 
+        general HOOPS/Stream Toolkit architecture.&nbsp; This information is reviewed 
+        in the HOOPS/Stream Technical Overview <br>
+        .</h5>
+    </blockquote>
+    <h3><a NAME="compiling"></a><b>1.1 Compiling and Linking</b> </h3>
+  </div>
+  <h5 align="left">The HOOPS/Stream base-class headers, source code, export library 
+    (for Windows) and libraries/dlls are located in the /dev_tools/base_stream 
+    subdirectories.&nbsp;&nbsp; The /dev_tools/base_stream/source directory includes 
+    the Microsoft DevStudio Project files or Unix makefile to enable rebuilding.&nbsp; 
+    <br>
+    &nbsp; <br>
+    &nbsp; <br>
+    &nbsp; </h5>
+  <p align="left"> 
+  <hr align="left">
+  <h2 align="left"><a NAME="reading and writing HOOPS Stream Files"></a><b>2. 
+    Reading and Writing HOOPS Stream Files</b> </h2>
+  <h3 align="left"> <a NAME="writing"></a>2.1 Writing</h3>
+  <blockquote> 
+    <h4 align="left"> <a NAME="writing overview"></a><b>2.1.1 Overview</b> <br>
+      &nbsp; </h4>
+    <h5 align="left">As reviewed in the HSF File Architecture document, an HSF 
+      file must have the following structure: </h5>
+    <h5 align="left"><b>&lt;TKE_Comment>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      <i>Required - contents denote file version</i></b> <br>
+      <b>&lt;opcode for a scenegraph object></b> <br>
+      <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      .</b> <br>
+      <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      .&nbsp;</b> <br>
+      <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      .</b> <br>
+      <b>&lt;opcode for a scenegraph object></b> <br>
+      <b>&lt;TKE_Termination>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      <i>Required</i></b> </h5>
+    <h5 align="left">This means that the first opcode exported to the file must 
+      be TKE_Comment with contents that are specifically formatted to contain 
+      the file version (the TK_Header class manages this automatically, and is 
+      discussed later).&nbsp; The last opcode exported must be TKE_Termination. 
+    </h5>
+    <h5 align="left">To create an HSF file, you must first create a&nbsp; BStreamFileToolkit 
+      object, and then manually create and initialize opcode-handlers (or custom 
+      objects derived from them) and export their contents.&nbsp; </h5>
+    <h5 align="left">Opcode handlers are derived from BBaseOpcodeHandler.&nbsp; 
+      This is an abstract class used as a base for derived classes which manage 
+      logical pieces of binary information.&nbsp; BBaseOpcodeHandler provides 
+      virtual methods which are implemented by derived classes to handle reading, 
+      writing, execution and interpretation of binary information.&nbsp; (The 
+      methods are called Read, Write, Execute and Interpret.)&nbsp; Execution 
+      refers to the process of populating application specific data structures 
+      with the binary information that has been read from a file or user-provided 
+      buffer within the Read method.&nbsp; Interpretation refers to the process 
+      of extracting application specific data to prepare it for subsequent writing 
+      to a file or user-provided buffer within the Write method. <br>
+      &nbsp; </h5>
+    <h5 align="left"><b>Naming Conventions</b> </h5>
+    <h5 align="left">Naming conventions for opcodes and opcode handlers are as 
+      follows: </h5>
+    <blockquote> 
+      <div align="left"> 
+        <h5>HSF file opcodes&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+          -&nbsp;&nbsp;&nbsp; <b>TKE_&lt;opcode></b> <br>
+          opcode handler classes&nbsp;&nbsp;&nbsp;&nbsp; -&nbsp;&nbsp;&nbsp; <b>TK_&lt;object-type></b></h5>
+      </div>
+    </blockquote>
+    <h5 align="left"><br>
+      <b>Initializing Opcodes</b> </h5>
+    <h5 align="left">During file writing, you must first access the graphical 
+      and user data that you wish to export and initialize the opcode's data structures.&nbsp; 
+      You could do this initialization work in the <b>Interpret</b> method of 
+      the opcode handler and call that method prior to exporting the opcode to 
+      the file.&nbsp; The opcode handler could also be directly initialized via 
+      the public interface after construction.&nbsp; <br>
+      &nbsp; </h5>
+    <h5 align="left"><b>Exporting Opcodes</b> </h5>
+    <h5 align="left">After the 'interpretation/initialization' phase is complete, 
+      you must call the <b>Write</b> method of the opcode handler until writing 
+      of the current opcode is complete.&nbsp; This will export the opcode data 
+      to an accumulation buffer (of user-specified size) that must initially be 
+      passed to the toolkit.&nbsp; This buffer can then be exported to an HSF 
+      file or utilized directly.&nbsp;&nbsp; The sample code discussed later in 
+      this section contains a reusable 'WriteObject' function that encapsulates 
+      the work necessary to export an object to a file; with minor modification, 
+      it could be used to export an object to application data-structures, over 
+      a network, etc... <br>
+      &nbsp; </h5>
+    <h5 align="left"><b>Resetting Opcodes</b> </h5>
+    <h5 align="left">If an opcode handler object is going to be reused to deal 
+      with another chunk of data, then the <b>BBaseOpcodeHandler::Reset</b> method 
+      should be called.&nbsp; This reinitializes opcode handler variables and 
+      frees up temporary data.&nbsp; <br>
+      &nbsp; </h5>
+    <h4 align="left"><a NAME="multi-purpose opcode handlers"></a><b>2.1.2 Multi-Purpose 
+      and Utility Opcode Handlers</b> </h4>
+    <h5 align="left">Some opcode-handlers can be used to process more than one 
+      opcode; when using these objects, the desired opcode must be passed into 
+      the opcode handler's constructor.&nbsp; (To find out which opcode handler 
+      supports each opcode, refer to the <a href="base_opcodes.txt">opcode registration 
+      list</a>).&nbsp; For example, the TK_Color_By_Index opcode handler supports 
+      both the TKE_Color_By_Index opcode and TKE_Color_By_Index_16 opcode. </h5>
+    <h5 align="left">Additionally, some of the TK_XXX classes are not actually 
+      opcode handlers, but rather serve as utility classes which simply export 
+      more than one opcode.&nbsp; For example the TK_Header class will export 
+      both the TKE_Comment opcode (with contents denoting the file version) and 
+      TKE_File_Info opcode.&nbsp; The version number that will be exported by 
+      default is the latest version of the HSF file that the HOOPS/Stream Toolkit 
+      supports.&nbsp;&nbsp; This is defined in BStream.h via the&nbsp; TK_File_Format_Version 
+      define. <br>
+      &nbsp; </h5>
+    <h4 align="left"><a NAME="compression"></a><b>2.1.3 Compression</b> </h4>
+    <h5 align="left">The HOOPS/Stream toolkit supports lossless LZ compression 
+      of the exported data.&nbsp; To enable compression, export the TKE_Start_Compression 
+      opcode.&nbsp; The toolkit will automatically be placed in 'compression mode' 
+      after this opcode is exported, and all subsequently exported opcodes will 
+      be compressed.&nbsp; To stop compression, export the TKE_Stop_Compression 
+      opcode.&nbsp;&nbsp; Typically, the TKE_Start_Compression opcode would be 
+      exported at the beginning of the file (but just after the TKE_Comment opcode 
+      which contains version information), and the TKE_Stop_Compression opcode 
+      would be exported at the end of the file (but just before the TKE_Termination 
+      opcode)&nbsp; Because this file wide LZ compression capability is lossless, 
+      provides good compression results, and is fairly efficient during both export 
+      and import, it should always be used. <br>
+      &nbsp; </h5>
+    <h5 align="left"><b>Example:</b> </h5>
+    <h5 align="left">Let's say we want to write out an HSF that contains a&nbsp; 
+      'segment' opcode, and have the segment contain a single 'marker' opcode.&nbsp; 
+      (A marker is denoted by a single 3D point.)&nbsp; The HSF file would need 
+      to have the following structure: </h5>
+    <h5 align="left"><b>&lt;TKE_Comment>&nbsp;</b> <br>
+      <b>&lt;TKE_File_Info></b> <br>
+      <b>&lt;TKE_Start_Compression>&nbsp;</b> <br>
+      <b>&lt;TKE_Open_Segment></b> <br>
+      <b>&lt;TKE_Marker></b> <br>
+      <b>&lt;TKE_Close_Segment></b> <br>
+      <b>&lt;TKE_Stop_Compression></b> <br>
+      <b>&lt;TKE_Termination>&nbsp;</b> </h5>
+    <h5 align="left">The code required to create this HSF file is <a href="simple_hsf1.cpp.txt">here</a>. 
+      <br>
+      &nbsp; </h5>
+    <h4 align="left"><a NAME="using_TKE_View"></a><b>2.1.4 Using the TKE_View 
+      Opcode</b> </h4>
+    <h5 align="left">It is very useful to store some information at the beginning 
+      of the file which denotes the extents of the scene, so that an application 
+      which is going to stream the file can setup the proper camera at the beginning 
+      of the streaming process. Otherwise, the camera would have to continually 
+      get reset as each new object was streamed in and the scene extents changed 
+      as a result. </h5>
+    <h5 align="left">The TKE_View opcode is designed for this purpose.&nbsp; It 
+      denotes a preset view which contains camera information, and has a name.&nbsp; 
+      An HSF file could have several TKE_View objects, for example,&nbsp; to denote 
+      'top', 'iso', and 'side' views.&nbsp; </h5>
+    <h5 align="left">The HOOPS Stream Control and Plug-In (an ActiveX control 
+      and Netscape Plug-In that can stream in HSF files over the web), along with 
+      the various PartViewers provided by Tech Soft America, all look for the 
+      presence of a TKE_View object near the beginning of the HSF file with the 
+      name 'default'.&nbsp; If one is found, then the camera information stored 
+      with this 'default' TKE_View object is used to setup the initial camera. 
+    </h5>
+    <h5 align="left">If you (or your customers) are going to rely on the Stream 
+      Control or Plug-In to view your HSF data, then you should export a 'default' 
+      TKE_View opcode as discussed above.&nbsp; If you are going to create your 
+      own HSF-reading application to stream in HSF files that you've generated, 
+      then that application should have some way of knowing the extents of the 
+      scene at the beginning of the reading process; this can only be achieved 
+      if your writing application has placed scene-extents information at the 
+      beginning of the HSF file (probably by using the TKE_View opcode), and your 
+      reader is aware of this information. <br>
+      &nbsp; </h5>
+    <h5 align="left"><b>Example:</b> </h5>
+    <h5 align="left">An HSF with the TKE_View opcode, along with a segment containing 
+      polyline and marker objects would look like: </h5>
+    <h5 align="left"><b>&lt;TKE_Comment>&nbsp;</b> <br>
+      <b>&lt;TKE_File_Info>&nbsp;</b> <br>
+      <b>&lt;TKE_View></b> <br>
+      <b>&lt;TKE_Start_Compression></b> <br>
+      <b>&lt;TKE_Open_Segment></b> <br>
+      <b>&lt;TKE_Polyline></b> <br>
+      <b>&lt;TKE_Marker></b> <br>
+      <b>&lt;TKE_Close_Segment></b> <br>
+      <b>&lt;TKE_Stop_Compression></b> <br>
+      <b>&lt;TKE_Termination>&nbsp;</b> </h5>
+    <h5 align="left">The code required to create this HSF file is <a href="simple_hsf2.cpp.txt">here</a>. 
+      <br>
+      &nbsp; </h5>
+    <h4 align="left"><a name="referencing_external_data"></a><b>2.1.5 Referencing 
+      External Data Sources </b></h4>
+    <h5 align="left"> The TKE_External_Reference opcode is used to represent a 
+      reference to external data sources. The reference would typically be a relative 
+      pathname but could also be an URL. This opcode is intended to be handled 
+      in a manner similar to TK_Referenced_Segment, where the scene-graph information 
+      located in the reference should be loaded into the currently open segment. 
+      For example, a reference of './left_tire.hsf' located immediately after 
+      a TKE_Open_Segment opcode would indicate that the HOOPS/3dGS scene-graph 
+      contained in left_tire.hsf should be created within the open segment. A 
+      reference of http://www.foobar.com/airplane.hsf would indicate that the 
+      .hsf resides at a website, and the reader must access the data (it may choose 
+      to first download the entire file and then display it, or stream the data 
+      in and display it incrementally) </h5>
+    <h5 align="left">&nbsp;</h5>
+    <h4 align="left"><a NAME="controlling quality of streamed entities using BaseStream"></a><b>2.1.6 
+      Controlling the Quality of the Streaming Process</b></h4>
+    <h5 align="left">The quality of the graphics streaming process is essentially 
+      based on how quickly the user gets an overall feel for the scene. One common 
+      technique involves exporting lower Levels of-Detail (LODs) for 3D objects 
+      within the scene since they can stream in more quickly.&nbsp; Another&nbsp; 
+      technique involves ordering objects within the file so that the most important 
+      objects in the scene are ordered towards the front of the file.&nbsp;&nbsp; 
+      Objects which are larger and closer to the camera are typically the most 
+      important.&nbsp;</h5>
+    <h5 align="left">While the HOOPS/3dGS-specific 3dgs classes provide built 
+      in logic to create LOD&nbsp; representations of objects, as well as logic 
+      to smartly order geometry within the file (exporting LOD representations 
+      first and sorting them base on cost::benefit ratio), such logic is not currently 
+      supported by the base classes.&nbsp; This is primarily because the BStreamFileToolkit 
+      object doesn't 'know' where the data is, or how it is arranged.&nbsp; Since 
+      the developer is manually traversing their own graphics information and 
+      mapping it to HSF objects, LODs must be manually generated/exported and 
+      any ordering/sorting would need to be done by the developer. <br>
+      &nbsp; </h5>
+    <h4 align="left"><a NAME="creating an HSF with LODs using BaseStream"></a><b>2.1.7 
+      Creating an HSF with LODs</b> </h4>
+    <h5 align="left">A more practical example of an HSF file is one that contains 
+      a 'real world' scene-graph, including: </h5>
+    <h5 align="left">- shells containing several LODs, local attributes and compression/write 
+      options <br>
+      - modeling matrices <br>
+      - inclusions (instancing) <br>
+      - colors, etc...&nbsp; </h5>
+    <h5 align="left">After reviewing the <a href="#write options">Write Options</a> 
+      section below, let's take the case where we want to write out the following 
+      scene-graph: <br>
+      &nbsp; </h5>
+    <p align="center"><img SRC="sample_scene_graph.jpg" NOSAVE height=444 width=664> 
+      <br>
+    </p>
+    <h5 align="left">Since the main segment tree references other segments (each 
+      reference is denoted by a TKE_Include_Segment object), the segments in the 
+      'include library' must come first in the file.&nbsp; Typically, it is desirable 
+      to have any LOD representations read in first so that the reading application 
+      (which may be incrementally streaming in the data) can quickly provide a 
+      rough depiction of the scene.&nbsp; Therefore, we need to store LOD representations 
+      of shells at the beginning of the file.&nbsp;&nbsp; The HOOPS/Stream Toolkit 
+      supports the concept of tagging, which enables the developer to first output 
+      a LOD representation of the shell, and then later output another LOD representation 
+      (or the full representation) of that same shell and associate back to the 
+      original shell.&nbsp;&nbsp; If you want to be able to maintain this association 
+      during reading, you must follow tagging procedures which are discussed later 
+      on, in&nbsp; section <a href="#using tags">4.3: Tagging HSF Objects</a>. 
+      Since the graphical information is coming from a custom set of data structures, 
+      you will need to provide your own LOD representations for shells.&nbsp; 
+    </h5>
+    <h5 align="left"><b>Note</b>: LOD support contained in the HOOPS 3D Graphics 
+      System could still be leveraged in the case where you are manually creating 
+      an HSF file, where you could call the HOOPS/3dGS utility function 'HC_Compute_Optimized_Shell' 
+      to generate LODs.&nbsp; This requires access to the HOOPS/3dGS API, available 
+      as part of the HOOPS 3D Application Framework.&nbsp; Contact Tech Soft America 
+      for HOOPS/3dAF licensing details. </h5>
+    <h5 align="left">The following is one possible structure of the HSF file which 
+      represents the above scene-graph and orders the various representations 
+      of the shell primitives:&nbsp; </h5>
+    <h5 align="left"><b>&lt;TKE_Comment>&nbsp;</b> <br>
+      <b>&lt;TKE_File_Info>&nbsp;</b> <br>
+      <b>&lt;TKE_View></b> <br>
+      <b>&lt;TKE_Start_Compression></b> </h5>
+    <h5 align="left"><b>&lt;TKE_Colormap></b> </h5>
+    <h5 align="left"><b>&lt;TKE_Open_Segment>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      // /include_library/object_1 segment</b> <br>
+      <b>&lt;TKE_Shell>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      // id=13, LOD 2 - output LOD 2&nbsp;</b> <br>
+      <b>&lt;TKE_Close_Segment>&nbsp;</b> </h5>
+    <h5 align="left"><b>&lt;TKE_Open_Segment>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      // /include_library/object_2 segment</b> <br>
+      <b>&lt;TKE_Shell>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      // id=14, LOD 2 - output LOD 2</b> <br>
+      <b>&lt;TKE_Close_Segment>&nbsp;</b> </h5>
+    <h5 align="left"><b>&lt;TKE_Open_Segment>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      // part_1 segment</b> <br>
+      <b>&lt;TKE_Include_Segment>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      // include the object_1 segment</b> <br>
+      <b>&lt;TKE_Modelling_Matrix>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      // give it a unique mod matrix</b> <br>
+      <b>&lt;TKE_Color_RGB>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      // apply a local color</b> <br>
+      <b>&lt;TKE_Close_Segment>&nbsp;</b> </h5>
+    <h5 align="left"><b>&lt;TKE_Open_Segment>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      // part_2 segment</b> <br>
+      <b>&lt;TKE_Include_Segment>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      // include the object_2 segment</b> <br>
+      <b>&lt;TKE_Modelling_Matrix>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+      // give it a unique mod matrix</b> <br>
+      <b>&lt;TKE_Close_Segment>&nbsp;</b> </h5>
+    <h5 align="left"><b>&lt;TKE_Shell>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // id=13, 
+      LOD 1&nbsp; -&nbsp; output LOD 1 for the shells</b> <br>
+      <b>&lt;TKE_Shell>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // id=14, LOD 1</b> </h5>
+    <h5 align="left"><b>&lt;TKE_Shell>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // id=13, 
+      LOD 0&nbsp; -&nbsp; output LOD 0 which is the original</b> <br>
+      <b>&lt;TKE_Shell>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // id=14, LOD 0&nbsp;</b> 
+    </h5>
+    <h5 align="left"><b>&lt;TKE_Close_Segment></b> </h5>
+    <h5 align="left"><b>&lt;TKE_Stop_Compression></b> <br>
+      <b>&lt;TKE_Termination>&nbsp;</b> <br>
+      &nbsp; </h5>
+    <h5 align="left">The code required to create this HSF is <a href="simple_hsf3.cpp.txt">here</a>.&nbsp; 
+      Note how the example reuses opcode handlers in cases where more than one 
+      object of a specific type is going to be exported to the HSF file. <br>
+      &nbsp; </h5>
+    <h5 align="left"><b>Non-Shell LODS</b> </h5>
+    <h5 align="left">The LOD representation for a shell object is not restricted 
+      to a shell, but can be composed of one or more non-shell objects.&nbsp; 
+      For example, a circle or several polylines could be used as the LOD representation 
+      for a shell.&nbsp; </h5>
+    <h5 align="left">This is achieved by calling the <b>TK_Shell::AppendObject 
+      </b>method for each primitive to be used as part of the non-shell LOD representation.&nbsp; 
+      This would be called during initialization of the TK_Shell data&nbsp; (typically 
+      performed within the Interpret method)&nbsp; <b>TK_Shell::AppendObject</b> 
+      does not make any copies of the object passed into it; it only stores a 
+      pointer to objects.&nbsp;&nbsp; Therefore, all objects need to be manually 
+      cleaned up before using the shell opcode handler again, or when deleting 
+      the object. <b>TK_Shell::PopObject</b> should be used to obtain the pointer 
+      to the next object and remove it from the shell handler's list of LOD objects.&nbsp; 
+    </h5>
+    <h5 align="left">The sample code reviewed above (<a href="simple_hsf3.cpp.txt">simple_hsf3.cpp</a>) 
+      includes an example of using a non-shell LOD (a circle) to represent LOD 
+      level 2 of the shell.&nbsp;&nbsp; Note that cleanup of the non-shell LOD 
+      object(s) is performed within the overloaded Reset method, which calls the 
+      base class' Reset method.&nbsp; This ensures that when the shell opcode 
+      handler is reset, everything will be properly cleaned up before the opcode 
+      handler object is reused.&nbsp; The sample code performs cleanup o the non-shell 
+      LOD objects in the Reset method instead of an overloaded constructor method 
+      because it reuses the custom shell opcode handler.&nbsp; <br>
+      &nbsp; <br>
+      &nbsp; </h5>
+    <h4 align="left"><a name="writing_examples"></a><b>2.1.8 Writing Examples</b> 
+    </h4>
+    <h5 align="left">We've seen examples of how to export several opcodes to an 
+      HSF file. Most opcodes are 'self-contained', and it is fairly easy to see 
+      how to initialize them by looking at the definition of the associated opcode-handler 
+      class. The protected data members must be initialied, and public functions 
+      are provided for doing so. However, some graphical attributes are more complicated 
+      in that they require export of several opcodes. This section will cover 
+      more complex situations such as these, and will evolve over time. </h5>
+    <h5 align="left">One of the more complex graphicsl attributes is textures. 
+      Recalling that HSF objects are essentially archives of HOOPS/3dGS scene-graph 
+      objects, it is useful to review how texture-mapping works in HOOPS/3dGS. 
+      First, an image must be defined. Then, a texture must be defined which refers 
+      to that image. The color of the faces of a shell (or mesh) must be set to 
+      the texture name, and finally, the vertex parameters must be set on the 
+      vertices of the shell (which map into the texture) </h5>
+    <h5 align="left">To export this info to an HSF file, the following opcodes 
+      must be exported: </h5>
+    <h5 align="left">1. TK_Image </h5>
+    <h5 align="left">2. TK_Texture (this must be exported after TK_Image, since 
+      it refers to it) </h5>
+    <h5 align="left">3. TK_Color (this must be exported after TK_Texture, since 
+      it refers to it) </h5>
+    <h5 align="left">An example of how to export a shell with a texture applied 
+      is located <a href="simple_hsf4.cpp.txt">here</a>. </h5>
+    <h5 align="left">&nbsp; </h5>
+    <h4 align="left"><a NAME="write_options"></a><b>2.1.9 Write Options&nbsp;</b> 
+    </h4>
+    <h5 align="left">The HOOPS/Stream Toolkit supports a variety of compression 
+      and streaming options which are used when exporting an HSF file.&nbsp; It 
+      may be desirable to modify these settings based on how your model is organized, 
+      the size of the model, and the amount of preprocessing time that is acceptable.&nbsp;&nbsp; 
+    </h5>
+    <h5 align="left">Write options are set on the toollkit by calling <b>BStreamFileToolkit::SetWriteFlags&nbsp;&nbsp; 
+      </b>File write options are specified by TK_File_Write_Options enumerated 
+      type in BStream.h </h5>
+    <h5 align="left">When using the base classes to manually map graphics information 
+      to an HSF file, only a subset of the file-write-options are supported, and 
+      the details are listed in each of the option descriptions below: <br>
+      &nbsp; </h5>
+  </blockquote>
+  <div align="left"> 
+    <table WIDTH="530" BORDER align="center" >
+      <tr> 
+        <td WIDTH="131" HEIGHT="21">
+          <h5><b>Supported</b></h5>
+        </td>
+        <td WIDTH="390" HEIGHT="21">
+          <h5><b>Unsupported</b></h5>
+        </td>
+      </tr>
+      <tr> 
+        <td WIDTH="131" HEIGHT="21">
+          <h5>TK_Full_Resolution_Vertices</h5>
+        </td>
+        <td WIDTH="390" HEIGHT="21">
+          <h5>TK_Suppress_LOD</h5>
+        </td>
+      </tr>
+      <tr> 
+        <td WIDTH="131" HEIGHT="21">
+          <h5>TK_Full_Resolution_Normals</h5>
+        </td>
+        <td WIDTH="390" HEIGHT="21">
+          <h5>TK_Disable_Priority_Heuristic</h5>
+        </td>
+      </tr>
+      <tr> 
+        <td WIDTH="131" HEIGHT="21">
+          <h5>TK_Full_Resolution</h5>
+        </td>
+        <td WIDTH="131" HEIGHT="21">
+          <h5>TK_Disable_Global_Compression</h5>
+        </td>
+      </tr>
+      <tr> 
+        <td WIDTH="131" HEIGHT="21">
+          <h5>TK_Force_Tags</h5>
+        </td>
+        <td WIDTH="390" HEIGHT="21">
+          <h5>TK_Generate_Dictionary</h5>
+        </td>
+      </tr>
+      <tr> 
+        <td WIDTH="131" HEIGHT="21">
+          <h5>TK_Connectivity_Compression</h5>
+        </td>
+      </tr>
+      <tr> 
+        <td WIDTH="390" HEIGHT="21">
+          <h5>TK_First_LOD_Is_Bounding_Box</h5>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <blockquote> 
+    <h5 align="left">Those in the "unsupported" column are there because they 
+      only make sense in the context of a specific graphics system, and dictate 
+      overall file organization. (They are supported by the '3dgs' classes)&nbsp; 
+      Users of the base classes are free to implement them (or not implement them), 
+      according to the needs of their application. All bits are by default off 
+      (set to zero). The following reviews the various types of options, along 
+      with their default values and usage: <br>
+      &nbsp; </h5>
+    <h5 align="left"><b>A.&nbsp; Compression</b> </h5>
+    <h5 align="left"><b>Global Compression</b> </h5>
+    <h5 align="left">The toolkit performs LZ compression of the entire file using 
+      a public domain component called 'zlib'; this is a lossless compression 
+      technique that permits pieces of the compressed file to be streamed and 
+      decompressed, and is computationally efficient on both the compression and 
+      decompression sides. </h5>
+    <h5 align="left">Usage:&nbsp; off by default; needs to be manually enabled 
+      by exporting TKE_Start_Compression and TKE_Stop_Compression opcodes to the 
+      file.&nbsp;&nbsp; Setting TK_Disable_Global_Compression will have no effect. 
+    </h5>
+    <h5 align="left">The HOOPS/Stream Toolkit will also compress raster data by 
+      default, using a JPEG compression utility. The compression level of this 
+      data can be controlled by calling BStreamFileToolkit::SetJpegQuality<br>
+      &nbsp; </h5>
+    <h5 align="left"><b>Geometry Compression</b> </h5>
+    <h5 align="left">Geometry compression is currently focused on the 'shell' 
+      primitive, (represented by the TKE_Shell opcode, and handled by the TK_Shell 
+      class) This is the primary primitive used to represent tessellated information.&nbsp; 
+      Datasets typically consist primarily of shells if the data sets originated 
+      in MCAD/CAM/CAE applications. </h5>
+    <h5 align="left">A TK_Shell object has local write suboptions which may or 
+      may not reflect the directives from the BStreamFileToolkit object's write 
+      options. A public function, <b>TK_Shell::InitSubop()</b> is available to 
+      initialize the write suboptions of TK_Shell with the BStreamFileToolkit 
+      write options.&nbsp;&nbsp; You should setup your desired write options on 
+      the BStreamFileToolkit object, and then call InitSubop within your shell 
+      opcode-handler's constructor or Interpret function.&nbsp; The shells' local 
+      suboptions may also be directly modified by calling <b>TK_Shell::SetSubop(), 
+      </b>and passing in any combination of the options defined in BOpcodeShell.h 
+    </h5>
+    <ul>
+      <li> 
+        <div align="left"> 
+          <h5><i>Vertex Compression<b> - </b></i>This involves encoding the locations 
+            of shell vertices, providing reduction in file size in exchange for 
+            loss of coordinate precision and slightly lower visual quality.&nbsp; 
+            The degradation in visual quality is highly dependent on the topology 
+            of the shell, as well as how the normals information is being exported.&nbsp;&nbsp; 
+            The function <i>BStreamFileToolkit::SetNumVertexBits()</i> allows 
+            the developer to control the number of bits of precision for each 
+            vertex.&nbsp; The default is 24 (8 each for x, y and z)</h5>
+        </div>
+        <h5 align="left"><br>
+          <i>Usage:</i>&nbsp; <b>Enabled by default within the BStreamFileToolkit 
+          object.</b>&nbsp; Disabled by setting <i>TK_Full_Resolution_Vertices</i> 
+          and/or <i>TK_Full_Resolution</i>.&nbsp;&nbsp;&nbsp; </h5>
+        <h5 align="left">Usage is controlled at the local shell level by calling 
+          TK_Shell::SetSubop and using the TKSH_COMPRESSED_POINTS define.&nbsp; 
+          For example, to turn this on, you would call SetSubop(TKSH_COMPRESSED_POINTS 
+          | GetSubop())&nbsp; To turn this off, you would call SetSubop(~TKSH_COMPRESSED_POINTS 
+          &amp; GetSubop()) <br>
+          &nbsp; <br>
+          &nbsp; </h5>
+      </li>
+      <li> 
+        <div align="left"> 
+          <h5><i>Normals Compression<b> - </b></i>Normals will be automatically 
+            exported to the HSF file if normals were explictity set on geometry 
+            using the TK_Polyhedron::SetNormals().&nbsp;&nbsp; Normals compression 
+            involves encoding vertex normals, providing reduction in file size 
+            in exchange for lower visual quality.&nbsp;&nbsp; Again, the degradation 
+            in visual quality is highly dependent on the topology of the shell, 
+            as well as how the normals information is being exported.&nbsp; HOOPS/Stream 
+            transmits compressed normals for vertices that have been compressed, 
+            or if a normal has been explicitly set on a vertex.&nbsp; Surfaces 
+            that had gradual curvature over a highly tessellated region can look 
+            faceted due to the aliasing of the compressed normals.&nbsp; The function 
+            <i>BStreamFileToolkit::SetNumNormalBits()</i> allows the developer 
+            to greatly reduce or effectively remove such aliasing at the cost 
+            of transmitting more data per normal.&nbsp; The default is 10.</h5>
+        </div>
+        <h5 align="left"><br>
+          <i>Usage:</i>&nbsp; <b>Enabled by default within the BStreamFileToolkit 
+          object.</b>&nbsp; Disabled by setting <i>TK_Full_Resolution_Normals</i> 
+          and/or <i>TK_Full_Resolution</i>.&nbsp;&nbsp;&nbsp; </h5>
+        <h5 align="left">Usage cannot currently be controlled at the local shell 
+          level. <br>
+          &nbsp; <br>
+          &nbsp; </h5>
+      </li>
+      <li> 
+        <div align="left"> 
+          <h5><i>Connectivity compression<b> - </b></i>This compresses 'shell' 
+            connectivity information.&nbsp; This compression technique can provide 
+            compelling reductions in files sizes for datasets that contain many 
+            'shell' primitives, but can also be a computationally intensive algorithm 
+            depending on the size of individual shells.&nbsp; Developers will 
+            need to decide for themselves whether the reduced file size is worth 
+            the extra computation time.&nbsp;&nbsp;</h5>
+        </div>
+        <h5 align="left"><br>
+          Additionally, depending on the topology of the shell, the algorithm 
+          may provide limited compression benefit or have to 'punt' after performing 
+          substantial work, thereby providing little to no additional file size 
+          reduction in exchange for extra computation time.&nbsp; Therefore, developers 
+          should do some experimentation with their specific class of datasets 
+          to see if the option is buying them any reduction in file size.&nbsp; 
+          If files sizes for typical files are the same both with and without 
+          the option set, then this compression option should be disabled when 
+          exporting an HSF file. Some specific examples of when the algorithm 
+          will punt or perform poorly are shells that contain many backwards faces 
+          (which also impact rendering performance and should generally be avoided 
+          anyway!), or contain certain complex combinations of&nbsp; 'handles' 
+          ( a teapot or a torus each have one handle) and holes (i.e. a flat plate 
+          that has a hole in the middle).&nbsp; In general, the connectivity compression 
+          algorithm will perform well with most of these cases, but developers 
+          should still take some time to investigate the [extra export time vs. 
+          file-size reduction] of their datasets with and without this option 
+          enabled.&nbsp; </h5>
+        <h5 align="left"><i>Usage:</i>&nbsp; <b>Disabled by default within the 
+          BStreamFileToolkit object</b>.&nbsp; Enabled by setting TK_Connectivity_Compression.&nbsp;&nbsp;&nbsp; 
+        </h5>
+        <h5 align="left">Usage is controlled at the local shell level by calling 
+          TK_Shell::SetSubop and using the TKSH_CONNECTIVITY_COMPRESSION define.&nbsp; 
+          For example, to turn this on, you would call SetSubop(TKSH_CONNECTIVITY_COMPRESSION 
+          | GetSubop())&nbsp; To turn this off, you would call SetSubop(~TKSH_CONNECTIVITY_COMPRESSION 
+          &amp; GetSubop()) <br>
+          &nbsp; </h5>
+      </li>
+    </ul>
+    <div align="left"> 
+      <h5><a NAME="dictionary options"></a><b>B.&nbsp; Dictionary</b> </h5>
+    </div>
+    <h5 align="left">Part of the HSF specification is a "dictionary" of file offsets.&nbsp; 
+      Its main purpose is to allow selective refinement of graphic database detail.&nbsp; 
+      The 3dgs classes will write such a dictionary at the end of the file if 
+      the <i>TK_Generate_Dictionary</i> write option is set.&nbsp; Though it would 
+      also be possible to create a dictionary with the base classes, there is 
+      not yet a public interface to do so.&nbsp; Users of the base classes who 
+      would like to take advantage of this area of HSF should contact technical 
+      support.&nbsp; </h5>
+    <h5 align="left"><a NAME="lod options"></a><b>C.&nbsp; LOD Options&nbsp;</b> 
+    </h5>
+    <h5 align="left">Three of the file write options (<i>TK_Suppress_LOD</i>, 
+      <i>TK_First_LOD_Is_Bounding_Box</i> and <i>TK_Disable_Priority_Heuristic</i>) 
+      control the existence and/or appearance of levels of detail. As with geometry 
+      compression (see above), these options are currently geared towards the 
+      <i>TK_Shell</i> opcode. </h5>
+    <ul>
+      <li> 
+        <div align="left"> 
+          <h5><i>TK_First_LOD_Is_Bounding_Box</i>: as the name suggests, this 
+            option causes the first LOD of any shell to be replaced with its axis 
+            aligned bounding box. The final argument to TK_Shell::InitSubop() 
+            is a boolean, <i>is_firstpass</i>. The shell is replaced with its 
+            bounding box only if the write option <i>TK_First_LOD_Is_Bounding_Box</i> 
+            and the is_firstpass argument to <i>InitSubop()</i> are set.&nbsp;&nbsp;</h5>
+        </div>
+      </li>
+      <li> 
+        <div align="left"> 
+          <h5><i>TK_Suppress_LOD</i> and <i>TK_Disable_Priority_Heuristic</i> 
+            are not supported and will not have any effect on the HSF contents 
+            written by base_stream. If they are to be respected at all, they are 
+            completely the user's responsibility. <i>TK_Suppress_LOD</i> is meant 
+            to prevent any levels of detail from getting into the file.&nbsp; 
+            <i>TK_Disable_Priority_Heuristic</i>, will indicate not to sort detail 
+            levels according to some heuristic that weighs cost versus benefit 
+            -- putting the most important things first.&nbsp;</h5>
+        </div>
+      </li>
+    </ul>
+    <h5 align="left"><br>
+      <a NAME="dictionary options"></a><b>D.&nbsp; Tagging</b> </h5>
+    <h5 align="left">The toolkit supports the concept of tagging, discussed in 
+      section <a href="#using tags">4.3: Tagging HSF Objects</a>&nbsp; Setting&nbsp; 
+      TK_Force_Tags will cause tags to be automatically generated by the toolkit 
+      during the writing process.&nbsp; (Note: tags will always be generated for 
+      shells regardless of the value of this write option.)</h5>
+    <h5 align="left">&nbsp;</h5>
+    <h5><a name="dictionary options"></a><b>E.&nbsp; Global Quantization</b> </h5>
+    <h5><font color="#330033">Setting&nbsp;TK_Global_Quantization will cause any 
+      required quantization to be global (bbox of scene) instead of local (bbox 
+      of individual geometry) . This is useful for situations where high-level 
+      objects are split up into mulitple shells, since it avoids cracks between 
+      the sub-objects (Using a solid modeling example, this would be a situation 
+      where a shell was used for each 'face', instead of using a single shell 
+      for each higher-level 'body'.) Regardless of this flag, however, local quantization 
+      applies until the first TKE_Bounding_Info. This flag is off by default.</font></h5>
+    <h5 align="left">&nbsp;</h5>
+  </blockquote>
+  <p align="left">&nbsp; 
+  <h3 align="left"> <a NAME="reading"></a>2.2 Reading</h3>
+  <div align="left"> 
+    <h5>The function supplied by the base classes to perform black-box reading 
+      of a HOOPS Stream File is <b>TK_Read_Stream_File</b>.&nbsp; </h5>
+  </div>
+  <h5 align="left">Black-box reading using <b>TK_Read_Stream_File</b> requires 
+    the following steps: </h5>
+  <div align="left"> 
+    <ul>
+      <h5> 1.&nbsp; create a BStreamFileToolkit object&nbsp; <br>
+        2.&nbsp; register custom opcode handlers registered with the BStreamFileToolkit 
+        object&nbsp; <br>
+        3.&nbsp; pass the BStreamFileToolkit object into <b>TK_Read_Stream_File</b> 
+      </h5>
+    </ul>
+    <h5>It is only necessary to register opcode handlers to deal with the HSF 
+      opcodes objects that are of interest (and will be mapped to custom data 
+      structures).&nbsp; Opcodes in the file which do not have a custom opcode 
+      handler registered for them will be handled by the BStreamFileToolkit's 
+      'default' opcode handler; this default handler will simply skip over the 
+      opcode.&nbsp;&nbsp; The toolkit can notify you of HSF file objects which 
+      do not have a custom opcode-handler registered for them, if you set the 
+      TK_Flag_Unhandled_Opcodes bit in the <i>flags</i> parameter of the reading 
+      function.&nbsp; (It will return TK_Error for unhandled opcodes) </h5>
+  </div>
+  <h5 align="left">Let's take the case where the reading application only cares 
+    about reading the segment and shell objects from HSF files.&nbsp;&nbsp; This 
+    could be supported via the following code: </h5>
+  <pre align="left">#include "BStream.h"  </pre>
+  <pre align="left">void my_reading_function()&nbsp; 
+   {&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TK_Status&nbsp; status;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; BStreamFileToolkit * tk = new BStreamFileToolkit;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; tk->SetOpcodeHandler (TKE_Open_Segment, new    TK_My_Open_Segment); 
+   &nbsp;&nbsp;&nbsp; tk->SetOpcodeHandler (TKE_Close_Segment, new TK_My_Close_Segment);    
+   &nbsp;&nbsp;&nbsp; tk->SetOpcodeHandler (TKE_Shell, new TK_My_Shell);  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; status = TK_Read_Stream_File("sample.hsf",    tk);  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; if (status == TK_Version)&nbsp; 
+   &nbsp;&nbsp;&nbsp; { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MessageBox("This file was created    with a newer version of the 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    HOOPS/Stream Toolkit.\nTo view it this application's 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    version of the toolkit will need to be updated."); 
+   &nbsp;&nbsp;&nbsp; } else if (status = TK_Error) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MessageBox("Error reading file.");    
+   } 
+   &nbsp; 
+   &nbsp; 
+   &nbsp;  </pre>
+  <h3 align="left"> <a NAME="controlling the reading/writing process"></a>2.3 
+    Controlling the Reading and Writing Process</h3>
+  <blockquote> 
+    <div align="left"> 
+      <h4><a NAME="overview of controlling reading and writing process"></a>2.3.1 
+        Overview </h4>
+    </div>
+    <h5 align="left">In addition to the high-level read/write functions which 
+      support reading from and writing to a disk file,&nbsp; the HOOPS/Stream 
+      Toolkit also supports writing and reading HOOPS Stream File information 
+      to and from a user-specified location.&nbsp; This is a powerful feature 
+      which enables the application developer to store the HOOPS Stream File information 
+      within a custom application specific file format (or any location) and retrieve 
+      it from the custom location, rather than use a separate .hsf file.&nbsp;&nbsp; 
+      More importantly, the data can be incrementally streamed into the reading 
+      application's scene-graph. </h5>
+    <h5 align="left">For example, many technical applications that also visualize 
+      2D/3D information utilize a custom file format that contains application 
+      specific data.&nbsp;&nbsp; When the file is read in, the application then 
+      goes through a laborious process of recreating the 2D/3D information associated 
+      with the application data.&nbsp;&nbsp;&nbsp; By utilizing the HOOPS/Stream 
+      Toolkit, a developer could cache the scene-graph geometry in their own proprietary 
+      file format file by actually embedding the .hsf information in their file.&nbsp; 
+      File load time and initial rendering is drastically reduced, the custom 
+      file format remains intact, and the highly compressed .hsf information minimizes 
+      the increase of file size. </h5>
+    <h5 align="left">Support for controlling the reading and writing process is 
+      provided by the BStreamFileToolkit class.&nbsp; An instance of an BStreamFileToolkit 
+      object should be created for each file that is being read or written, and 
+      then either the ParseBuffer or GenerateBuffer method should be called to 
+      control reading and writing, respectively.&nbsp; <br>
+      &nbsp; </h5>
+    <h4 align="left"><a NAME="controlling reading"></a><b>2.3.2 Controlling Reading</b> 
+    </h4>
+    <h5 align="left">First review section <a href="#reading">2.2: Reading HSF 
+      Files</a>.&nbsp; To control the reading process, a piece of binary data 
+      that has been read from an .hsf file is presented to the BStreamFileToolkit 
+      object for parsing and insertion into your custom data structures by calling 
+      the BStreamFileToolkit::ParseBuffer method.&nbsp; This method doesn't care 
+      where the data originated from, but simply reads the data from the buffer 
+      passed to it, and calls the Read and Execute methods of the opcode handler 
+      registered to handle the current opcode being processed.&nbsp; Therefore, 
+      if you want to access custom HSF objects, you will need to have first registered 
+      custom opcode handlers for the objects of interest (and implement the Execute 
+      methods to do something with the data.)&nbsp; </h5>
+    <h5 align="left">The following code example demonstrates how data could be 
+      manually read from a local file and inserted into your custom data structures 
+      using ParseBuffer.&nbsp;&nbsp; A file is open and pieces of data are read 
+      from it using the BStreamFileToolkit wrapper functions for file opening 
+      and reading ( OpenFile() and ReadBuffer() )&nbsp;&nbsp; Data is continually 
+      read and passed&nbsp; to ParseBuffer until it returns TK_Complete,&nbsp; 
+      indicating that reading is complete, or until an error occurs.&nbsp; <br>
+      &nbsp; </h5>
+    <pre align="left">void Read_Stream_File (char const * filename)&nbsp; 
+   { 
+   &nbsp;&nbsp;&nbsp; auto&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; char&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    block[BUFFER_SIZE]; 
+   &nbsp;&nbsp;&nbsp; auto&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TK_Status&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    status = TK_Normal; 
+   &nbsp;&nbsp;&nbsp; auto&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    amount;  </pre>
+    <pre align="left">&nbsp;&nbsp;&nbsp; BStreamFileToolkit * tk = new BStreamFileToolkit;  </pre>
+    <pre align="left">&nbsp;&nbsp;&nbsp; // our sample custom toolkit only cares about    segment and shells 
+   &nbsp;&nbsp; tk->SetOpcodeHandler (TKE_Open_Segment, new TK_My_Open_Segment);    
+   &nbsp;&nbsp; tk->SetOpcodeHandler (TKE_Close_Segment, new TK_My_Close_Segment);    
+   &nbsp;&nbsp; tk->SetOpcodeHandler (TKE_Shell, new TK_My_Shell);  </pre>
+    <pre align="left">&nbsp;&nbsp;&nbsp; if ((status = tk->OpenFile (filename)) != TK_Normal)    
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return status;  </pre>
+    <pre align="left">&nbsp;&nbsp;&nbsp; do { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (tk->ReadBuffer (block, BUFFER_SIZE,    amount) != TK_Normal) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break;  </pre>
+    <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; status = tk->ParseBuffer    (block, amount);  </pre>
+    <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (status == TK_Error)    { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // whatever...    
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } 
+   &nbsp;&nbsp;&nbsp; } while (status != TK_Complete);  </pre>
+    <pre align="left">&nbsp;&nbsp; tk->CloseFile ();  </pre>
+    <pre align="left">&nbsp;&nbsp;&nbsp; delete tk; 
+   } 
+   &nbsp;  </pre>
+    <h4 align="left"><a NAME="controlling writing"></a><b>2.3.3 Controlling Writing</b> 
+    </h4>
+    <h5 align="left">Controlling writing using the base classes is already explained 
+      in <a href="#writing">Section 2.1:&nbsp; Writing HSF Files</a>&nbsp; Since 
+      writing out an HSF file using the base classes must be done manually anyway 
+      (because the developer has to supply their own logic ot traverse the graphics 
+      information and directly export HSF objects), exporting to a buffer rather 
+      than a file is just a special case of the WriteObject function described 
+      in the example programs in Section 2.1&nbsp; The only difference would be 
+      to omit the 'fwrite' call, and deal with the HSF data buffer directly.&nbsp; 
+      (Perhaps by sending it to another application, or exporting it to your own 
+      non-HSF file, etc...) <br>
+      &nbsp; </h5>
+  </blockquote>
+  <h3 align="left"> <a NAME="verifying HSF files"></a>2.4 Verifying HSF Files</h3>
+  <div align="left"> 
+    <h5>Licensees of HOOPS/Stream who chose to use '.hsf' as their file name extension 
+      are contractually required to write compliant HSF files. </h5>
+  </div>
+  <h5 align="left">Therefore, it is highly recommended that you take steps to 
+    verify the correctness of HSF files that you export using the base classes, 
+    since there is the potential of incorrectly <b>formatting</b> the data (especially 
+    user-data) or incorrectly <b>organizing</b> the scene-graph.&nbsp; For example, 
+    every TK_Open_Segment opcode must be matched by TK_Close_Segment opcode.&nbsp; 
+    Testing can be performed in two phases: <br>
+    &nbsp; </h5>
+  <h5 align="left"><b>Basic Testing</b> </h5>
+  <h5 align="left">The SDK includes a Reference Application called the MfcHoopsRefApp 
+    under Windows distributions, and QtHoopsRefApp under Unix distributions.&nbsp; 
+    It is located in the /bin directory.&nbsp; After creating an HSF file, read 
+    it into the Reference Application.&nbsp; If there is an error with the <b>formatting</b> 
+    of the HSF data, the app will generate a corresponding message box and <b>Advanced 
+    Testing</b> should be performed (discussed below).&nbsp;&nbsp; If no message 
+    is generated, then the formatting of the data in the HSF file is valid.&nbsp; 
+  </h5>
+  <h5 align="left">Correct formatting of the data is not to be confused with the 
+    validity of the scene-graph represented in the HSF file.&nbsp; If there is 
+    a problem with how the scene-graph is organized, the reference application 
+    will generate a HOOPS/3dGS-specific error.&nbsp; This error should be used 
+    to try and locate the problem with how the scene-graph was organized.&nbsp; 
+    Additionally, after a problematic file has finished loading, it can be useful 
+    to export it to an 'HMF' file from the application.&nbsp; This is a readable, 
+    ASCII representation of the scene-graph.&nbsp; Inspection of this file may 
+    provide clues to the problem with scene-graph organization. <br>
+    &nbsp; </h5>
+  <h5 align="left"><b>Advanced Testing</b> </h5>
+  <h5 align="left">If the Reference Application reports that there was an error 
+    with reading the file, then further steps must be taken to determine the problem. 
+    If user data is being written out (via the TKE_Start_User_Data opcode, which 
+    can be manually exported or exported using the TK_User_Data opcode handler) 
+    confirm that the data is being properly formatted per the notes in <a href="#customizing HSF objects">Section 
+    4.1: Customizing HSF Objects</a>&nbsp;&nbsp; This type of error could also 
+    be due to a bug in the writing or reading logic of the toolkit itself.&nbsp; 
+  </h5>
+  <h5 align="left">The toolkit provides logfile capabilities to help track down 
+    such problems.&nbsp; To use these capabilities, perform the following steps:&nbsp; 
+  </h5>
+  <h5 align="left">1.&nbsp; call BStreamFileToolkit::SetLogging(true)&nbsp; </h5>
+  <h5 align="left">2.&nbsp; re-export the HSF file; the toolkit will create a 
+    file called hsf_export_log.txt which contains a byte representing each opcode 
+    that was exported.&nbsp; </h5>
+  <h5 align="left">3.&nbsp; read the HSF file using the&nbsp; TK_Read_Stream_File 
+    function as reviewed in <a href="#controlling reading">Section 2.3.2: Controlling 
+    Reading</a> (ensure that any custom opcode handlers that you've created are 
+    registered with the BStreamFileToolkit object passed into TK_Read_Stream_File) 
+    The toolkit will create a file called hsf_import_log.txt which contains a 
+    byte representing each opcode that was imported.&nbsp; </h5>
+  <h5 align="left">4.&nbsp; Compare the opcodes in the two log files and look 
+    for the first opcode where they differ (if any).&nbsp; It is likely that the 
+    first pair of matching opcodes has a problem with data formatting (or the 
+    toolkit has a bug).&nbsp; If you cannot find any problem with how you've formatted 
+    or exported the data, submit the problematic HSF file and the log files to 
+    technical support.&nbsp; <br>
+    &nbsp; <br>
+    &nbsp; </h5>
+  <h3><a NAME="HOOPS/3dGS classes"></a><b>2.5&nbsp; HOOPS/3dgs Classes</b> </h3>
+  <div align="left"> 
+    <h5>As previously mentioned, the HOOPS/3dGS-specific classes encapsulate the 
+      work of traversing/querying/exporting the HOOPS/3dGS scene-graph to an HSF 
+      file, as well as the work of reading an HSF file and mapping HSF objects 
+      to a HOOPS/3dGS scene-graph.&nbsp; Because HOOPS/3dGS-specific classes are 
+      derived from the base classes,&nbsp; (performing the above logic in overloaded 
+      versions of the Interpret and Execute methods), they provide a valuable 
+      reference of how to use the base classes, and their source code is included 
+      with the toolkit. <br>
+    </h5>
+  </div>
+  <hr align="left">
+  <h2 align="left"><a name="streaming_an_HSF_file"></a><b>3. Streaming an HSF 
+    File</b> </h2>
+  <h5 align="left">Streaming of 3D data typically refers to a process whereby 
+    graphical information is&nbsp; retrieved from a remote location such as a 
+    website or server and is displayed as soon as it is received by the client 
+    application.&nbsp; It allows the end-user to quickly obtain some visual feedback, 
+    as well as interact with the scene as it is still being displayed.&nbsp; <br>
+    &nbsp; </h5>
+  <h3 align="left"> <a name="basic_streaming"></a>3.1 Basic Streaming</h3>
+  <div align="left"> 
+    <h5>The following steps are necessary to add support for streaming an HSF 
+      into an application: </h5>
+    <ul>
+      <h5> 1.&nbsp; Create an instance of a BStreamFileToolkit object. </h5>
+    </ul>
+  </div>
+  <ul>
+    <h5 align="left">2.&nbsp; Open a file.&nbsp; For a local file, this could 
+      be done manually using fopen, or the toolkit's wrapper function OpenFile() 
+      could be used.&nbsp; </h5>
+    <h5 align="left">3.&nbsp; Read, process and incrementally draw chunks of the 
+      file to the screen by calling the sequence of ReadBuffer, ParseBuffer and 
+      your application-specific scene-graph drawing function within a loop until 
+      the entire file has been read.&nbsp; For a local file, reading could be 
+      done manually using fread.&nbsp; If the toolkit's OpenFile wrapper function 
+      was used to previously open the file, than ReadBuffer may be used to read 
+      from the file. </h5>
+  </ul>
+  <div align="left"> 
+    <h5>In review, it is up to the developer to map the data to their custom data-structures 
+      within the Execute method of their custom opcode handlers when using the 
+      base classes.&nbsp; </h5>
+  </div>
+  <h5 align="left">The following code demonstrates how an HSF file called 'factory.hsf'&nbsp; 
+    could be streamed into the HOOPS database and incrementally drawn, using the 
+    base classes: <br>
+    &nbsp; </h5>
+  <pre align="left">void Stream_HSF_File (char const * filename)&nbsp; 
+   { 
+   &nbsp;&nbsp;&nbsp; auto&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; char&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    block[BUFFER_SIZE]; 
+   &nbsp;&nbsp;&nbsp; auto&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TK_Status&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    status = TK_Normal; 
+   &nbsp;&nbsp;&nbsp; auto&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    amount;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; BStreamFileToolkit * tk = new BStreamFileToolkit;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; // our sample custom toolkit only cares about    segment and shells 
+   &nbsp;&nbsp;&nbsp; tk->SetOpcodeHandler (TKE_Open_Segment, new TK_My_Open_Segment);    
+   &nbsp;&nbsp;&nbsp; tk->SetOpcodeHandler (TKE_Close_Segment, new TK_My_Close_Segment);    
+   &nbsp;&nbsp;&nbsp; tk->SetOpcodeHandler (TKE_Shell, new TK_My_Shell);  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; if ((status = tk->OpenFile (filename)) != TK_Normal)    
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return status;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; do { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (tk->ReadBuffer (block, BUFFER_SIZE,    amount) != TK_Normal) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; status = tk->ParseBuffer    (block, amount);  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MyGraphicsUpdateFunction();    
+   &nbsp;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if (status == TK_Error)    { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // whatever...    
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; break; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; } 
+   &nbsp;&nbsp;&nbsp; } while (status != TK_Complete);  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; tk->CloseFile ();  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; delete tk; 
+   } 
+   &nbsp;  </pre>
+  <h3 align="left"> <a name="streaming_on_separate_thread"></a>3.2 Performing 
+    Streaming on a Separate Thread</h3>
+  <div align="left"> 
+    <h5>The previous example is intended to demonstrate how data streaming would 
+      be performed on the same thread as the application.&nbsp; The main application 
+      code and the data reading/streaming process all happen sequentially and 
+      synchronously within the same thread, and control does not return to the 
+      main application loop until reading is complete. However, it may be desirable 
+      to have the data read from the file asynchronously, independent of application 
+      processing.&nbsp; This would allow the user to interact with the application 
+      in a normal fashion, while data is still being streamed from the file which 
+      may be local, or could be coming in via a slower intranet or internet connection.&nbsp; 
+    </h5>
+  </div>
+  <h5 align="left">This can be supported by performing the reading on a thread 
+    which is separate from the main application thread.&nbsp; After this thread 
+    reads in data of a user-specified size, it would post a message to the main 
+    application event loop indicating that it has a new chunk of data ready for 
+    processing.&nbsp; Then, the main application loop would pass that data to 
+    the ParseBuffer function for processing and subsequent insertion into your 
+    application database or custom graphics data structures.&nbsp; </h5>
+  <h5 align="left">Creation of a separate thread and posting a message to the 
+    main application loop involves platform and graphical user-interface (GUI) 
+    specific logic.&nbsp; </h5>
+  <h5 align="left"><br>
+    &nbsp; <br>
+    &nbsp; </h5>
+  <h2 align="left"><a NAME="customizing the HSF file"></a><b>4. Customizing the 
+    HSF File</b> </h2>
+  <h5 align="left">In addition to writing and reading a standard HOOPS Stream 
+    File, the HOOPS/Stream Toolkit provides support for storing and retreiving 
+    user-defined data in the HSF file.&nbsp; This data could be associated with 
+    HSF objects, or it could simply be custom data which is convenient to store 
+    inside an HSF. The toolkit also supports tagging of objects in the HSF file, 
+    which allows for association of HSF objects with user data.&nbsp;&nbsp; The 
+    TKE_Start_User_Data opcode is used to represent user data. <br>
+    &nbsp; </h5>
+  <h3 align="left"><a NAME="customizing HSF objects"></a><b>4.1 Customizing HSF 
+    Objects</b> </h3>
+  <h5 align="left">This section reviews the process of creating customized versions 
+    of default HSF objects.&nbsp; This is achieved by replacing the BStreamFileTookit's 
+    default handler for a particular opcode with a custom opcode handler which 
+    is derived from the default handler class.&nbsp; The custom opcode handler 
+    would provide support for writing and reading additional user-data.&nbsp; 
+  </h5>
+  <div align="left"> 
+    <ul>
+      <li> 
+        <h5> During file writing, you must first access the graphical and user 
+          data that you wish to export and initialize the opcode's data structures; 
+          we refer to this as 'interpretation'.&nbsp; This work could be done 
+          in the opcode's constructor, or you could perform the work in the <b>Interpret</b> 
+          method of each opcode handler and call that method prior to exporting 
+          the opcode to the file.&nbsp; After 'interpretation' is complete, you 
+          must call the <b>Write</b> method of the opcode handler until writing 
+          of the current opcode is complete.&nbsp; This exports the opcode data 
+          to an accumulation buffer initially passed to the toolkit.&nbsp; This 
+          buffer could then be exported to an HSF&nbsp; file or utilized directly.&nbsp; 
+          (This process was previously reviewed in <a href="#writing">Section 
+          2.1</a>)&nbsp;&nbsp;</h5>
+      </li>
+    </ul>
+    <ul>
+      <li> 
+        <h5> During file reading (which is initiated by calling the TK_Read_Stream_File 
+          function, reviewed in <a href="#reading">Section 2.2</a>), the ParseBuffer 
+          method of the BStreamFileToolkit object automatically reads the opcode 
+          at the start of each piece of binary information and continually calls 
+          the <b>Read</b> method of the associated opcode handler.&nbsp;&nbsp; 
+          After the opcode handler reports that reading is complete, ParseBuffer 
+          calls the <b>Execute</b> method of the opcode handler.&nbsp; The data 
+          which has been read and parsed would typically be mapped to your custom 
+          application/graphical data structures within the <b>Execute</b> method 
+          of each opcode handler.&nbsp; However, this work could also be performed 
+          in the Read method; doing it in the Execute method is optional.&nbsp;&nbsp;</h5>
+      </li>
+    </ul>
+    <ul>
+      <li> 
+        <h5>Your custom opcode handler should implement the virtual method called 
+          <b>BBaseOpcodeHandler::Clone()</b> This method needs to make a new instance 
+          of the opcode handler.</h5>
+      </li>
+    </ul>
+  </div>
+  <div align="left"> 
+    <h5>For example, let's say we wanted to write out an extra piece of user-data 
+      at the end of each piece of 'shell' geometry, (and of course retrieve it 
+      during reading) that represents a temperature value for each of the vertices 
+      in the shell's points array.&nbsp;&nbsp; Given that the shell primitive 
+      is denoted by the TKE_Shell opcode, and handled by the TK_Shell opcode-handler, 
+      this would involve the following steps: <br>
+      &nbsp; <br>
+      &nbsp; </h5>
+  </div>
+  <h5 align="left"><b>1.&nbsp; Define a new class derived from TK_Shell that overloads 
+    the Write and Read methods to process the export and import of extra user 
+    data.</b> </h5>
+  <h5 align="left">As previously mentioned, query/retrieval of the user data from 
+    custom data structures during the writing process would typically occur within 
+    the Interpret method of the opcode handler.&nbsp; Similarly, mapping of the 
+    imported user data to custom application data structures would typically occur 
+    in the Execute method.&nbsp; However, this work can be performed in the Write 
+    and Read methods as well, as the example indicates. <br>
+    &nbsp; </h5>
+  <h5 align="left">The following sample header expands upon the sample My_TK_Shell 
+    object reviewed in Section <a href="#writing">2.1:&nbsp; Writing an HSF</a>,&nbsp; 
+    by also overloading the Read and Write methods.&nbsp; <br>
+    &nbsp; </h5>
+  <pre align="left">#include "BOpcodeShell.h"  </pre>
+  <pre align="left">class My_TK_Shell : public TK_Shell&nbsp; 
+   { 
+   &nbsp;&nbsp;&nbsp; protected:  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int&nbsp;&nbsp;&nbsp;    my_stage;&nbsp;&nbsp; // denotes the current processing stage  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; public:  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; My_TK_Shell() { my_stage    = 0; }  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TK_Status&nbsp;&nbsp;    Execute (BStreamFileToolkit &amp; tk) alter; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TK_Status&nbsp;&nbsp; Interpret (BStreamFileToolkit    &amp; tk, HC_KEY key,&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    int lod=-1) alter;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TK_Status&nbsp;&nbsp;    Read (BStreamFileToolkit &amp; tk) alter; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TK_Status&nbsp;&nbsp; Write (BStreamFileToolkit    &amp; tk) alter;  </pre>
+  <div align="left"> 
+    <blockquote> 
+      <blockquote>&nbsp;</blockquote>
+    </blockquote>
+  </div>
+  <blockquote> 
+    <blockquote> 
+      <pre align="left">TK_Status&nbsp;&nbsp; Clone (BStreamFileToolkit &amp; tk,        BBaseOpcodeHandler **) const;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</pre>
+    </blockquote>
+  </blockquote>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; void&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    Reset () alter; 
+   }; 
+   &nbsp; 
+   &nbsp;  </pre>
+  <h5 align="left"><b>2.&nbsp; Implement the custom Write function.</b> </h5>
+  <h5 align="left">This is done in stages, each of which correspond to the discrete 
+    pieces of data that need to be written out for the custom shell.&nbsp; We 
+    use different versions of the BStreamFileTookit's PutData method to output 
+    the user data, and we return from the writing function during each stage if 
+    the attempt to output the data failed. (This could happen due to an error 
+    or because the user-supplied buffer is full.) At this point, review the process 
+    of <a href="user_data.html">Formatting User Data</a>. </h5>
+  <h5 align="left">The following lists in detail the 5 writing stages for our 
+    custom shell opcode-handler : </h5>
+  <div align="left"> 
+    <blockquote> 
+      <h5><i>Stage 0</i>:&nbsp; Output the default TK_Shell object by calling 
+        the base class' Write function&nbsp; <br>
+        ( TK_Shell::Write )</h5>
+    </blockquote>
+    <blockquote> 
+      <h5><i>Stage 1-4</i>:&nbsp; These stages write out the custom data (the 
+        temperature array) as well as formatting information required to denote 
+        a block of user data.&nbsp; </h5>
+      <blockquote> 
+        <h5>1.&nbsp; Output the TKE_Start_User_Data opcode to identify the beginning 
+          of the user data&nbsp; </h5>
+      </blockquote>
+    </blockquote>
+  </div>
+  <blockquote> 
+    <blockquote> 
+      <h5 align="left">2.&nbsp; Output the # of bytes of user data. </h5>
+      <h5 align="left">3.&nbsp; Output the user data itself.&nbsp; </h5>
+      <h5 align="left">4.&nbsp;&nbsp; Output the TKE_Start_User_Data opcode to 
+        identify the end of the user data <br>
+        &nbsp; </h5>
+    </blockquote>
+  </blockquote>
+  <div align="left"> 
+    <pre>TK_Status My_TK_Shell::Write (BStreamFileToolkit &amp; tk)&nbsp;    
+   { 
+   &nbsp;&nbsp;&nbsp; TK_Status&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; status; </pre>
+  </div>
+  <pre align="left">&nbsp;&nbsp;&nbsp; switch (m_stage)&nbsp; 
+   &nbsp;&nbsp;&nbsp; { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // call the base class' Write function    to output the default&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // TK_Shell object 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; case 0:&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((status    = TK_Shell::Write(tk)) != TK_Normal) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    return status; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; my_stage++;    
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp; nobreak;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // output the TKE_Start_User_Data    opcode 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; case 1:&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((status    = PutData (tk, (unsigned 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    char)TKE_Start_User_Data)) != TK_Normal) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    return status; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; my_stage++;    
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp; nobreak;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // output the amount of user    data in bytes; we're writing out&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // 1 float for each vertex value,    so we have 4*m_num_values 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; case 2:&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((status    = PutData (tk, 4*m_num_values)) != TK_Normal) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    return status;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; m_progress    = 0;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    my_stage++; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp; nobreak;&nbsp;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // output our custom    data, which in this example is an array of 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // temperature values which are stored    in an application 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // data structure called 'temperature_values'    
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // since the temperature values array    might always be larger 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // than the buffer, we can't just    "try again" so always generate 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // piecemeal, with m_progress the    number of values done so far 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; case 3:&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((status    = PutData (tk, temperature_values, 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    m_num_values)) != TK_Normal)  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    my_stage++;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp; break;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; case 4:&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // output the TKE_End_User_Data opcode    which denotes the end 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // of user    data 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((status    = PutData (tk, (unsigned 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    char)TKE_End_User_Data)) != TK_Normal) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    return status; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; my_stage    = -1; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp; break;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; default: 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return TK_Error;    
+   &nbsp;&nbsp;&nbsp; }  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; return status; 
+   } 
+   &nbsp; 
+   &nbsp;  </pre>
+  <h5 align="left"><b>3.&nbsp; Implement the custom Read function&nbsp; </b>This 
+    is also done in stages, each of which correspond to the discrete pieces of 
+    data that need to be read in for the custom shell.&nbsp; We use different 
+    versions of the BStreamFileTookit's GetData method to retreive data, and we 
+    return from the reading function during each stage if the attempt to retreive 
+    the data failed. Otherwise, the stage counter is incremented and we move on 
+    to the next stage.&nbsp; </h5>
+  <h5 align="left">The stages during the reading process are analogous to the 
+    stages during the writing process outline above, with one exception.&nbsp;&nbsp; 
+    The&nbsp; TKE_Start_User_Data opcode would still be read during 'Stage 1', 
+    but rather than blindly attempting to read our custom data, we need to handle 
+    the case where there <b>isn't</b> any user data attached to this shell object.&nbsp; 
+    Perhaps the file isn't a custom file, or it was a custom file and this particular 
+    shell object simply didn't have any user data appended to it.&nbsp; </h5>
+  <h5 align="left">It is also appropriate at this time to bring up the issue of 
+    versioning and user data; it is also possible that there <b>is</b> user data 
+    following this shell object, but it is not 'our' user data.&nbsp; Meaning, 
+    it is not temperature data that was written out by our custom shell object, 
+    and therefore it is data that we don't understand; as a result, we could attempt 
+    to read to much or too little data.&nbsp; If custom versioning information 
+    was written at the beginning of our custom file, and this versioning information 
+    was used to verify that this was a file written out by our custom logic, then 
+    it is generally safe to proceed with processing user data since we 'know' 
+    what it is.&nbsp; The versioning issue, including details on how to write 
+    custom versioning information in the&nbsp; file, is discussed in more detail 
+    in the next section <a href="#storing additional user data">4.2: Versioning 
+    and Storing Additional User Data</a> </h5>
+  <h5 align="left">Note that to check if there is any user data, we first call 
+    LookatData to simply look at (but not get) the next byte and verify that it 
+    is indeed a TKE_Start_User_Data opcode.&nbsp; If not, we return. <br>
+    &nbsp; </h5>
+  <pre align="left">TK_Status My_TK_Shell::Read (BStreamFileToolkit &amp; tk)&nbsp;    
+   { 
+   &nbsp;&nbsp;&nbsp; TK_Status&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; status;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; switch (my_stage)&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; case 0: { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((status    = TK_Shell::Read (tk)) != TK_Normal) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    return status; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; my_stage++;    
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp; nobreak;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; case 1:&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned    char temp;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    // look at the next byte since it may not be the 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // TKE_Start_User_Data    opcode 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((status    = LookatData(tk, temp)) != TK_Normal) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    return status;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    if (temp != TKE_Start_User_Data) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    return TK_Normal;&nbsp;&nbsp; // there isn't any user data, so return!&nbsp;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    // get the opcode from the buffer 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((status    = GetData (tk, temp)) != TK_Normal) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    return status; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; my_stage++;    
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp; nobreak;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; case 2:&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int length;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // get the integer denoting    the amount of user data 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((status    = GetData (tk, length)) != TK_Normal) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    return status; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; my_stage++;    
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp; break;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; case 3:&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // get the    temperature value array; this assumes we've 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // already    determined the length of the array and identified 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // it using    m_num_values 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((status    = GetData (tk, temperature_values, 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    m_num_values)) != TK_Normal) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    return status; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; my_stage++;    
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp; break;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; case 4:&nbsp; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; { 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; unsigned    char temp;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // get the TKE_End_User_Data    opcode which denotes the end of 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // user data    
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; if ((status    = GetData (tk, temp)) != TK_Normal) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    return status;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    if (temp != TKE_End_User_Data) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    return TK_Error;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    my_stage = -1; 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }&nbsp;&nbsp; break;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; default: 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; return TK_Error;    
+   &nbsp;&nbsp;&nbsp; }  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; return status; 
+   } 
+   &nbsp;  </pre>
+  <h5 align="left"><b>4.&nbsp; Implement the custom Reset Function</b> </h5>
+  <h5 align="left">The toolkit will call the opcode handler's Reset function after 
+    it has finished processing the opcode.&nbsp;&nbsp; This method should reinitialize 
+    any opcode handler variables, free up temporary data and then call the base 
+    class implementation. </h5>
+  <pre align="left">void My_TK_Shell::Reset() 
+   { 
+   &nbsp;&nbsp; my_stage = 0; 
+   &nbsp;&nbsp; TK_Shell::Reset(); 
+   } 
+   &nbsp; </pre>
+  <h5 align="left"><b>5. Implement the custom Clone function</b></h5>
+  <pre align="left">TK_Status My_TK_Shell::Clone (BStreamFileToolkit & tk, BBaseOpcodeHandler    **newhandler) const </pre>
+  <pre align="left">{ </pre>
+  <blockquote> 
+    <pre align="left">*newhandler = new My_TK_Shell(); </pre>
+    <div align="left"> 
+      <pre>if ( *newhandler != null )      </pre>
+      <blockquote> 
+        <pre> return TK_Normal; </pre>
+      </blockquote>
+    </div>
+    <pre align="left">else </pre>
+    <blockquote> 
+      <pre align="left">return tk.Error(); </pre>
+    </blockquote>
+  </blockquote>
+  <pre align="left">} </pre>
+  <p align="left">&nbsp; 
+  <h5 align="left"><b>6.&nbsp; Instruct the toolkit to use our custom shell opcode 
+    handler in place of the default handler by calling SetOpcodeHandler.&nbsp; 
+    We specify the type of opcode that we want to replace, and pass in a pointer 
+    to the new opcode handler object.</b> </h5>
+  <pre align="left">&nbsp;&nbsp;&nbsp; tk->SetOpcodeHandler (TKE_Shell, new My_TK_Shell);  </pre>
+  <h5 align="left">This will also cause the toolkit to delete it's default handler 
+    object for the TKE_Shell opcode. <b>Note:</b>&nbsp; As the HOOPS/Stream Reference 
+    Manual points out,&nbsp; all opcode handler objects stored in the BStreamFileToolkit 
+    object will be deleted when the BStreamFileTookit object is deleted.&nbsp; 
+    Therefore, we would not delete the My_TK_Shell object created in the above 
+    example.&nbsp; <br>
+    &nbsp; <br>
+    &nbsp; </h5>
+  <h3 align="left"><a NAME="storing additional user data"></a><b>4.2 Versioning 
+    and Storing Additional User Data</b> </h3>
+</div>
+<blockquote> 
+  <div align="left"> 
+    <h5 align="left"><b>4.2.1 Versioning</b> </h5>
+  </div>
+  <div align="left"> 
+    <h5 align="left">As discussed in the previous section, one way for you to 
+      check if the file contains custom HSF objects that you know/care about is 
+      to always use custom opcode handlers, which then check during the reading 
+      process to see if there is user data.&nbsp; However, there is one deliberate 
+      flaw to the example approach and its corresponding sample code.&nbsp;&nbsp; 
+      If the code sees a custom chunk of data following the default TK_Shell object 
+      (by noticing a TKE_Start_User_Data opcode), it simply goes ahead and reads 
+      the data, assuming that it was data written out by our custom shell handler.&nbsp; 
+      However, what if the file was written out by a custom handler that was not 
+      ours?!&nbsp; In this case, we wouldn't understand the information and don't 
+      care about it.&nbsp; However, the sample code does not properly check if 
+      the data is something that we know/care about.&nbsp; Because it is assuming 
+      a specific amount of user data, and this is an unsafe assumption, the code 
+      is flawed. </h5>
+  </div>
+  <div align="left"> 
+    <h5 align="left">One potential solution is to add another stage during the 
+      writing process:&nbsp; after writing out the TKE_Start_User_Data opcode 
+      and the # of bytes of custom data, we could also write out some special 
+      value which 'marks' the custom data as 'our' custom data.&nbsp; Then, during 
+      reading, we would check that special value to confirm if it was our data.&nbsp; 
+      However, this solution is a bit cumbersome since it means that our custom 
+      logic would always need to be executed, and to properly handle the case, 
+      we'd also have to either A) peek at the data up through the special value 
+      and then return from the function (so that the default toolkit will skip 
+      the custom data)&nbsp; or B) manually skip through the custom data ourselves 
+      by utilizing the '# of bytes' information.&nbsp; </h5>
+  </div>
+  <div align="left"> 
+    <h5 align="left">A better solution would be to store some type of additional 
+      versioning information in the beginning of the file which could be checked 
+      once, and then we would create and register our custom HSF object handlers 
+      only if the file was verified to be a custom version that we created with 
+      our custom toolkit.&nbsp; Recalling that the first opcode in an HSF file 
+      is always a TKE_Comment opcode (with contents that are specifically formatted 
+      to denote file version information), you could export another TKE_Comment 
+      opcode immediately after the first one with contents that contain additional 
+      version information.&nbsp; For example: <br>
+      &nbsp; </h5>
+  </div>
+  <div align="left"> 
+    <h5 align="left"><b>&lt;TKE_Comment> <i>standard version information; contents:&nbsp; 
+      HSF V6.30</i></b> <br>
+      <b>&lt;TKE_Comment>&nbsp;custom<i> version information; contents:&nbsp; 
+      SuperCAD V2.00</i></b> <br>
+      <b>&lt;data opcode></b> <br>
+      <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .</b> <br>
+      <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .&nbsp;</b> <br>
+      <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; .</b> <br>
+      <b>&lt;data opcode></b> <br>
+      <b>&lt;TKE_Termination>&nbsp;</b> <br>
+      &nbsp; <br>
+      &nbsp; </h5>
+  </div>
+  <div align="left"> 
+    <h5 align="left">The following section details how additional information 
+      could be added at the beginning of the file (prior to default HSF objects) 
+      as well as at the end of the file. <br>
+      &nbsp; </h5>
+  </div>
+  <div align="left">
+    <h5 align="left"><b>4.2.2 Storing Additional User Data</b> </h5>
+  </div>
+  <div align="left"> 
+    <h5 align="left">In addition to providing support for attaching/retreiving 
+      user data to/from default HSF objects (by enabling overloading of the Write 
+      and Read methods of opcode handlers),&nbsp; the HOOPS/Stream Toolkit also 
+      provides general support for exporting user data via the TK_XML, TK_User_Data 
+      and TK_URL opcode handlers, which export the TKE_XML, TKE_Start_User_Data, 
+      and TKE_URL opcodes, respectively.&nbsp;&nbsp; This gives developers the 
+      ability to store discrete chunks of user data that may (or may not) be associated 
+      with the HSF objects.&nbsp; The TK_XML opcode handler would be used to store/retreive 
+      XML data, and the TK_User_Data opcode handler would be used to store/retrieve 
+      custom binary data. The TK_URL opcode handler provides informational links 
+      corresponding to data (as opposed to TKE_External_Reference which provides 
+      additional content).. </h5>
+  </div>
+  <div align="left">
+    <h5 align="left">When writing out user data within the Write method of your 
+      custom TK_User_Data object, be sure to review the process of <a href="user_data.html">Formatting 
+      User Data</a>. </h5>
+  </div>
+  <div align="left">
+    <h5 align="left">To handle import/export of user data, you will need to register 
+      a custom opcode handler for the TKE_Start_User_Data opcode.&nbsp; This is 
+      because the toolkit's default handler (TK_User_Data)&nbsp; simply skips 
+      over the user data that is read in.&nbsp;&nbsp; (Remember that custom opcode 
+      handlers such as My_TK_Shell described in the previous section typically 
+      only handle user data that is <i>appended</i> to a default HSF object.&nbsp; 
+      If you are adding discrete chunks of user data to the file, then you must 
+      Write/Read that data with an entirely new TK_User_Data handler)&nbsp;&nbsp; 
+      The following steps are involved: <br>
+      &nbsp; </h5>
+  </div>
+  <div align="left">
+    <h5 align="left"><b>1.&nbsp; Define a new class derived from TK_User_Data 
+      (which we'll call TK_My_User_Data) that overloads the Write and Read methods 
+      to process the extra user data.</b> </h5>
+  </div>
+  <div align="left">
+    <pre align="left">#include "object.h"  </pre>
+  </div>
+  <div align="left">
+    <pre align="left">class TK_My_User_Data : public TK_User_Data 
+   { 
+   &nbsp;&nbsp;&nbsp; protected:  </pre>
+  </div>
+  <div align="left">
+    <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; int&nbsp;&nbsp;&nbsp;    my_stage;&nbsp;&nbsp; // denotes the current processing stage  </pre>
+  </div>
+  <div align="left">
+    <pre align="left">&nbsp;&nbsp;&nbsp; public:  </pre>
+  </div>
+  <div align="left">
+    <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; TK_My_User_Data(unsigned    char opcode) : TK_User_Data(opcode) {}  </pre>
+  </div>
+  <div align="left">
+    <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // Within Read(), we    may need to verify that the user data is 'our' 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // user data.&nbsp; As previously    noted, one approach is to write out 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // versioning information at the    beginning of the file. 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // If it is not our custom version    of the file, we would NOT 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // even register this custom user    data opcode handler; instead 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // we would allow the default TK_User_Data    handler to take care of 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the TKE_Start_User_Data opcode    by simply skipping over any user data  </pre>
+  </div>
+  <div align="left">
+    <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; virtual TK_Status&nbsp;&nbsp;    Read (BStreamFileToolkit &amp; tk) alter;  </pre>
+  </div>
+  <div align="left">
+    <pre align="left">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; virtual TK_Status&nbsp;&nbsp;    Write (BStreamFileToolkit &amp; tk) alter; 
+   }; 
+   &nbsp;  </pre>
+  </div>
+  <div align="left">
+    <h5 align="left"><b>2.&nbsp; Instruct the toolkit to use our custom user data 
+      opcode handler in place of the default handler by calling SetOpcodeHandler.&nbsp; 
+      We specify the type of opcode that we want to replace, and pass in a pointer 
+      to the new opcode handler object.</b> </h5>
+  </div>
+  <div align="left">
+    <pre align="left">&nbsp;&nbsp;&nbsp; tk->SetOpcodeHandler (TKE_Start_User_Data,&nbsp;    
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    new TK_My_User_Data(TKE_Start_User_Data)); </pre>
+  </div>
+  <div align="left">
+    <h5 align="left">This will also cause the toolkit to delete it's default handler 
+      object for the TKE_Start_User_Data opcode. <b>Note:</b>&nbsp; As the HOOPS/Stream 
+      Reference Manual points out,&nbsp; all opcode handler objects stored in 
+      the BStreamFileToolkit object will be deleted when the BStreamFileTookit 
+      object is deleted.&nbsp; Therefore, we would not delete the TK_My_User_Data 
+      object created in the above example.&nbsp; </h5>
+  </div>
+  <div align="left">
+    <h5 align="left">Custom handling of the TKE_XML opcode would be similar to 
+      the above, but you would instead register a custom opcode handler for the 
+      XML opcode that is derived from TK_XML.</h5>
+    <h5 align="left">&nbsp;</h5>
+  </div>
+</blockquote>
+<div align="left">
+  <h3 align="left"><a NAME="using tags"></a><b>4.3 Tagging HSF Objects to Associate 
+    User Data&nbsp;</b> </h3>
+  <h5 align="left">If user data needs to be associated with geometry, objects 
+    of interest can be 'tagged' by the HOOPS/Stream Toolkit when they are written 
+    to the file.&nbsp; </h5>
+  <div align="left"> 
+    <ul>
+      <li> 
+        <h5> After an object is tagged, a tagging function can be used to map 
+          the object's database ID to its tag and store it as a tag-table entry; 
+          this info would then typically be used to store a mapping between user-data 
+          and HSF objects.&nbsp;&nbsp;&nbsp;</h5>
+      </li>
+      <li> 
+        <h5> Then, during reading, a tag-table entry should be created for any 
+          tagged items, and then the new database Ids of tagged objects can be 
+          accessed to maintain the mapping between user-data and HSF entities.&nbsp;&nbsp;&nbsp;</h5>
+      </li>
+    </ul>
+  </div>
+  <h5 align="left"><br>
+    The following provides a detailed example of how to use tags: </h5>
+  <h5 align="left">Let's first assume that we have a 'polyline' primitive in our 
+    application data structures with an ID of 1000, and that our application-specific 
+    data has a data structure associated with the polyline.&nbsp;&nbsp; When we 
+    want to save out our custom data (which could be in either the HSF file or 
+    a separate file), let's assume that the data structure will have an ID of 
+    50. </h5>
+  <h5 align="left"><b>Writing:</b> </h5>
+  <h5 align="left"><b>1.</b>&nbsp; When we output the polyline, we must call BStreamFileToolkit::SetKey(1000) 
+    before the opcode handler's Write method is called. This tells the toolkit 
+    what the 'current' ID is.&nbsp; We then 'tag'&nbsp; the polyline by calling 
+    the 'Tag' method of the BBaseOpcodeHandler class.&nbsp; (This can be done 
+    explicitly by calling 'Tag' within a custom handler, or can be done by asking 
+    the toolkit to automatically Tag all HSF objects, as we'll discuss later.).&nbsp;&nbsp; 
+    Again, this adds an entry to the HSF toolkit's internal tag-table; the entry 
+    contains a pair consisting of the ID and a Tag value. </h5>
+  <h5 align="left"><b>2.</b>&nbsp; Anytime after the polyline has been tagged, 
+    we can call the BStreamFileTookit::KeyToIndex method, which, given the ID 
+    of the polyline, returns to us the file Index of the polyline.&nbsp; </h5>
+  <h5 align="left"><b>3.</b>&nbsp; Since we know that our custom data associated 
+    with the polyline had an ID of 50, we can now store our own mapping between 
+    the custom data and the polyline's file Tag returned in Step 2.&nbsp; Specifically, 
+    this means that we store the following pair of data somewhere: </h5>
+  <div align="left"> 
+    <blockquote> 
+      <blockquote> 
+        <h5>[50, &lt;the value returned from KeyToIndex>]</h5>
+      </blockquote>
+    </blockquote>
+    <h5>The 'somewhere' could of course be in the HSF file.&nbsp; This would probably 
+      be handled by a custom TK_User_Data object.&nbsp;&nbsp;&nbsp; However, the 
+      pairs of mapping data could be external to the HSF file as well; perhaps 
+      it is desirable to store it in another user-specific file.&nbsp; The main 
+      point is that after reading the HSF objects back in, we will want to retreive 
+      the mapping data in order to rebuild a runtime mapping between our custom 
+      data and new objects in our graphical database. <br>
+      &nbsp; </h5>
+  </div>
+  <h5 align="left"><b>Reading:</b> </h5>
+  <h5 align="left"><b>1.</b>&nbsp; During the reading process, we first read in 
+    the polyline object, and map them it custom application data structures in 
+    the overloaded Execute method of our custom polyline opcode handler. (Let's 
+    assume that the example polyline discussed above has a new ID of 500 in our 
+    app data structures.)&nbsp; We must also call BStreamFileToolkit::SetKey(500) 
+    in the Execute method so that any following Tag opcode will result in a properly 
+    generated tag-table entry.&nbsp; After the polyline is read in, the toolkit 
+    notices that it was tagged, and adds a new entry to the internal tag-table 
+    which contains a pair consisting of the new polyline ID (which was set on 
+    the toolkit via the call to SetKey) and the Tag value.&nbsp; </h5>
+  <h5 align="left">Note:&nbsp; The Execute method should call BStreamFileToolkit::SetKey(ID)&nbsp; 
+    for any objects that might be tagged, which include segments and geometry.&nbsp; 
+  </h5>
+  <h5 align="left"><b>2.</b> We retreive the mapping data that was output in Step 
+    3 of the Writing process.&nbsp; </h5>
+  <h5 align="left"><b>3.</b>&nbsp; We call the BStreamFileTookit::IndexToKey method, 
+    and pass it the index value that was associated with our custom data value 
+    of 50.&nbsp;&nbsp;&nbsp; This returns to us the new ID of the polyline stored 
+    in our application data structures, and we can now associate the custom data 
+    (id =50) along with the polyline (id = 500) that is stored in our application 
+    data structures.&nbsp; </h5>
+  <h5 align="left"><b>Automatic Tag Generation</b> </h5>
+  <h5 align="left">Tags can be automatically generated during the writing process 
+    by setting the TK_Force_Tags write option: </h5>
+  <pre align="left">&nbsp;&nbsp;&nbsp; int&nbsp;&nbsp; flags = TK_Force_Tags;&nbsp;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; BStreamFileToolkit * tk = new BStreamFileToolkit;  </pre>
+  <pre align="left">&nbsp;&nbsp;&nbsp; BStreamFileToolkit->SetWriteFlags(flags); 
+   &nbsp;  </pre>
+  <h5 align="left">All HSF objects which can have tags (such as geometry,segments 
+    and includes) will be tagged during writing, and an entry will be added to 
+    the HSF toolkit's internal tag-table for each object, which is a pair consisting 
+    of the database ID and a Tag value.&nbsp;&nbsp;&nbsp; Note that during export 
+    of the opcode, we must call BStreamFileToolkit::set_last_key before the Write 
+    method is called. <br>
+    &nbsp; <br>
+    &nbsp; </h5>
+  <h5 align="left"><b>Manual Tag Generation</b> </h5>
+  <h5 align="left">To manually instruct the toolkit to Tag specific objects in 
+    the HSF file (and add an entry to the HSF toolkit's internal tag-table which 
+    is a pair consisting of the database ID and a Tag value), the default opcode 
+    handler for the object-type of interest must be overloaded so that we can 
+    Tag the object within an overloaded Write function.&nbsp; For example, if 
+    we only wanted to tag HSF polyline objects, we would instruct the toolkit 
+    to use our custom polyline opcode handler: </h5>
+  <pre align="left">&nbsp;&nbsp;&nbsp; tk->SetOpcodeHandler (TKE_Polyline, new My_TK_Polyline    (TKE_Polyline)); 
+   &nbsp; 
+   &nbsp;  </pre>
+  <pre align="left">TK_Status My_TK_Polyline::Write(BStreamFileToolkit &amp;tk)&nbsp;    
+   { 
+   &nbsp;&nbsp; TK_Status status;  </pre>
+  <pre align="left">&nbsp;&nbsp; // write out the default object 
+   &nbsp;&nbsp; if (m_stage!=-1) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; status = TK_Polyline::Write(tk);  </pre>
+  <pre align="left">&nbsp;&nbsp; // we are in complete with writing the default object,    so we now 
+   &nbsp;&nbsp; // tag it 
+   &nbsp;&nbsp; if (m_stage==-1) 
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; status = Tag( tk, -1 );  </pre>
+  <pre align="left">&nbsp;&nbsp; return (status); 
+   }  </pre>
+  <h5 align="left">As discussed previously, we must call BStreamFileToolkit::SetKey 
+    before the Tag function is called. <br>
+    &nbsp; </h5>
+  <h5 align="left"><b>Note</b>: the toolkit automatically tags shell objects (TKE_Shell) 
+    during export. <br>
+    &nbsp; </h5>
+  <h2 align="left"><a NAME="maximixing performance"></a><b>5. Maximizing Performance</b> 
+  </h2>
+  <h3 align="left"><a NAME="Rendering performance"></a><b>5.1 Rendering</b> </h3>
+  <blockquote> 
+    <h4 align="left"><a NAME="performance - scene-graph organization"></a><b>5.1.1 
+      Scene-graph organization</b> </h4>
+    <h5 align="left">An HSF file is essentially an archive of a HOOPS/3dGS scene-graph.&nbsp; 
+      Even if HOOPS/3dGS is not used as the graphics system for rendering,&nbsp; 
+      the organization of the scene-graph inside the HSF file can affect rendering 
+      performance.&nbsp;&nbsp; Optimal scene-graph structure is covered in the 
+      <b><u>3D With HOOPS</u></b> book, and is also discussed in the articles 
+      at <a href="http://developer.hoops3d.com">developer.hoops3d.com</a>&nbsp;&nbsp; 
+      Critical areas include keeping segments to a minimum, organizing the scene-graph 
+      based on attributes rather than geometry, using 'shell' primitives whenever 
+      possible to represent tessellated data, and making sure that the shells 
+      are as large as possible.&nbsp; </h5>
+    <h5 align="left">Keep in mind that a scene-graph is meant to serve as an optimal 
+      organization of the <i>graphical </i>information, rather than higher-level 
+      application information such as 'assemblies', 'parts', etc... Structuring 
+      the scene-graph based on the organization of higher-level application data-structures, 
+      while perhaps convenient, can severely compromise rendering performance 
+      and memory usage inside the application which is doing the reading.&nbsp; 
+      However, the HOOPS/Stream Toolkit's range of HSF opcode objects and customization 
+      facilities makes it easy to associate custom (non scene-graph) data with 
+      the scene-graph objects and store them in the HSF file, or store the external 
+      to the HSF file (perhaps as XML data). <br>
+      &nbsp; </h5>
+    <h4 align="left"><a NAME="performance - shell organization"></a><b>5.1.2 Shell 
+      organization</b> </h4>
+    <h5 align="left">The TK_Shell opcode-handler provides support for defining 
+      a shell via tristrips.&nbsp;&nbsp; Drawing shells using tristrips maximizes 
+      rendering performance.&nbsp; Therefore, shell objects should be exported 
+      via tristrips if they are available.&nbsp; This is done by formatting the 
+      facelist pased into TK_Shell::SetFaces to contain tristrips, and setting 
+      the TKSH_TRISTRIPS bit in the shell's suboption variable using TK_Shell::SetSubop.&nbsp; 
+      For example: </h5>
+    <pre align="left"> TK_Shell::SetSubop( TKSH_TRISTRIPS | GetSubop() ); 
+   &nbsp; 
+   &nbsp;  </pre>
+    <h4 align="left"><a NAME="performance - polygon handedness"></a><b>5.1.3 Polygon 
+      handedness</b> </h4>
+    <h5 align="left">Polygon handedness is a basic vector graphics concept.&nbsp; 
+      The specifics are covered in the <b><u><a href="http://developer.hoops3d.com/3dwithhoops/HoopsProgrammingGuide.pdf">3D 
+      With HOOPS</a></u></b> book, but in general, the existence of a polygon 
+      handedness setting for an object enables an application to render that object 
+      using backplane culling.&nbsp; This typically&nbsp; results in a signficant 
+      increase in rendering performance. </h5>
+    <h5 align="left">If a TK_Shell object is being exported to an HSF and can 
+      (or should) have a handedness defined for its faces, it is critical to make 
+      sure that the handedness attribute is exported to the HSF file.&nbsp; This 
+      is achieved by using the TK_Heuristics object to export the TKE_Heuristics 
+      opcode. </h5>
+    <h5 align="left">This is important because: </h5>
+    <h5 align="left">1.&nbsp; The reading application may not be able to determine 
+      what a proper handedness is for the shells </h5>
+    <h5 align="left">2.&nbsp; Even if the reading application can determine a 
+      proper handedness setting, the scene may look incorrect if the setting is 
+      made in the application and wasn't made at the time of file export (and 
+      hence stored with the shells).&nbsp; This is because the HOOPS/Stream Toolkit 
+      will explicitly export compressed normals during the writing phase, and 
+      it is possible that these normals won't be consistent with the handedness 
+      setting made in the reading application.&nbsp; </h5>
+    <h5 align="left">Note:&nbsp; if the handedess attribute is going to be exported 
+      for a shell or group of shells, it is important to make sure that all the 
+      faces in the shell are all defined with a consistent point ordering.&nbsp; 
+      Otherwise some faces will be 'backwards', and the object will have holes 
+      in it if a viewing application renders the object by relying on the existence 
+      of a handedess setting to perform backplane culling. <br>
+    </h5>
+  </blockquote>
+  <hr align="left" width="100%">
+  <tr> 
+    <td></td>
+  </tr>
+  <div align="left"> 
+    <script language=JavaScript>
+<!--
+
+	function doClick (name) {
+		top.frames["logo"].loadByName(name);
+	}
+
+//-->
+</script>
+  </div>
+</div>
+</body>
+</html>

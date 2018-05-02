@@ -1,0 +1,12 @@
+base referer
+rect $class_xaml_drawable_attributes_1_1_path_attribute_provider.html 35,6 336,32
+rect $class_xaml_drawable_attributes_1_1_stroke_end_line_cap_1_1_provider.html 14,56 358,83
+rect $class_xaml_drawable_attributes_1_1_stroke_start_line_cap_1_1_provider.html 11,107 360,134
+rect $class_xaml_drawable_attributes_1_1_stroke_dash_cap_1_1_provider.html 23,158 348,184
+rect $class_xaml_drawable_attributes_1_1_stroke_line_join_1_1_provider.html 26,208 346,235
+rect $class_xaml_drawable_attributes_1_1_stroke_miter_limit_1_1_provider.html 20,259 351,286
+rect $class_xaml_drawable_attributes_1_1_stroke_end_line_cap_1_1_consumer.html 8,310 363,336
+rect $class_xaml_drawable_attributes_1_1_stroke_start_line_cap_1_1_consumer.html 6,360 366,387
+rect $class_xaml_drawable_attributes_1_1_stroke_dash_cap_1_1_consumer.html 18,411 354,438
+rect $class_xaml_drawable_attributes_1_1_stroke_line_join_1_1_consumer.html 20,462 351,488
+rect $class_w_t___x_a_m_l___file.html 127,512 244,539

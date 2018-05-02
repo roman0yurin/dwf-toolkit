@@ -1,0 +1,9 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_d_w_f_content_manager.html 1175,132 1404,159
+rect $class_d_w_f_toolkit_1_1_d_w_f_content_reader.html 412,147 634,173
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_x_m_l_buildable.html 7,175 210,201
+rect $class_d_w_f_toolkit_1_1_d_w_f_content_resource_reader.html 384,288 662,315
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_string.html 31,352 186,379
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_ownable.html 436,5 610,32
+rect $class_d_w_f_package_reader.html 448,56 598,83
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_string_key_skip_list.html 394,559 652,585

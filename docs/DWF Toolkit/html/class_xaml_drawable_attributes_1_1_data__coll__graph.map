@@ -1,0 +1,5 @@
+base referer
+rect $class_xaml_attribute.html 12,96 167,123
+rect $class_xaml_attribute.html 5,6 149,32
+rect $class_xaml_path_geometry.html 213,96 355,123
+rect $class_xaml_path_geometry_1_1_xaml_path_figure.html 173,6 419,32

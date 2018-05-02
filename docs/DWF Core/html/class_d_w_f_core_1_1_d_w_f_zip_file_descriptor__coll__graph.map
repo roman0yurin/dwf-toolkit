@@ -1,0 +1,11 @@
+base referer
+rect $class_d_w_f_core_1_1_d_w_f_core_memory.html 149,5 347,32
+rect $class_d_w_f_core_1_1_d_w_f_file.html 87,184 231,211
+rect $class_d_w_f_core_1_1_d_w_f_string.html 56,83 211,109
+rect $class_d_w_f_core_1_1_d_w_f_zip_file_index.html 333,133 528,160
+rect $class_d_w_f_core_1_1_d_w_f_stream_output_buffer_descriptor.html 107,365 408,392
+rect $class_d_w_f_core_1_1_d_w_f_file_descriptor.html 57,275 260,301
+rect $class_d_w_f_core_1_1_d_w_f_ownable.html 517,365 691,392
+rect $struct_d_w_f_core_1_1_i_d_w_f_ownable.html 744,275 920,301
+rect $class_d_w_f_core_1_1_d_w_f_owner.html 560,275 720,301
+rect $class_d_w_f_core_1_1_d_w_f_input_stream.html 715,365 909,392

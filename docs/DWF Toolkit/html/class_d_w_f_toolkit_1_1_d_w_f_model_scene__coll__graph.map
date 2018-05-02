@@ -1,0 +1,6 @@
+base referer
+rect $class_d_w_f_attribute_handler_builder.html 5,83 197,109
+rect $class_d_w_f_geometry_handler_builder.html 221,83 421,109
+rect $class_d_w_f_feature_handler_builder.html 445,83 632,109
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_string.html 656,83 811,109
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_core_memory.html 635,5 832,32

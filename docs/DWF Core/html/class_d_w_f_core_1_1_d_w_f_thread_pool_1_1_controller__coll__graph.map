@@ -1,0 +1,9 @@
+base referer
+rect $class_d_w_f_core_1_1_d_w_f_core_memory.html 350,6 547,32
+rect $class_d_w_f_core_1_1_d_w_f_thread.html 232,174 395,200
+rect $class_d_w_f_core_1_1_d_w_f_signal.html 336,83 494,110
+rect $class_d_w_f_core_1_1_d_w_f_thread_pool.html 406,264 595,291
+rect $class_d_w_f_core_1_1_d_w_f_semaphore.html 568,83 758,110
+rect $class_d_w_f_core_1_1_d_w_f_thread_mutex.html 782,83 982,110
+rect $class_d_w_f_core_1_1_d_w_f_thread_worker.html 107,83 312,110
+rect $class_d_w_f_core_1_1_d_w_f_synchronization.html 603,6 819,32

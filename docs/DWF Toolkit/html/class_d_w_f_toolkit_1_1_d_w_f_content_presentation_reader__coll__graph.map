@@ -1,0 +1,9 @@
+base referer
+rect $class_d_w_f_package_reader.html 451,8 600,35
+rect $class_d_w_f_toolkit_1_1_d_w_f_content_presentation_node.html 384,123 667,149
+rect $class_d_w_f_content_presentation_node_container.html 7,113 271,140
+rect $class_d_w_f_toolkit_1_1_d_w_f_content_presentation_view.html 385,173 665,200
+rect $class_d_w_f_x_m_l_element_builder.html 440,225 611,252
+rect $class_d_w_f_toolkit_1_1_d_w_f_content_presentation.html 400,276 651,303
+rect $class_d_w_f_toolkit_1_1_d_w_f_property_reference.html 404,327 647,353
+rect $class_d_w_f_toolkit_1_1_d_w_f_model_scene_change_handler.html 376,377 675,404

@@ -1,0 +1,5 @@
+base referer
+rect $class_w_t___object.html 6,125 96,152
+rect $class_w_t___item___list.html 120,125 227,152
+rect $class_w_t___item.html 135,16 212,43
+rect $class_w_t___opcode.html 251,125 350,152

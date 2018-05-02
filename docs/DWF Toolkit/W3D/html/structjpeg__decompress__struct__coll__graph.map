@@ -1,0 +1,16 @@
+base referer
+rect $structjpeg__color__quantizer.html 244,8 391,35
+rect $struct_j_q_u_a_n_t___t_b_l.html 5,85 115,112
+rect $structjpeg__component__info.html 241,123 393,149
+rect $struct_j_h_u_f_f___t_b_l.html 268,173 367,200
+rect $structjpeg__inverse__dct.html 255,224 380,251
+rect $structjpeg__source__mgr.html 255,275 380,301
+rect $structjpeg__d__coef__controller.html 239,325 396,352
+rect $structjpeg__color__deconverter.html 236,376 399,403
+rect $structjpeg__entropy__decoder.html 240,427 395,453
+rect $structjpeg__marker__reader.html 245,477 389,504
+rect $structjpeg__d__main__controller.html 236,528 399,555
+rect $structjpeg__upsampler.html 259,579 376,605
+rect $structjpeg__input__controller.html 244,629 391,656
+rect $structjpeg__d__post__controller.html 239,680 396,707
+rect $structjpeg__decomp__master.html 241,731 393,757

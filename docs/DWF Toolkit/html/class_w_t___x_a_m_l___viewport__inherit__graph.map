@@ -1,0 +1,4 @@
+base referer
+rect $class_xaml_drawable_attributes_1_1_canvas_attribute_provider.html 5,5 325,32
+rect $class_xaml_drawable_attributes_1_1_clip_1_1_provider.html 349,5 605,32
+rect $class_xaml_drawable_attributes_1_1_clip_1_1_consumer.html 629,5 896,32

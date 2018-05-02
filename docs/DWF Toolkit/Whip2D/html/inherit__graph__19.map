@@ -1,0 +1,8 @@
+base referer
+rect $class_w_t___opcode.html 5,107 104,133
+rect $class_w_t___optioncode.html 152,107 272,133
+rect $struct_w_t___fill___pattern_1_1_w_t___fill___pattern___option___code.html 321,5 631,32
+rect $class_w_t___font___optioncode.html 399,56 553,83
+rect $class_w_t___line___style_1_1_w_t___line___style___option___code.html 327,107 625,133
+rect $class_w_t___text___optioncode.html 400,157 552,184
+rect $class_w_t___viewport___optioncode.html 387,208 565,235

@@ -1,0 +1,5 @@
+base referer
+rect $class_w_t___filled___ellipse.html 6,229 136,256
+rect $class_w_t___outline___ellipse.html 160,229 302,256
+rect $class_w_t___drawable.html 98,80 204,107
+rect $class_w_t___object.html 106,5 196,32

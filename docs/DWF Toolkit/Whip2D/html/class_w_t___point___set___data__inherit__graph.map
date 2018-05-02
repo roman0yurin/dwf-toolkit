@@ -1,0 +1,11 @@
+base referer
+rect $class_w_t___gouraud___point___set___data.html 141,80 344,107
+rect $class_w_t___point___set.html 493,80 603,107
+rect $class_w_t___gouraud___point___set.html 96,155 264,181
+rect $class_w_t___gouraud___polyline.html 5,229 163,256
+rect $class_w_t___gouraud___polytriangle.html 187,229 368,256
+rect $class_w_t___macro___draw.html 288,155 413,181
+rect $class_w_t___polygon.html 437,155 536,181
+rect $class_w_t___polyline.html 560,155 659,181
+rect $class_w_t___polymarker.html 683,155 803,181
+rect $class_w_t___polytriangle.html 827,155 947,181

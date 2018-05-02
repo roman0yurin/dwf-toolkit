@@ -1,0 +1,5 @@
+base referer
+rect $class_xaml_attribute.html 5,96 171,123
+rect $class_xaml_attribute.html 16,6 160,32
+rect $class_xaml_drawable_attributes_1_1_brush_ref.html 195,96 424,123
+rect $class_xaml_brush_1_1_brush.html 244,6 375,32

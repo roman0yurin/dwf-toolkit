@@ -1,0 +1,4 @@
+base referer
+rect $class_xaml_canvas.html 5,80 104,107
+rect $class_xaml_canvas_1_1_attribute_parser.html 128,80 323,107
+rect $class_xaml_drawable_attributes_1_1_resources_provider.html 347,80 635,107

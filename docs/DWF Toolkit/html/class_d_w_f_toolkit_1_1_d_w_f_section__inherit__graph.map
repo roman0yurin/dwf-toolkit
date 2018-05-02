@@ -1,0 +1,11 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_d_w_f_data_section.html 539,5 742,32
+rect $class_d_w_f_toolkit_1_1_d_w_f_e_model_section.html 530,56 751,83
+rect $class_d_w_f_toolkit_1_1_d_w_f_e_plot_section.html 536,107 744,133
+rect $class_d_w_f_toolkit_1_1_d_w_f_global_section.html 534,157 747,184
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_section.html 524,208 756,235
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_x_m_l_buildable.html 27,5 230,32
+rect $class_d_w_f_toolkit_1_1_d_w_f_x_m_l_serializable.html 15,56 242,83
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_ownable.html 42,107 215,133
+rect $class_d_w_f_toolkit_1_1_d_w_f_resource_container.html 6,157 251,184
+rect $class_d_w_f_toolkit_1_1_d_w_f_property_container.html 8,208 248,235

@@ -1,0 +1,17 @@
+base referer
+rect $class_w_t___attribute.html 5,270 107,296
+rect $class_w_t___object.html 17,112 108,139
+rect $class_w_t___option.html 93,219 184,246
+rect $class_w_t___units.html 208,219 288,246
+rect $class_w_t___drawable.html 423,219 529,246
+rect $class_w_t___viewport___option___viewport___units.html 103,320 348,347
+rect $class_w_t___string.html 244,112 329,139
+rect $class_w_t___matrix.html 132,112 220,139
+rect $class_w_t___opcode.html 781,112 880,139
+rect $class_w_t___optioncode.html 795,219 915,246
+rect $class_w_t___viewport___optioncode.html 781,320 960,347
+rect $class_w_t___contour___set.html 423,320 548,347
+rect $class_w_t___logical___box.html 408,112 531,139
+rect $class_w_t___logical___point.html 503,6 633,32
+rect $class_w_t___point___set___data.html 605,112 749,139
+rect $class_w_t___point___set.html 596,270 705,296

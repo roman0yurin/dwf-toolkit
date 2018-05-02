@@ -1,0 +1,9 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_1_1_reference.html 7,56 263,83
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_request_1_1_reference.html 312,56 619,83
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_request_1_1_concrete_reference.html 668,31 1028,57
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_request_1_1_forward_reference.html 671,81 1025,108
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_request_1_1_content_reference.html 1108,5 1460,32
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_request_1_1_manifest_reference.html 1105,56 1463,83
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_request_1_1_section_descriptor_reference.html 1079,107 1489,133
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_request_1_1_signature_request_reference.html 1077,157 1491,184

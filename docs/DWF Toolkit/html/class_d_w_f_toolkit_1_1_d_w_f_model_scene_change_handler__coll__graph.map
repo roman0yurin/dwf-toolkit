@@ -1,0 +1,7 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_d_w_f_x_m_l_serializable.html 112,251 339,277
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_x_m_l_serializable_base.html 5,173 253,200
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_string.html 69,83 224,109
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_core_memory.html 181,5 379,32
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_ordered_vector.html 277,173 560,200
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_vector.html 317,83 552,109

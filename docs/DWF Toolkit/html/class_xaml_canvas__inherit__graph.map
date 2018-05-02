@@ -1,0 +1,10 @@
+base referer
+rect $class_xaml_drawable.html 120,6 230,32
+rect $class_xaml_drawable_attributes_1_1_canvas_attribute_consumer.html 10,56 340,83
+rect $class_xaml_drawable_attributes_1_1_name_1_1_provider.html 42,107 308,134
+rect $class_xaml_drawable_attributes_1_1_render_transform_1_1_provider.html 7,158 343,184
+rect $class_xaml_drawable_attributes_1_1_clip_1_1_provider.html 47,208 303,235
+rect $class_xaml_drawable_attributes_1_1_opacity_1_1_provider.html 36,259 314,286
+rect $class_xaml_drawable_attributes_1_1_opacity_mask_1_1_provider.html 20,310 330,336
+rect $class_xaml_drawable_attributes_1_1_navigate_uri_1_1_provider.html 23,360 327,387
+rect $class_xaml_drawable_attributes_1_1_resources_1_1_provider.html 27,411 323,438

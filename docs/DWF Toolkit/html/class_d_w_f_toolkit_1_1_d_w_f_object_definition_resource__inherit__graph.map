@@ -1,0 +1,7 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_d_w_f_resource.html 252,155 439,181
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_x_m_l_buildable.html 5,80 208,107
+rect $class_d_w_f_toolkit_1_1_d_w_f_x_m_l_serializable.html 232,80 459,107
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_x_m_l_serializable_base.html 221,5 469,32
+rect $class_d_w_f_toolkit_1_1_d_w_f_property_container.html 483,80 723,107
+rect $class_d_w_f_defined_object_container.html 463,155 660,181

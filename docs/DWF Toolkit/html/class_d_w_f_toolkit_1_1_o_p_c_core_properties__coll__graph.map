@@ -1,0 +1,9 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_o_p_c_x_m_l_part.html 431,267 609,293
+rect $class_d_w_f_toolkit_1_1_o_p_c_part.html 367,189 519,216
+rect $class_d_w_f_toolkit_1_1_o_p_c_relationship_container_interface.html 5,5 317,32
+rect $class_d_w_f_toolkit_1_1_o_p_c_relationship_container.html 313,83 572,109
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_string.html 596,83 751,109
+rect $class_d_w_f_toolkit_1_1_o_p_c_core_properties_reader.html 543,189 804,216
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_input_stream.html 95,83 289,109
+rect $class_o_p_c_x_m_l_element_builder.html 775,83 945,109

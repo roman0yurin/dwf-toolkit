@@ -1,0 +1,5 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_d_w_f_publishable.html 5,147 205,173
+rect $class_d_w_f_toolkit_1_1_d_w_f_resource_container.html 367,147 612,173
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_string.html 245,5 400,32
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_ordered_vector.html 636,147 919,173

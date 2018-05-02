@@ -1,0 +1,15 @@
+base referer
+rect $class_w_t___x_a_m_l___xaml___parser.html 1060,300 1231,327
+rect $class_w_t___x_a_m_l___w2_x___parser.html 1060,404 1231,431
+rect $class_xaml_dictionary.html 1088,476 1203,503
+rect $class_xaml_drawable_attributes_1_1_name_1_1_provider.html 7,121 273,148
+rect $class_xaml_path.html 415,151 495,177
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_output_stream.html 352,221 557,248
+rect $class_w_t___x_a_m_l___rendition.html 379,283 531,309
+rect $class_w_t___opc_resource_serializer.html 360,333 549,360
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_string.html 377,388 532,415
+rect $class_w_t___x_a_m_l___file_1_1_w_t___x_a_m_l___object_list.html 327,439 583,465
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_u_u_i_d.html 377,489 532,516
+rect $class_w_t___opc_resource_materializer.html 353,540 556,567
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_input_stream.html 357,613 552,640
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_x_m_l_serializer.html 352,692 557,719

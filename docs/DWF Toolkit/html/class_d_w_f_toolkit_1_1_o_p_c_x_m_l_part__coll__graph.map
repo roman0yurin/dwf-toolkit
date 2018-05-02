@@ -1,0 +1,9 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_o_p_c_part.html 524,382 676,408
+rect $class_d_w_f_toolkit_1_1_o_p_c_relationship_container_interface.html 6,184 318,211
+rect $class_d_w_f_toolkit_1_1_o_p_c_relationship_container.html 354,291 612,318
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_ordered_vector.html 342,184 624,211
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_vector.html 390,83 624,110
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_core_memory.html 408,6 606,32
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_string.html 584,134 739,160
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_input_stream.html 699,291 894,318

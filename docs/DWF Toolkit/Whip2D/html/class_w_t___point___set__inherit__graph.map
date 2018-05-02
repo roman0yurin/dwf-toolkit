@@ -1,0 +1,7 @@
+base referer
+rect $class_w_t___macro___draw.html 5,155 131,182
+rect $class_w_t___polygon.html 155,155 253,182
+rect $class_w_t___polyline.html 277,155 376,182
+rect $class_w_t___polymarker.html 400,155 520,182
+rect $class_w_t___polytriangle.html 544,155 664,182
+rect $class_w_t___point___set___data.html 255,6 399,32

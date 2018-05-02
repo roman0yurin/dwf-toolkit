@@ -1,0 +1,5 @@
+base referer
+rect $class_d_w_f_segment_handler_builder.html 6,83 200,109
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_string.html 224,83 379,109
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_core_memory.html 203,5 400,32
+rect $class_d_w_f_attribute_handler_builder.html 403,83 595,109

@@ -1,0 +1,14 @@
+base referer
+rect $class_w_t___attribute.html 60,19 162,45
+rect $class_w_t___font___option___height.html 26,69 196,96
+rect $class_w_t___font___option___style.html 30,120 192,147
+rect $class_w_t___font___option___rotation.html 20,171 202,197
+rect $class_w_t___font___option___oblique.html 22,221 200,248
+rect $class_w_t___font___option___family.html 24,272 198,299
+rect $class_w_t___font___option___spacing.html 20,323 202,349
+rect $class_w_t___font___option___charset.html 22,373 200,400
+rect $class_w_t___font___optioncode.html 34,424 188,451
+rect $class_w_t___font___option___width___scale.html 7,475 215,501
+rect $class_w_t___font___option___font___name.html 10,525 212,552
+rect $class_w_t___font___option___flags.html 28,576 194,603
+rect $class_w_t___font___option___pitch.html 30,627 192,653

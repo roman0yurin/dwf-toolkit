@@ -1,0 +1,6 @@
+base referer
+rect $class_d_w_f_core_1_1_d_w_f_core_memory.html 5,6 203,32
+rect $class_d_w_f_core_1_1_d_w_f_file.html 120,174 264,200
+rect $class_d_w_f_core_1_1_d_w_f_string.html 141,83 296,110
+rect $class_d_w_f_core_1_1_d_w_f_input_stream.html 317,264 512,291
+rect $class_d_w_f_core_1_1_d_w_f_file_descriptor.html 91,264 293,291

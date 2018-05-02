@@ -1,0 +1,5 @@
+base referer
+rect $class_xaml_path.html 144,80 224,107
+rect $class_xaml_path_1_1_attribute_parser.html 248,80 427,107
+rect $class_xaml_image_rendition_path.html 5,155 181,182
+rect $class_xaml_rendition_path.html 205,155 344,182

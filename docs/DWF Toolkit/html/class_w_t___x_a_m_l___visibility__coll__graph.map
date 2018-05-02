@@ -1,0 +1,5 @@
+base referer
+rect $class_xaml_drawable_attributes_1_1_path_attribute_provider.html 13,5 315,32
+rect $class_xaml_drawable_attributes_1_1_glyphs_attribute_provider.html 5,56 323,83
+rect $class_xaml_drawable_attributes_1_1_opacity_1_1_provider.html 25,107 303,133
+rect $class_xaml_drawable_attributes_1_1_opacity_1_1_consumer.html 20,157 308,184

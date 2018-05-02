@@ -1,0 +1,8 @@
+base referer
+rect $class_d_w_f_publisher.html 920,6 1029,32
+rect $class_d_w_f_toolkit_1_1_d_w_f_property_visitor.html 865,96 1084,123
+rect $class_d_w_f_toolkit_1_1_d_w_f_section.html 887,310 1063,336
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_string.html 7,296 161,323
+rect $class_d_w_f_toolkit_1_1_d_w_f_resource.html 337,376 524,403
+rect $class_d_w_f_toolkit_1_1_d_w_f_resource_visitor.html 863,478 1087,504
+rect $class_d_w_f_toolkit_1_1_d_w_f_published_content_element_listener.html 808,528 1141,555

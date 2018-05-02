@@ -1,0 +1,9 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_request_1_1_reference.html 263,355 569,381
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_1_1_reference.html 116,264 372,291
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature.html 45,355 232,381
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_string.html 135,83 289,109
+rect $class_d_w_f_toolkit_1_1_d_w_f_signature_1_1_digest_value.html 67,173 333,200
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_core_memory.html 116,5 313,32
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_digest_output_stream.html 320,83 563,109
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_output_stream.html 339,5 544,32

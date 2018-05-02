@@ -1,0 +1,7 @@
+base referer
+rect $class_xaml_brush_1_1_image.html 80,80 213,107
+rect $class_xaml_brush_1_1_visual.html 400,80 531,107
+rect $class_xaml_brush_1_1_xaml_image_brush.html 5,155 203,182
+rect $class_xaml_brush_1_1_xaml_fixed_pattern_brush.html 227,155 464,182
+rect $class_xaml_brush_1_1_xaml_hatch_brush.html 488,155 683,182
+rect $class_xaml_brush_1_1_xaml_user_pattern_brush.html 707,155 939,182

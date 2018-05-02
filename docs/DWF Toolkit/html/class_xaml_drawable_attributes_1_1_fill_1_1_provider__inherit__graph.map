@@ -1,0 +1,12 @@
+base referer
+rect $class_w_t___x_a_m_l___color.html 363,5 488,32
+rect $class_w_t___x_a_m_l___contrast___color.html 333,56 517,83
+rect $class_w_t___x_a_m_l___fill.html 369,107 481,133
+rect $class_w_t___x_a_m_l___fill___pattern.html 344,157 507,184
+rect $class_w_t___x_a_m_l___user___fill___pattern.html 327,208 524,235
+rect $class_w_t___x_a_m_l___user___hatch___pattern.html 317,259 533,285
+rect $class_xaml_drawable_attributes_1_1_fill_provider.html 304,309 547,336
+rect $class_xaml_glyphs.html 377,360 473,387
+rect $class_xaml_glyphs_1_1_attribute_parser.html 329,411 521,437
+rect $class_xaml_path.html 385,461 465,488
+rect $class_xaml_path_1_1_attribute_parser.html 336,512 515,539

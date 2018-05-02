@@ -1,0 +1,10 @@
+base referer
+rect $class_d_w_f_package_reader.html 108,355 258,381
+rect $class_d_w_f_x_m_l_element_builder.html 282,355 452,381
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_string.html 668,83 823,109
+rect $class_d_w_f_toolkit_1_1_d_w_f_defined_object.html 476,355 692,381
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_x_m_l_serializable_base.html 622,173 870,200
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_core_memory.html 647,5 844,32
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_x_m_l_buildable.html 344,264 547,291
+rect $class_d_w_f_toolkit_1_1_d_w_f_x_m_l_serializable.html 627,264 854,291
+rect $class_d_w_f_toolkit_1_1_d_w_f_s_t_d_map.html 6,264 320,291

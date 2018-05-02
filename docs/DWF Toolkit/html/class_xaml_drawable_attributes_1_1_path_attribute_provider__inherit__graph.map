@@ -1,0 +1,16 @@
+base referer
+rect $class_w_t___x_a_m_l___attribute___u_r_l.html 376,6 555,32
+rect $class_w_t___x_a_m_l___color.html 403,56 528,83
+rect $class_w_t___x_a_m_l___contrast___color.html 374,107 558,134
+rect $class_w_t___x_a_m_l___dash___pattern.html 378,158 554,184
+rect $class_w_t___x_a_m_l___fill.html 410,208 522,235
+rect $class_w_t___x_a_m_l___fill___pattern.html 384,259 547,286
+rect $class_w_t___x_a_m_l___gouraud___polyline.html 366,310 566,336
+rect $class_w_t___x_a_m_l___line___pattern.html 380,360 551,387
+rect $class_w_t___x_a_m_l___line___style.html 387,411 544,438
+rect $class_w_t___x_a_m_l___line___weight.html 382,462 550,488
+rect $class_w_t___x_a_m_l___u_r_l.html 406,512 526,539
+rect $class_w_t___x_a_m_l___user___fill___pattern.html 367,563 564,590
+rect $class_w_t___x_a_m_l___user___hatch___pattern.html 358,614 574,640
+rect $class_w_t___x_a_m_l___visibility.html 394,664 538,691
+rect $class_xaml_path_1_1_attribute_parser.html 376,715 555,742

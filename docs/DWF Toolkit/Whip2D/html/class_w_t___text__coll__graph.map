@@ -1,0 +1,10 @@
+base referer
+rect $class_w_t___drawable.html 297,14 404,40
+rect $class_w_t___text___option___reserved.html 257,64 444,91
+rect $class_w_t___text___option___bounds.html 263,179 439,206
+rect $class_w_t___logical___point.html 7,142 137,168
+rect $class_w_t___font.html 312,230 389,256
+rect $class_w_t___text___option___overscore.html 255,280 447,307
+rect $class_w_t___text___optioncode.html 275,331 427,358
+rect $class_w_t___string.html 308,422 393,448
+rect $class_w_t___text___option___underscore.html 252,472 449,499

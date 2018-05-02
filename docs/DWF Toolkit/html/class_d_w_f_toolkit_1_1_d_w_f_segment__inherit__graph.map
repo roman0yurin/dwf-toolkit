@@ -1,0 +1,4 @@
+base referer
+rect $class_d_w_f_attribute_handler_builder.html 5,5 197,32
+rect $class_d_w_f_geometry_handler_builder.html 221,5 421,32
+rect $class_d_w_f_feature_handler_builder.html 445,5 632,32

@@ -1,0 +1,8 @@
+base referer
+rect $class_w_t___x_a_m_l___visibility.html 360,5 504,32
+rect $class_xaml_canvas.html 383,56 481,83
+rect $class_xaml_canvas_1_1_attribute_parser.html 335,107 529,133
+rect $class_xaml_glyphs.html 384,157 480,184
+rect $class_xaml_glyphs_1_1_attribute_parser.html 336,208 528,235
+rect $class_xaml_path.html 392,259 472,285
+rect $class_xaml_path_1_1_attribute_parser.html 343,309 521,336

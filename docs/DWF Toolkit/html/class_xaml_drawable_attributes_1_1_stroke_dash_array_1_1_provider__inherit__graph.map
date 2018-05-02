@@ -1,0 +1,8 @@
+base referer
+rect $class_w_t___x_a_m_l___dash___pattern.html 5,80 181,107
+rect $class_w_t___x_a_m_l___gouraud___polyline.html 205,80 405,107
+rect $class_w_t___x_a_m_l___line___pattern.html 429,80 600,107
+rect $class_xaml_path.html 624,80 704,107
+rect $class_xaml_path_1_1_attribute_parser.html 728,80 907,107
+rect $class_xaml_image_rendition_path.html 485,155 661,182
+rect $class_xaml_rendition_path.html 685,155 824,182

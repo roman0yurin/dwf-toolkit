@@ -1,0 +1,6 @@
+base referer
+rect $class_base_opcode_handler_observer.html 5,96 205,123
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_output_stream.html 229,96 435,123
+rect $class_b_stream_file_toolkit.html 459,96 592,123
+rect $class_b_controlled_memory_object.html 331,6 509,32
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_input_stream.html 533,6 728,32

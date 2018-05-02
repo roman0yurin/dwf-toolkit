@@ -1,0 +1,4 @@
+base referer
+rect $class_xaml_graphics_object.html 6,31 152,57
+rect $class_xaml_arc_segment.html 215,5 343,32
+rect $class_xaml_polyline_segment.html 202,56 356,83

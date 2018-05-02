@@ -1,0 +1,12 @@
+base referer
+rect $class_xaml_brush_1_1_brush.html 5,183 136,209
+rect $class_xaml_brush_1_1_image.html 211,132 344,159
+rect $class_xaml_brush_1_1_linear_gradient.html 185,183 369,209
+rect $class_xaml_brush_1_1_radial_gradient.html 184,233 371,260
+rect $class_xaml_brush_1_1_solid_color.html 199,284 356,311
+rect $class_xaml_brush_1_1_visual.html 212,81 343,108
+rect $class_xaml_brush_1_1_xaml_image_brush.html 440,157 637,184
+rect $class_xaml_brush_1_1_xaml_fixed_pattern_brush.html 420,107 657,133
+rect $class_xaml_brush_1_1_xaml_hatch_brush.html 441,5 636,32
+rect $class_xaml_brush_1_1_xaml_user_pattern_brush.html 423,56 655,83
+rect $class_xaml_resource.html 16,107 125,133

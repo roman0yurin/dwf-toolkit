@@ -1,0 +1,8 @@
+base referer
+rect $struct_d_w_f_toolkit_1_1_d_w_f_signature_reader_1_1_d_s_a_key_value_strings.html 331,154 696,180
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_string.html 7,180 161,207
+rect $class_d_w_f_toolkit_1_1_x509_issuer_serial.html 413,204 613,231
+rect $struct_d_w_f_toolkit_1_1_d_w_f_signature_reader_1_1_r_s_a_key_value_strings.html 331,255 696,282
+rect $class_d_w_f_package_reader.html 439,306 588,332
+rect $class_d_w_f_toolkit_1_1_x509_data.html 435,356 592,383
+rect $class_d_w_f_x_m_l_element_builder.html 428,416 599,443

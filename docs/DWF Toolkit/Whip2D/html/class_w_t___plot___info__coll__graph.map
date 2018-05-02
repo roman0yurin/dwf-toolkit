@@ -1,0 +1,5 @@
+base referer
+rect $class_w_t___object.html 6,16 96,43
+rect $class_w_t___point2_d.html 120,16 219,43
+rect $class_w_t___matrix2_d.html 243,16 347,43
+rect $class_w_t___string.html 446,16 531,43

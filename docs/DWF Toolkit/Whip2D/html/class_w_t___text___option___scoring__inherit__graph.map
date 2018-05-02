@@ -1,0 +1,5 @@
+base referer
+rect $class_w_t___text___option___overscore.html 5,229 197,256
+rect $class_w_t___text___option___underscore.html 221,229 419,256
+rect $class_w_t___option.html 165,80 256,107
+rect $class_w_t___object.html 165,5 256,32

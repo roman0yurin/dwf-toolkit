@@ -1,0 +1,4 @@
+base referer
+rect $class_d_w_f_core_1_1_d_w_f_core_memory.html 5,5 203,32
+rect $class_d_w_f_core_1_1_d_w_f_string.html 105,83 260,109
+rect $class_d_w_f_core_1_1_d_w_f_synchronization.html 284,83 500,109

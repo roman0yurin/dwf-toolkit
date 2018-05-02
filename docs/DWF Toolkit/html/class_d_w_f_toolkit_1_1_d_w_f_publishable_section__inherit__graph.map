@@ -1,0 +1,5 @@
+base referer
+rect $class_d_w_f_toolkit_1_1_d_w_f_model.html 144,229 312,256
+rect $class_d_w_f_toolkit_1_1_d_w_f_publishable.html 5,80 205,107
+rect $class_d_w_f_toolkit_1_1_d_w_f_resource_container.html 229,80 475,107
+rect dwfcore.tag$class_d_w_f_core_1_1_d_w_f_owner.html 272,5 432,32

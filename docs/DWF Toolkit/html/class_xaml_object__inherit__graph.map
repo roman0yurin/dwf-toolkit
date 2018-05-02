@@ -1,0 +1,7 @@
+base referer
+rect $class_xaml_drawable.html 121,80 231,107
+rect $class_xaml_canvas.html 5,155 104,181
+rect $class_xaml_glyphs.html 128,155 224,181
+rect $class_xaml_path.html 248,155 328,181
+rect $class_xaml_image_rendition_path.html 109,229 285,256
+rect $class_xaml_rendition_path.html 309,229 448,256

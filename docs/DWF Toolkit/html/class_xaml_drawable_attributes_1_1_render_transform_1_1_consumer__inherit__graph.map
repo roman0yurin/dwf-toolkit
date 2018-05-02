@@ -1,0 +1,9 @@
+base referer
+rect $class_xaml_drawable_attributes_1_1_canvas_attribute_consumer.html 5,80 336,107
+rect $class_xaml_drawable_attributes_1_1_glyphs_attribute_consumer.html 360,80 688,107
+rect $class_xaml_drawable_attributes_1_1_path_attribute_consumer.html 712,80 1024,107
+rect $class_xaml_canvas.html 121,155 220,181
+rect $class_xaml_glyphs.html 476,155 572,181
+rect $class_xaml_path.html 828,155 908,181
+rect $class_xaml_image_rendition_path.html 689,229 865,256
+rect $class_xaml_rendition_path.html 889,229 1028,256

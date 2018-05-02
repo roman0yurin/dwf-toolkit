@@ -1,0 +1,5 @@
+base referer
+rect $class_d_w_f_core_1_1_d_w_f_core_memory.html 5,80 203,107
+rect $class_d_w_f_core_1_1_d_w_f_file_descriptor.html 227,80 429,107
+rect $class_d_w_f_core_1_1_d_w_f_ownable.html 453,80 627,107
+rect $struct_d_w_f_core_1_1_i_d_w_f_ownable.html 452,6 628,32

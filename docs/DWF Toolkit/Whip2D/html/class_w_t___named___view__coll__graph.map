@@ -1,0 +1,6 @@
+base referer
+rect $class_w_t___item.html 5,115 83,141
+rect $class_w_t___object.html 177,115 268,141
+rect $class_w_t___logical___box.html 292,115 415,141
+rect $class_w_t___logical___point.html 288,5 419,32
+rect $class_w_t___string.html 439,115 524,141

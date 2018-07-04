@@ -16,7 +16,7 @@
 /* @(#) $Id$ */
 
 #include <stdio.h>
-#include "core/zlib/zlib.h"
+#include "dwfcore/zlib/zlib.h"
 
 #ifdef  DWFCORE_BUILD_ZLIB
 

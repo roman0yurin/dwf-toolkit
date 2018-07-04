@@ -86,7 +86,7 @@ namespace DWFToolkit
         DwfResult(Enum in) : m_value (in) {}
         /// Int type cast operator
         operator int() const {return (int) m_value;}
-		#ifndef __APPLE_CC__
+		#if !defined(__APPLE_CC__) && !defined(__linux__)
 		/// HRESULT type cast operator
         operator HRESULT() const {return (HRESULT) m_value;}
 		#endif 
@@ -94,7 +94,7 @@ namespace DWFToolkit
         DwfResult const & operator=  (DwfResult const & in) {m_value = in.m_value; return *this;}
         /// Assignment operator (copy value from a DwfResult::Enum value)
         DwfResult const & operator=  (DwfResult::Enum in)   {m_value = in; return *this;}
-		#ifndef __APPLE_CC__
+		#if  !defined(__APPLE_CC__) && !defined(__linux__)
         /// Assignment operator (copy value from an HRESULT.)
         /** \warning May overflow enumeration - use only valid DwfResult::Enum values! 
         */

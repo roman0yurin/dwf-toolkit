@@ -30,6 +30,7 @@
  * You can disable use of extended/expanded memory entirely by altering these
  * definitions or overriding them from the Makefile (eg, -DEMS_SUPPORTED=0).
  */
+#ifdef USE_MSDOS_MEMMGR
 
 #ifndef XMS_SUPPORTED
 #define XMS_SUPPORTED  1
@@ -636,3 +637,5 @@ jpeg_mem_term (j_common_ptr cinfo)
   _fheapmin();
 #endif
 }
+
+#endif //USE_MSDOS_MEMMGR

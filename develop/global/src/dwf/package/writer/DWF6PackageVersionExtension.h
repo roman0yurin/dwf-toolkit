@@ -35,6 +35,9 @@ using namespace DWFCore;
 #include "dwf/Toolkit.h"
 #include "dwf/package/utility/DWFPackageFileDescriptor.h"
 
+#undef minor
+#undef major
+
 namespace DWFCore
 {
 class DWFXMLSerializer;

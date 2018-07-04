@@ -19,12 +19,10 @@
 //  Data and Computer Software), as applicable.
 //
 
-
+#ifdef  _DWFCORE_WIN32_SYSTEM
 #include "dwf/publisher/win32/EmbeddedFontImpl.h"
 using namespace DWFToolkit;
 
-
-#ifdef  _DWFCORE_WIN32_SYSTEM
 
 
 #pragma warning(push)
@@ -1144,7 +1142,7 @@ throw ( DWFException )
         //
         // the attempt failed
         //
-        // If the font name cannot be changed, don’t install the font. Use font 
+        // If the font name cannot be changed, donï¿½t install the font. Use font 
         // replacement instead. If the partial font is installed using the fonts 
         // own name, it will prevent another subset of the same font from being 
         // installed in the future. 

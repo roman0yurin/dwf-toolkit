@@ -49,6 +49,8 @@
  * Dan Gildor (gyld@in-touch.com).
  */
 
+#ifdef USE_MAC_MEMMGR
+
 #define JPEG_INTERNALS
 #include "jinclude.h"
 #include "jpeglib.h"
@@ -287,3 +289,5 @@ jpeg_mem_term (j_common_ptr cinfo)
 {
   /* no work */
 }
+
+#endif //USE_MAC_MEMMGR

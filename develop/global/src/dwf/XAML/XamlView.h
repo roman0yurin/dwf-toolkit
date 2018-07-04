@@ -46,7 +46,7 @@ protected:
     //@{ \name Construction
     /// Constructs a WT_XAML_View object.
     WT_XAML_View()
-        : WT_View (WD_False)
+        : WT_View ("")
      { }
 
     /// Constructs a WT_XAML_View object with the given bounds.

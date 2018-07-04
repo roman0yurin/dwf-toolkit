@@ -127,7 +127,7 @@ select_file_name (char * fname)
 {
   next_file_num++;      /* advance counter */
   sprintf(fname, TEMP_FILE_NAME, TEMP_DIRECTORY, next_file_num);
-  mktemp(fname);        /* make sure file name is unique */
+  mkstemp(fname);        /* make sure file name is unique */
   /* mktemp replaces the trailing XXXXXX with a unique string of characters */
 }
 
@@ -230,7 +230,11 @@ METHODDEF(void)
 close_backing_store (j_common_ptr cinfo, backing_store_ptr info)
 {
   fclose(info->temp_file);  /* close the file */
+ #ifndef __linux__
   unlink(info->temp_name);  /* delete the file */
+ #elseif
+  remove(info->temp_name);
+ #endif
 /* If your system doesn't have unlink(), use remove() instead.
  * remove() is the ANSI-standard name for this function, but if
  * your system was ANSI you'd be using jmemansi.c, right?

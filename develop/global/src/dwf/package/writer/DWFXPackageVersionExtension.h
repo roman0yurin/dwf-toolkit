@@ -33,6 +33,9 @@ using namespace DWFCore;
 
 #include "dwf/Toolkit.h"
 
+#undef minor
+#undef major
+
 namespace DWFToolkit
 {
 class DWFXPackageWriter;

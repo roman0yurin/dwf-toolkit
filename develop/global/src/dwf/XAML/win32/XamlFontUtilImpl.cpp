@@ -15,6 +15,7 @@
 //  Restricted Rights) and DFAR 252.227-7013(c)(1)(ii) (Rights in Technical
 //  Data and Computer Software), as applicable.
 //
+#ifndef __linux__
 
 #include "XAML/pch.h"
 #include <windows.h>
@@ -487,3 +488,5 @@ XamlFontUtilImpl::getFontStringWidth( const WT_XAML_File &crFile, const WT_Strin
     delete[] zFontName;
     return WT_Result::Success;
 }
+
+#endif //__linux__

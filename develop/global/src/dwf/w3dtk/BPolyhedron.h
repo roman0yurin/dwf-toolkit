@@ -14,6 +14,8 @@
 #ifndef BBINFILETK_POLYHEDRON
 #define BBINFILETK_POLYHEDRON
 
+#include "dgn/Mesh.hpp"
+
 ///
 ///\file        dwf/w3dtk/BPolyhedron.h
 ///

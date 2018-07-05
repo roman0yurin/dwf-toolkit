@@ -201,6 +201,11 @@ class BBINFILETK_API TK_Shell : public TK_Polyhedron {
 
         void        Reset (void) alter;
 
+        /**
+        * Преобразовать данные в треугольную сеть для передачи в java
+        */
+        dgn::Mesh toDgnMesh();
+
     private:
 
         void _optimizeThisShell()

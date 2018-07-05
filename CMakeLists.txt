@@ -10,8 +10,9 @@ add_definitions(-DDWFCORE_STATIC -DDWFTK_STATIC -DWHIP_USE_WCHAR_STRINGS -DSTDC 
 
 include_directories(develop/global/src)
 include_directories(develop/global/src/dwf)
+include_directories(djinni)
 
-file(GLOB_RECURSE DWF_SOURES develop/global/src/*.cpp develop/global/src/*.c)
+file(GLOB_RECURSE DWF_SOURES develop/global/src/*.cpp develop/global/src/*.c djinni/*.cpp)
 
 add_library(${PROJECT_NAME} STATIC ${DWF_SOURES})
 

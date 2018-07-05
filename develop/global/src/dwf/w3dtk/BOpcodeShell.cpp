@@ -20,6 +20,7 @@
 #include "dwf/w3dtk/BInternal.h"
 #include <math.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "hoops/hoops_tools.h"
 
@@ -1861,4 +1862,22 @@ void TK_Shell::Reset (void) alter
     m_flist = null;
     m_lodlevel = 0;
     TK_Polyhedron::Reset();
+}
+
+
+
+
+dgn::Mesh TK_Shell::toDgnMesh() {
+    std::vector<float> xyz(this->mp_points, this->mp_points+this->mp_pointcount*3);
+    std::vector<int> indexes;
+
+    assert(this->m_flistlen % 4 == 0); //все грани должны быть треугольниками
+    for(int pt_idx = 0; pt_idx < this->m_flistlen; pt_idx+=4){
+    	assert(this->m_flist[pt_idx] == 3);
+    	for (int i = 1; i < 4; ++i ) {
+				indexes.push_back(this->m_flist[i + pt_idx]);
+			}
+    }
+
+    return dgn::Mesh(xyz, indexes);
 }

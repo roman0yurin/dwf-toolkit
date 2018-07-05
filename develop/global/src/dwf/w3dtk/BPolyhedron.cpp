@@ -18,6 +18,8 @@
 #include "dwf/w3dtk/BInternal.h"
 #include <math.h>
 #include <stdlib.h>
+#include <assert.h>
+
 #define ASSERT(x)
 
 

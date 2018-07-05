@@ -453,6 +453,10 @@ class BBINFILETK_API2 BStreamFileToolkit : public BControlledMemoryObject {
         BStreamFileToolkit (void);
         virtual ~BStreamFileToolkit ();
 
+        int getNestingLevel(){
+					return this->m_nesting_level;
+        }
+
         /*!
 			Sets toolkit into ASCII Mode
 		*/

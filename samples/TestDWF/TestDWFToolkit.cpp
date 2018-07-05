@@ -63,20 +63,53 @@ void GetContentInfo(DWFContent *pContent) {
 	GetClassInformation(pContent);
 }
 
+typedef std::vector<std::pair<std::wstring, std::wstring>> OBJ_SEMANTIC;
+
 class SegmentOpcodeHandler : public TK_Open_Segment {
+protected:
+		 std::map<std::wstring, OBJ_SEMANTIC> &semantic;
 public:
-		SegmentOpcodeHandler() : TK_Open_Segment() { ; }
+		SegmentOpcodeHandler(std::map<std::wstring, OBJ_SEMANTIC> &semantic) : TK_Open_Segment(), semantic(semantic) {
+		}
 
 		virtual ~SegmentOpcodeHandler() { ; }
 
 		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
 			TK_Status eStatus = TK_Open_Segment::Execute(rW3DParser);
 			if (eStatus == TK_Normal) {
-				wcout << L"\tНомер сегмента: " << (const wchar_t *) (this->m_string) << endl;
+				wcout << L"\tУровень сегмента: " << rW3DParser.getNestingLevel() << endl;
 			}
+
+			string str =  string(this->m_string, this->m_length);
+			wstring wstr(str.begin(), str.end());
+			auto const result = semantic.find(wstr);
+			if (result != semantic.end()){
+				OBJ_SEMANTIC sem = result->second;
+				for(auto const &pair : sem){
+					wcout << pair.first << L" -> " << pair.second << endl;
+				}
+			}
+			wcout << L"\n" << endl;
 
 			return eStatus;
 		}
+};
+
+class TAGOpcodeHandler : public TK_Tag {
+protected:
+		std::map<std::wstring, OBJ_SEMANTIC> &semantic;
+public:
+		TAGOpcodeHandler(std::map<std::wstring, OBJ_SEMANTIC> &semantic) : TK_Tag(), semantic(semantic) {
+		}
+
+		virtual ~TAGOpcodeHandler() { ; }
+
+		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
+		TK_Status eStatus = TK_Tag::Execute(rW3DParser);
+		if (eStatus == TK_Normal) {
+		}
+		return eStatus;
+}
 };
 
 class ShellHandler : public TK_Shell {
@@ -104,7 +137,11 @@ public:
 		}
 };
 
-void GetDWFObjectDefinition(DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst) {
+std::wstring toStdString(const DWFString &str){
+	return std::wstring((const wchar_t *)str, str.chars());
+}
+
+void GetDWFObjectDefinition(DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, std::map<std::wstring, OBJ_SEMANTIC> &all_semantic){
 	const wchar_t *str = (const wchar_t *) pInst->node();
 	wcout << L"Object [" << (const wchar_t *) pInst->object() << L"] Node [" << str << L"]  sequence="
 				<< pInst->sequence() << endl;
@@ -114,21 +151,24 @@ void GetDWFObjectDefinition(DWFObjectDefinition *pDef, DWFDefinedObjectInstance 
 	DWFPropertyContainer *pInstProps = pDef->getInstanceProperties(*pInst);
 
 	DWFProperty::tMap::Iterator *piProp = pInstProps->getProperties();
+	OBJ_SEMANTIC semantic;
 	if (piProp) {
 		for (; piProp->valid(); piProp->next()) {
 			pProp = piProp->value();
+			semantic.push_back(std::make_pair(toStdString(pProp->name()), toStdString(pProp->value())));
 			wcout << (const wchar_t *) pProp->name() << L", " << (const wchar_t *) pProp->value() << L"    ["
 						<< (const wchar_t *) pProp->category() << L"]" << endl;
+
 		}
 
 		DWFCORE_FREE_OBJECT(piProp);
 	}
-
+	all_semantic[toStdString(pInst->object())] = semantic;
 	DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
 
 	if (piChildren) {
 		for (; piChildren->valid(); piChildren->next()) {
-			GetDWFObjectDefinition(pDef, piChildren->value());
+			GetDWFObjectDefinition(pDef, piChildren->value(), all_semantic);
 		}
 		DWFCORE_FREE_OBJECT(piChildren);
 	}
@@ -227,6 +267,8 @@ int main(int argc, char *argv[]) {
 		//DWFCORE_FREE_OBJECT(piProperties);
 	}
 
+	std::map<std::wstring, OBJ_SEMANTIC> all_semantic;
+
 	DWFSection *pSection = NULL;
 	DWFManifest::SectionIterator *piSections = rManifest.getSections();
 	if (piSections) {
@@ -280,7 +322,7 @@ int main(int argc, char *argv[]) {
 					DWFDefinedObjectInstance::tList::const_iterator iInst = rRootInstances.begin();
 					for (; iInst != rRootInstances.end(); iInst++) {
 						pInst = *iInst;
-						GetDWFObjectDefinition(pDef, pInst);
+						GetDWFObjectDefinition(pDef, pInst, all_semantic);
 					}
 				}
 			}
@@ -323,11 +365,12 @@ int main(int argc, char *argv[]) {
 						//oW3DStreamParser.SetOpcodeHandler(TKE_Start_User_Data, new StartUserDataHandler);
 						//oW3DStreamParser.SetOpcodeHandler(TKE_Stop_User_Data, new StartUserDataHandler);
 
-						oW3DStreamParser.SetOpcodeHandler(TKE_Shell, new ShellHandler);
+						//oW3DStreamParser.SetOpcodeHandler(TKE_Shell, new ShellHandler);
 
 						//oW3DStreamParser.SetOpcodeHandler(TKE_Comment, new CommentHandler);
-						oW3DStreamParser.SetOpcodeHandler(TKE_Open_Segment, new SegmentOpcodeHandler);
+						oW3DStreamParser.SetOpcodeHandler(TKE_Tag, new TAGOpcodeHandler(all_semantic));
 						//oW3DStreamParser.SetOpcodeHandler(TKE_Text_With_Encoding, new TextWithEncodingOpcodeHandler);
+						oW3DStreamParser.SetOpcodeHandler(TKE_Open_Segment, new SegmentOpcodeHandler(all_semantic));
 
 						//
 						// Attach the stream to the parser

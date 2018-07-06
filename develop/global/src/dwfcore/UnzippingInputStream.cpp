@@ -26,7 +26,7 @@ using namespace DWFCore;
 
 
 _DWFCORE_API
-DWFUnzippingInputStream::DWFUnzippingInputStream( unzFile pUnzipStream )
+DWFUnzippingInputStream::DWFUnzippingInputStream( dwf_unzFile pUnzipStream )
 throw()
                        : DWFInputStream()
                        , _bFileOpen( false )
@@ -43,7 +43,7 @@ throw()
 {
     if (_bFileOpen)
     {
-        unzCloseCurrentFile( _pUnzipStream );
+        dwf_unzCloseCurrentFile(_pUnzipStream);
     }
 
     if (_pDescriptor)
@@ -76,15 +76,15 @@ throw( DWFException )
         //
         // locate the file
         //
-    if (unzLocateFile(_pUnzipStream, zArchivedFile, 1) == UNZ_OK)
+    if (dwf_unzLocateFile(_pUnzipStream, zArchivedFile, 1) == UNZ_OK)
     {
             //
             // open the file
             //
-        if (unzOpenCurrentFile(_pUnzipStream, zPassword, zArchivedFile) == UNZ_OK)
+        if (dwf_unzOpenCurrentFile(_pUnzipStream, zPassword, zArchivedFile) == UNZ_OK)
         {
-            unz_file_info tFileInfo;
-            unzGetCurrentFileInfo( _pUnzipStream, &tFileInfo, NULL, 0, NULL, 0, NULL, 0 );
+            dwf_unz_file_info tFileInfo;
+            dwf_unzGetCurrentFileInfo(_pUnzipStream, &tFileInfo, NULL, 0, NULL, 0, NULL, 0);
 
             _nFileBytesRemaining = tFileInfo.uncompressed_size;
             //_bIsEncrypted = tFileInfo.flag & 0x01;
@@ -130,7 +130,7 @@ throw( DWFException )
     //
     // stream from the archive directly to the caller
     //
-    int nBytesRead = unzReadCurrentFile( _pUnzipStream, pBuffer, static_cast<unsigned int>(nBytesToRead) );
+    int nBytesRead = dwf_unzReadCurrentFile(_pUnzipStream, pBuffer, static_cast<unsigned int>(nBytesToRead));
 
         //
         // an error occurred

@@ -65,14 +65,14 @@ void GetContentInfo(DWFContent *pContent) {
 
 typedef std::vector<std::pair<std::wstring, std::wstring>> OBJ_SEMANTIC;
 
-class SegmentOpcodeHandler : public TK_Open_Segment {
+class OpenHandler : public TK_Open_Segment {
 protected:
 		 std::map<std::wstring, OBJ_SEMANTIC> &semantic;
 public:
-		SegmentOpcodeHandler(std::map<std::wstring, OBJ_SEMANTIC> &semantic) : TK_Open_Segment(), semantic(semantic) {
+		OpenHandler(std::map<std::wstring, OBJ_SEMANTIC> &semantic) : TK_Open_Segment(), semantic(semantic) {
 		}
 
-		virtual ~SegmentOpcodeHandler() { ; }
+		virtual ~OpenHandler() { ; }
 
 		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
 			TK_Status eStatus = TK_Open_Segment::Execute(rW3DParser);
@@ -370,7 +370,7 @@ int main(int argc, char *argv[]) {
 						//oW3DStreamParser.SetOpcodeHandler(TKE_Comment, new CommentHandler);
 						oW3DStreamParser.SetOpcodeHandler(TKE_Tag, new TAGOpcodeHandler(all_semantic));
 						//oW3DStreamParser.SetOpcodeHandler(TKE_Text_With_Encoding, new TextWithEncodingOpcodeHandler);
-						oW3DStreamParser.SetOpcodeHandler(TKE_Open_Segment, new SegmentOpcodeHandler(all_semantic));
+						oW3DStreamParser.SetOpcodeHandler(TKE_Open_Segment, new OpenHandler(all_semantic));
 
 						//
 						// Attach the stream to the parser

@@ -127,7 +127,7 @@ typedef struct
 {
     DWFInputStream* pStream;   /* io structore of the zipfile */
     bool bOwnStream;
-    unz_global_info gi;         /* public global information */
+    dwf_unz_global_info gi;         /* public global information */
     uLong byte_before_the_zipfile;/* byte before the zipfile, (>0 for sfx)*/
     uLong num_file;             /* number of the current file in the zipfile*/
     uLong pos_in_central_dir;   /* pos of the current file in the central dir*/
@@ -138,14 +138,14 @@ typedef struct
     uLong offset_central_dir;   /* offset of start of central directory with
                                    respect to the starting disk number */
 
-    unz_file_info cur_file_info; /* public info about the current file in zip*/
+    dwf_unz_file_info cur_file_info; /* public info about the current file in zip*/
     unz_file_info_internal cur_file_info_internal; /* private info about it*/
     file_in_zip_read_info_s* pfile_in_zip_read; /* structure about the current
                                         file if we are decompressing it */
     unzIndex *locator;
 } unz_s;
 
-DWFInputStream* ZEXPORT unzGetFilePointer(unzFile uf)
+DWFInputStream* ZEXPORT dwf_unzGetFilePointer(dwf_unzFile uf)
 {
     return ((unz_s *)uf)->pStream;
 }
@@ -272,10 +272,10 @@ local int strcmpcasenosensitive_internal (const char* fileName1, const char* fil
         (like 1 on Unix, 2 on Windows)
 
 */
-int ZEXPORT unzStringFileNameCompare (
-    const char* fileName1,
-    const char* fileName2,
-    int iCaseSensitivity)
+int ZEXPORT dwf_unzStringFileNameCompare(
+        const char *fileName1,
+        const char *fileName2,
+        int iCaseSensitivity)
 {
     if (iCaseSensitivity==0)
         iCaseSensitivity=CASESENSITIVITYDEFAULTVALUE;
@@ -369,7 +369,7 @@ local int compareLocator(const void* locator1, const void* locator2)
     return DWFCORE_COMPARE_ASCII_STRINGS(fname1, fname2);
 }
 
-local unzFile unzLocal_OpenFile(const DWFString& zPath, unzIndex* locator)
+local dwf_unzFile unzLocal_OpenFile(const DWFString& zPath, unzIndex* locator)
 {
     unz_s us;
     unz_s *s;
@@ -492,7 +492,7 @@ local unzFile unzLocal_OpenFile(const DWFString& zPath, unzIndex* locator)
 
     s->locator = locator;
 
-    unzGoToFirstFile((unzFile)s);
+    dwf_unzGoToFirstFile((dwf_unzFile) s);
 
     //Build an index of file names and their zip offsets.
     if (locator && locator->locatorArray == NULL)
@@ -504,9 +504,9 @@ local unzFile unzLocal_OpenFile(const DWFString& zPath, unzIndex* locator)
         {
             unsigned long j=0, i=0;
             char *filename, szCurrentFileName[UNZ_MAXFILENAMEINZIP+1];
-            unzGetCurrentFileInfo(s,NULL,
-                                    szCurrentFileName,sizeof(szCurrentFileName)-1,
-                                    NULL,0,NULL,0);
+            dwf_unzGetCurrentFileInfo(s, NULL,
+                                      szCurrentFileName, sizeof(szCurrentFileName) - 1,
+                                      NULL, 0, NULL, 0);
             //canonicalize the filename
             while(szCurrentFileName[i]=='/' || szCurrentFileName[i]=='\\')
                 i++;
@@ -526,19 +526,19 @@ local unzFile unzLocal_OpenFile(const DWFString& zPath, unzIndex* locator)
                 s->num_file,
                 s->pos_in_central_dir);
 
-            err = unzGoToNextFile((unzFile)s);
+            err = dwf_unzGoToNextFile((dwf_unzFile) s);
         }
 
         //Now that we've built the index, sort it
         qsort(s->locator->locatorArray, s->locator->locatorCount, sizeof(struct locatorEntry*), compareLocator);
 
-        unzGoToFirstFile((unzFile)s);
+        dwf_unzGoToFirstFile((dwf_unzFile) s);
     }
 
-    return (unzFile)s;
+    return (dwf_unzFile)s;
 }
 
-local unzFile unzLocal_OpenStream(DWFInputStream& rStream, unzIndex *locator)
+local dwf_unzFile unzLocal_OpenStream(DWFInputStream& rStream, unzIndex *locator)
 {
     unz_s us;
     unz_s *s;
@@ -629,7 +629,7 @@ local unzFile unzLocal_OpenStream(DWFInputStream& rStream, unzIndex *locator)
 
     s->locator = locator;
 
-    unzGoToFirstFile((unzFile)s);
+    dwf_unzGoToFirstFile((dwf_unzFile) s);
 
     //Build an index of file names and their zip offsets.
     if (locator && locator->locatorArray == NULL)
@@ -641,9 +641,9 @@ local unzFile unzLocal_OpenStream(DWFInputStream& rStream, unzIndex *locator)
         {
             unsigned long j=0, i=0;
             char *filename, szCurrentFileName[UNZ_MAXFILENAMEINZIP+1];
-            unzGetCurrentFileInfo(s,NULL,
-                                    szCurrentFileName,sizeof(szCurrentFileName)-1,
-                                    NULL,0,NULL,0);
+            dwf_unzGetCurrentFileInfo(s, NULL,
+                                      szCurrentFileName, sizeof(szCurrentFileName) - 1,
+                                      NULL, 0, NULL, 0);
             //canonicalize the filename
             while(szCurrentFileName[i]=='/' || szCurrentFileName[i]=='\\')
                 i++;
@@ -663,16 +663,16 @@ local unzFile unzLocal_OpenStream(DWFInputStream& rStream, unzIndex *locator)
                 s->num_file,
                 s->pos_in_central_dir);
 
-            err = unzGoToNextFile((unzFile)s);
+            err = dwf_unzGoToNextFile((dwf_unzFile) s);
         }
 
         //Now that we've built the index, sort it
         qsort(s->locator->locatorArray, s->locator->locatorCount, sizeof(struct locatorEntry*), compareLocator);
 
-        unzGoToFirstFile((unzFile)s);
+        dwf_unzGoToFirstFile((dwf_unzFile) s);
     }
 
-    return (unzFile)s;
+    return (dwf_unzFile)s;
 }
 
 /*
@@ -681,15 +681,15 @@ local unzFile unzLocal_OpenStream(DWFInputStream& rStream, unzIndex *locator)
      "zlib/zlib109.zip".
      If the zipfile cannot be opened (file don't exist or in not valid), the
        return value is NULL.
-     Else, the return value is a unzFile Handle, usable with other function
+     Else, the return value is a dwf_unzFile Handle, usable with other function
        of this unzip package.
 */
-unzFile ZEXPORT unzOpenFile ( const DWFString& zPath, unzIndex* pIndex )
+dwf_unzFile ZEXPORT dwf_unzOpenFile(const DWFString &zPath, unzIndex *pIndex)
 {
     return unzLocal_OpenFile(zPath, pIndex);
 }
 
-unzFile ZEXPORT unzOpenStream ( DWFInputStream& rStream, unzIndex* pIndex )
+dwf_unzFile ZEXPORT dwf_unzOpenStream(DWFInputStream &rStream, unzIndex *pIndex)
 {
     return unzLocal_OpenStream(rStream, pIndex);
 }
@@ -699,7 +699,7 @@ unzFile ZEXPORT unzOpenStream ( DWFInputStream& rStream, unzIndex* pIndex )
   If there is files inside the .Zip opened with unzipOpenCurrentFile (see later),
     these files MUST be closed with unzipCloseCurrentFile before call unzipClose.
   return UNZ_OK if there is no problem. */
-int ZEXPORT unzClose (unzFile file)
+int ZEXPORT dwf_unzClose(dwf_unzFile file)
 {
     unz_s* s;
     if (file==NULL)
@@ -707,7 +707,7 @@ int ZEXPORT unzClose (unzFile file)
     s=(unz_s*)file;
 
     if (s->pfile_in_zip_read!=NULL)
-        unzCloseCurrentFile(file);
+        dwf_unzCloseCurrentFile(file);
 
     if (s->bOwnStream)
     {
@@ -724,7 +724,7 @@ int ZEXPORT unzClose (unzFile file)
   Write info about the ZipFile in the *pglobal_info structure.
   No preparation of the structure is needed
   return UNZ_OK if there is no problem. */
-int ZEXPORT unzGetGlobalInfo (unzFile file, unz_global_info *pglobal_info)
+int ZEXPORT dwf_unzGetGlobalInfo(dwf_unzFile file, dwf_unz_global_info *pglobal_info)
 {
     unz_s* s;
     if (file==NULL)
@@ -736,9 +736,9 @@ int ZEXPORT unzGetGlobalInfo (unzFile file, unz_global_info *pglobal_info)
 
 
 /*
-   Translate date/time from Dos format to tm_unz (readable more easilty)
+   Translate date/time from Dos format to dwf_tm_unz (readable more easilty)
 */
-local void unzlocal_DosDateToTmuDate (uLong ulDosDate, tm_unz* ptm)
+local void unzlocal_DosDateToTmuDate (uLong ulDosDate, dwf_tm_unz* ptm)
 {
     uLong uDate;
     uDate = (uLong)(ulDosDate>>16);
@@ -752,9 +752,9 @@ local void unzlocal_DosDateToTmuDate (uLong ulDosDate, tm_unz* ptm)
 }
 
 /*
-   Translate date/time from Dos format to tm_unz (readable more easilty)
+   Translate date/time from Dos format to dwf_tm_unz (readable more easilty)
 */
-void ZEXPORT unzDosDateToTmuDate (uLong ulDosDate, tm_unz* ptm)
+void ZEXPORT dwf_unzDosDateToTmuDate(uLong ulDosDate, dwf_tm_unz *ptm)
 {
 
     unzlocal_DosDateToTmuDate(ulDosDate, ptm);
@@ -763,8 +763,8 @@ void ZEXPORT unzDosDateToTmuDate (uLong ulDosDate, tm_unz* ptm)
 /*
   Get Info about the current file in the zipfile, with internal only info
 */
-local int unzlocal_GetCurrentFileInfoInternal OF((unzFile file,
-                                                  unz_file_info *pfile_info,
+local int unzlocal_GetCurrentFileInfoInternal OF((dwf_unzFile file,
+                                                  dwf_unz_file_info *pfile_info,
                                                   unz_file_info_internal
                                                   *pfile_info_internal,
                                                   char *szFileName,
@@ -775,8 +775,8 @@ local int unzlocal_GetCurrentFileInfoInternal OF((unzFile file,
                                                   uLong commentBufferSize));
 
 local int unzlocal_GetCurrentFileInfoInternal (
-    unzFile file,
-    unz_file_info *pfile_info,
+    dwf_unzFile file,
+    dwf_unz_file_info *pfile_info,
     unz_file_info_internal *pfile_info_internal,
     char *szFileName,
     uLong fileNameBufferSize,
@@ -786,7 +786,7 @@ local int unzlocal_GetCurrentFileInfoInternal (
     uLong commentBufferSize)
 {
     unz_s* s;
-    unz_file_info file_info;
+    dwf_unz_file_info file_info;
     unz_file_info_internal file_info_internal;
     int err=UNZ_OK;
     uLong uMagic;
@@ -938,15 +938,15 @@ local int unzlocal_GetCurrentFileInfoInternal (
   No preparation of the structure is needed
   return UNZ_OK if there is no problem.
 */
-int ZEXPORT unzGetCurrentFileInfo (
-    unzFile file,
-    unz_file_info *pfile_info,
-    char *szFileName,
-    uLong fileNameBufferSize,
-    void *extraField,
-    uLong extraFieldBufferSize,
-    char *szComment,
-    uLong commentBufferSize)
+int ZEXPORT dwf_unzGetCurrentFileInfo(
+        dwf_unzFile file,
+        dwf_unz_file_info *pfile_info,
+        char *szFileName,
+        uLong fileNameBufferSize,
+        void *extraField,
+        uLong extraFieldBufferSize,
+        char *szComment,
+        uLong commentBufferSize)
 {
     return unzlocal_GetCurrentFileInfoInternal(file,pfile_info,NULL,
                                                 szFileName,fileNameBufferSize,
@@ -958,7 +958,7 @@ int ZEXPORT unzGetCurrentFileInfo (
   Set the current file of the zipfile to the first file.
   return UNZ_OK if there is no problem
 */
-int ZEXPORT unzGoToFirstFile (unzFile file)
+int ZEXPORT dwf_unzGoToFirstFile(dwf_unzFile file)
 {
     int err=UNZ_OK;
     unz_s* s;
@@ -980,7 +980,7 @@ int ZEXPORT unzGoToFirstFile (unzFile file)
   return UNZ_OK if there is no problem
   return UNZ_END_OF_LIST_OF_FILE if the actual file was the latest.
 */
-int ZEXPORT unzGoToNextFile (unzFile file)
+int ZEXPORT dwf_unzGoToNextFile(dwf_unzFile file)
 {
     unz_s* s;
     int err;
@@ -1018,10 +1018,10 @@ local int isLocator(const void* key, const void* locator)
   UNZ_OK if the file is found. It becomes the current file.
   UNZ_END_OF_LIST_OF_FILE if the file is not found
 */
-int ZEXPORT unzLocateFile (
-    unzFile file,
-    const DWFString& zFilename,
-    int iCaseSensitivity)
+int ZEXPORT dwf_unzLocateFile(
+        dwf_unzFile file,
+        const DWFString &zFilename,
+        int iCaseSensitivity)
 {
     unz_s* s;
     int err;
@@ -1077,14 +1077,14 @@ int ZEXPORT unzLocateFile (
     }
 
     //we should have found the file
-    err = unzGoToFirstFile(file);
+    err = dwf_unzGoToFirstFile(file);
     while (err == UNZ_OK)
     {
         char szCurrentFileName[UNZ_MAXFILENAMEINZIP+1];
-        unzGetCurrentFileInfo(file,NULL,
-                                szCurrentFileName,sizeof(szCurrentFileName)-1,
-                                NULL,0,
-                                NULL,0);
+        dwf_unzGetCurrentFileInfo(file, NULL,
+                                  szCurrentFileName, sizeof(szCurrentFileName) - 1,
+                                  NULL, 0,
+                                  NULL, 0);
         j=0;
         i=0;
         //canonicalize the filename
@@ -1099,10 +1099,10 @@ int ZEXPORT unzLocateFile (
         }
         szCurrentFileName[j] = 0;
 
-        if (unzStringFileNameCompare(szCurrentFileName,
-                                        buf,iCaseSensitivity)==0)
+        if (dwf_unzStringFileNameCompare(szCurrentFileName,
+                                         buf, iCaseSensitivity)==0)
             return UNZ_OK;
-        err = unzGoToNextFile(file);
+        err = dwf_unzGoToNextFile(file);
     }
 
     s->num_file = num_fileSaved ;
@@ -1204,7 +1204,7 @@ local int unzlocal_CheckCurrentFileCoherencyHeader (
   Open for reading data the current file in the zipfile.
   If there is no error and the file is opened, the return value is UNZ_OK.
 */
-int ZEXPORT unzOpenCurrentFile (unzFile file, const DWFString& zPassword, const DWFString& zFilename )
+int ZEXPORT dwf_unzOpenCurrentFile(dwf_unzFile file, const DWFString &zPassword, const DWFString &zFilename)
 {
     char encryption_header[12];
     int err=UNZ_OK;
@@ -1223,7 +1223,7 @@ int ZEXPORT unzOpenCurrentFile (unzFile file, const DWFString& zPassword, const 
         return UNZ_PARAMERROR;
 
     if (s->pfile_in_zip_read != NULL)
-        unzCloseCurrentFile(file);
+        dwf_unzCloseCurrentFile(file);
 
     if (unzlocal_CheckCurrentFileCoherencyHeader(s,&iSizeVar,
                 &offset_local_extrafield,&size_local_extrafield)!=UNZ_OK)
@@ -1267,14 +1267,14 @@ int ZEXPORT unzOpenCurrentFile (unzFile file, const DWFString& zPassword, const 
         if ((dwf_extra[3] & kzDWFSaltedPasswordMask)  &&
             (dwf_extra[1] == kzDWFLocalFileHeader[1]) &&
             (dwf_extra[2] == kzDWFLocalFileHeader[2]) &&
-            (dwf_extra[0] == kzDWFLocalFileHeader[0]) && 
+            (dwf_extra[0] == kzDWFLocalFileHeader[0]) &&
             (zFilename.chars() > 0))
         {
             char* pUTF8Filename = NULL;
             zFilename.getUTF8( &pUTF8Filename );
 
             dwf_salt_init_keys( pUTF8Filename, pUTF8Password, s->cur_file_info.key );
-            
+
             DWFCORE_FREE_MEMORY( pUTF8Filename );
         }
         else
@@ -1360,10 +1360,10 @@ int ZEXPORT unzOpenCurrentFile (unzFile file, const DWFString& zPassword, const 
   return <0 with error code if there is an error
     (UNZ_ERRNO for IO error, or zLib error for uncompress error)
 */
-int ZEXPORT unzReadCurrentFile (
-    unzFile file,
-    voidp buf,
-    unsigned len)
+int ZEXPORT dwf_unzReadCurrentFile(
+        dwf_unzFile file,
+        voidp buf,
+        unsigned len)
 {
     int err=UNZ_OK;
     uInt iRead = 0;
@@ -1508,7 +1508,7 @@ int ZEXPORT unzReadCurrentFile (
 /*
   Give the current position in uncompressed data
 */
-z_off_t ZEXPORT unztell (unzFile file)
+z_off_t ZEXPORT dwf_unztell(dwf_unzFile file)
 {
     unz_s* s;
     file_in_zip_read_info_s* pfile_in_zip_read_info;
@@ -1527,7 +1527,7 @@ z_off_t ZEXPORT unztell (unzFile file)
 /*
   return 1 if the end of file was reached, 0 elsewhere
 */
-int ZEXPORT unzeof (unzFile file)
+int ZEXPORT dwf_unzeof(dwf_unzFile file)
 {
     unz_s* s;
     file_in_zip_read_info_s* pfile_in_zip_read_info;
@@ -1548,7 +1548,7 @@ int ZEXPORT unzeof (unzFile file)
 
 
 /*
-  Read extra field from the current file (opened by unzOpenCurrentFile)
+  Read extra field from the current file (opened by dwf_unzOpenCurrentFile)
   This is the local-header version of the extra field (sometimes, there is
     more info in the local-header version than in the central-header)
 
@@ -1559,10 +1559,10 @@ int ZEXPORT unzeof (unzFile file)
   the return value is the number of bytes copied in buf, or (if <0)
     the error code
 */
-int ZEXPORT unzGetLocalExtrafield (
-    unzFile file,
-    voidp buf,
-    unsigned len)
+int ZEXPORT dwf_unzGetLocalExtrafield(
+        dwf_unzFile file,
+        voidp buf,
+        unsigned len)
 {
     unz_s* s;
     file_in_zip_read_info_s* pfile_in_zip_read_info;
@@ -1603,7 +1603,7 @@ int ZEXPORT unzGetLocalExtrafield (
   Close the file in zip opened with unzipOpenCurrentFile
   Return UNZ_CRCERROR if all the file was read but the CRC is not good
 */
-int ZEXPORT unzCloseCurrentFile (unzFile file)
+int ZEXPORT dwf_unzCloseCurrentFile(dwf_unzFile file)
 {
     int err=UNZ_OK;
 
@@ -1644,10 +1644,10 @@ int ZEXPORT unzCloseCurrentFile (unzFile file)
   uSizeBuf is the size of the szComment buffer.
   return the number of byte copied or an error code <0
 */
-int ZEXPORT unzGetGlobalComment (
-    unzFile file,
-    char *szComment,
-    uLong uSizeBuf)
+int ZEXPORT dwf_unzGetGlobalComment(
+        dwf_unzFile file,
+        char *szComment,
+        uLong uSizeBuf)
 {
     unz_s* s;
     uLong uReadThis ;
@@ -1675,42 +1675,42 @@ int ZEXPORT unzGetGlobalComment (
 }
 
 /*
-int ZEXPORT unzIsEncrypted(const wchar_t *path)
+int ZEXPORT dwf_unzIsEncrypted(const wchar_t *path)
 {
     int result=0;
-    unzFile file = unzLocal_OpenFile(path, false);
-    unz_file_info file_info;
+    dwf_unzFile file = unzLocal_OpenFile(path, false);
+    dwf_unz_file_info file_info;
 
     if (file==NULL)
         return UNZ_PARAMERROR;
 
-    result = unzGoToFirstFile(file);
+    result = assimp_unzGoToFirstFile(file);
 
     if (result==UNZ_OK)
     {
-        result = unzGetCurrentFileInfo(file, &file_info, 0, 0, 0, 0, 0, 0);
+        result = dwf_unzGetCurrentFileInfo(file, &file_info, 0, 0, 0, 0, 0, 0);
         if (result==UNZ_OK)
             result = file_info.flag & 0x01;
     }
 
-    unzClose(file);
+    dwf_unzClose(file);
     return result;
 }
 */
 
-int ZEXPORT unzIsEncrypted(unzFile file)
+int ZEXPORT dwf_unzIsEncrypted(dwf_unzFile file)
 {
     int result=0;
-    unz_file_info file_info;
+    dwf_unz_file_info file_info;
 
     if (file==NULL)
         return UNZ_PARAMERROR;
 
-    result = unzGoToFirstFile(file);
+    result = dwf_unzGoToFirstFile(file);
 
     if (result==UNZ_OK)
     {
-        result = unzGetCurrentFileInfo(file, &file_info, 0, 0, 0, 0, 0, 0);
+        result = dwf_unzGetCurrentFileInfo(file, &file_info, 0, 0, 0, 0, 0, 0);
         if (result==UNZ_OK)
             result = file_info.flag & 0x01;
     }

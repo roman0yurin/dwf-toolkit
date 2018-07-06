@@ -485,7 +485,7 @@ protected:
     ///
     ///         The data structure representing an archive reader stream (from the zip library.)
     ///
-    unzFile                             _pUnzipStream;
+    dwf_unzFile                             _pUnzipStream;
 
     ///
     ///         The external stream that provides read-access to a remote archive or something acting like one.

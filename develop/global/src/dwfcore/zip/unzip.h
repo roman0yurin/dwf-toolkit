@@ -82,9 +82,9 @@ extern "C" {
 /* like the STRICT of WIN32, we define a pointer that cannot be converted
     from (void*) without cast */
 typedef struct TagunzFile__ { int unused; } unzFile__;
-typedef unzFile__ *unzFile;
+typedef unzFile__ *dwf_unzFile;
 #else
-typedef voidp unzFile;
+typedef voidp dwf_unzFile;
 #endif
 
 #define UNZ_OK                                  (0)
@@ -97,8 +97,8 @@ typedef voidp unzFile;
 #define UNZ_CRCERROR                    (-105)
 #define UNZ_BADPASSWORD                 (-106)
 
-/* tm_unz contain date/time info */
-typedef struct tm_unz_s
+/* dwf_tm_unz contain date/time info */
+typedef struct dwf_tm_unz_s
 {
     uInt tm_sec;            /* seconds after the minute - [0,59] */
     uInt tm_min;            /* minutes after the hour - [0,59] */
@@ -106,20 +106,20 @@ typedef struct tm_unz_s
     uInt tm_mday;           /* day of the month - [1,31] */
     uInt tm_mon;            /* months since January - [0,11] */
     uInt tm_year;           /* years - [1980..2044] */
-} tm_unz;
+} dwf_tm_unz;
 
-/* unz_global_info structure contain global data about the ZIPfile
+/* dwf_unz_global_info structure contain global data about the ZIPfile
    These data comes from the end of central dir */
-typedef struct unz_global_info_s
+typedef struct dwf_unz_global_info_s
 {
     uLong number_entry;         /* total number of entries in
                        the central dir on this disk */
     uLong size_comment;         /* size of the global comment of the zipfile */
-} unz_global_info;
+} dwf_unz_global_info;
 
 
-/* unz_file_info contain information about a file in the zipfile */
-typedef struct unz_file_info_s
+/* dwf_unz_file_info contain information about a file in the zipfile */
+typedef struct dwf_unz_file_info_s
 {
     uLong version;              // version made by
     uLong version_needed;       // version needed to extract
@@ -138,14 +138,14 @@ typedef struct unz_file_info_s
     uLong internal_fa;          // internal file attributes
     uLong external_fa;          // external file attributes
     uLong key[3];               // binary keys used for passwording
-    tm_unz tmu_date;            // last mod date in tmu format
-} unz_file_info;
+    dwf_tm_unz tmu_date;            // last mod date in tmu format
+} dwf_unz_file_info;
 
-ZEXTERN DWFInputStream* ZEXPORT unzGetFilePointer(unzFile uf);
+ZEXTERN DWFInputStream* ZEXPORT dwf_unzGetFilePointer(dwf_unzFile uf);
 
-ZEXTERN int ZEXPORT unzStringFileNameCompare OF ((const char* fileName1,
-                                                 const char* fileName2,
-                                                 int iCaseSensitivity));
+ZEXTERN int ZEXPORT dwf_unzStringFileNameCompare OF ((const char* fileName1,
+                                                             const char* fileName2,
+                                                             int iCaseSensitivity));
 /*
    Compare two filename (fileName1,fileName2).
    If iCaseSenisivity = 1, comparision is case sensitivity (like strcmp)
@@ -183,36 +183,40 @@ typedef struct _unzIndex
             free(locatorArray);
     }
 } unzIndex;
-ZEXTERN unzFile ZEXPORT unzOpenFile OF((const DWFString& zPath, unzIndex* pIndex));
-ZEXTERN unzFile ZEXPORT unzOpenStream OF((DWFInputStream& rStream, unzIndex* pIndex));
+ZEXTERN dwf_unzFile ZEXPORT dwf_unzOpenFile OF((const DWFString& zPath, unzIndex* pIndex));
+ZEXTERN dwf_unzFile ZEXPORT dwf_unzOpenStream OF((DWFInputStream & rStream, unzIndex * pIndex));
 /*
   Open a Zip file. path contain the full pathname (by example,
      on a Windows NT computer "c:\\zlib\\zlib111.zip" or on an Unix computer
      "zlib/zlib111.zip".
      If the zipfile cannot be opened (file don't exist or in not valid), the
        return value is NULL.
-     Else, the return value is a unzFile Handle, usable with other function
+     Else, the return value is a dwf_unzFile Handle, usable with other function
        of this unzip package.
 */
 
-ZEXTERN int ZEXPORT unzClose OF((unzFile file));
+ZEXTERN int ZEXPORT dwf_unzClose OF((dwf_unzFile
+                                            file));
 /*
   Close a ZipFile opened with unzipOpen.
-  If there is files inside the .Zip opened with unzOpenCurrentFile (see later),
+  If there is files inside the .Zip opened with dwf_unzOpenCurrentFile (see later),
     these files MUST be closed with unzipCloseCurrentFile before call unzipClose.
   return UNZ_OK if there is no problem. */
 
-ZEXTERN int ZEXPORT unzGetGlobalInfo OF((unzFile file,
-                    unz_global_info *pglobal_info));
+ZEXTERN int ZEXPORT dwf_unzGetGlobalInfo OF((dwf_unzFile
+                                                    file,
+                                                            dwf_unz_global_info * pglobal_info));
 /*
   Write info about the ZipFile in the *pglobal_info structure.
   No preparation of the structure is needed
   return UNZ_OK if there is no problem. */
 
 
-ZEXTERN int ZEXPORT unzGetGlobalComment OF((unzFile file,
-                                           char *szComment,
-                       uLong uSizeBuf));
+ZEXTERN int ZEXPORT dwf_unzGetGlobalComment OF((dwf_unzFile
+                                                       file,
+                                                               char * szComment,
+                                                               uLong
+                                                       uSizeBuf));
 /*
   Get the global comment string of the ZipFile, in the szComment buffer.
   uSizeBuf is the size of the szComment buffer.
@@ -223,39 +227,46 @@ ZEXTERN int ZEXPORT unzGetGlobalComment OF((unzFile file,
 /***************************************************************************/
 /* Unzip package allow you browse the directory of the zipfile */
 
-ZEXTERN int ZEXPORT unzGoToFirstFile OF((unzFile file));
+ZEXTERN int ZEXPORT dwf_unzGoToFirstFile OF((dwf_unzFile
+                                                    file));
 /*
   Set the current file of the zipfile to the first file.
   return UNZ_OK if there is no problem
 */
 
-ZEXTERN int ZEXPORT unzGoToNextFile OF((unzFile file));
+ZEXTERN int ZEXPORT dwf_unzGoToNextFile OF((dwf_unzFile
+                                                   file));
 /*
   Set the current file of the zipfile to the next file.
   return UNZ_OK if there is no problem
   return UNZ_END_OF_LIST_OF_FILE if the actual file was the latest.
 */
 
-ZEXTERN int ZEXPORT unzLocateFile OF((unzFile file,
-                                      const DWFString& zFilename,
-                                      int iCaseSensitivity));
+ZEXTERN int ZEXPORT dwf_unzLocateFile OF((dwf_unzFile
+                                                 file,
+                                                 const DWFString &zFilename,
+                                                 int iCaseSensitivity));
 /*
   Try locate the file szFileName in the zipfile.
-  For the iCaseSensitivity signification, see unzStringFileNameCompare
+  For the iCaseSensitivity signification, see dwf_unzStringFileNameCompare
 
   return value :
   UNZ_OK if the file is found. It becomes the current file.
   UNZ_END_OF_LIST_OF_FILE if the file is not found
 */
 
-ZEXTERN int ZEXPORT unzGetCurrentFileInfo OF((unzFile file,
-                         unz_file_info *pfile_info,
-                         char *szFileName,
-                         uLong fileNameBufferSize,
-                         void *extraField,
-                         uLong extraFieldBufferSize,
-                         char *szComment,
-                         uLong commentBufferSize));
+ZEXTERN int ZEXPORT dwf_unzGetCurrentFileInfo OF((dwf_unzFile
+                                                         file,
+                                                                 dwf_unz_file_info * pfile_info,
+                                                                 char * szFileName,
+                                                                 uLong
+                                                         fileNameBufferSize,
+                                                                 void * extraField,
+                                                                 uLong
+                                                         extraFieldBufferSize,
+                                                                 char * szComment,
+                                                                 uLong
+                                                         commentBufferSize));
 /*
   Get Info about the current file
   if pfile_info!=NULL, the *pfile_info structure will contain somes info about
@@ -270,7 +281,8 @@ ZEXTERN int ZEXPORT unzGetCurrentFileInfo OF((unzFile file,
 */
 
 
-ZEXTERN void ZEXPORT unzDosDateToTmuDate OF((uLong ulDosDate, tm_unz* ptm));
+ZEXTERN void ZEXPORT dwf_unzDosDateToTmuDate OF((uLong
+                                                        ulDosDate, dwf_tm_unz * ptm));
 
 
 /***************************************************************************/
@@ -278,7 +290,10 @@ ZEXTERN void ZEXPORT unzDosDateToTmuDate OF((uLong ulDosDate, tm_unz* ptm));
    from it, and close it (you can close it before reading all the file)
    */
 
-ZEXTERN int ZEXPORT unzOpenCurrentFile OF((unzFile file, const DWFString& zPassword, const DWFString& zFilename = L"" ));
+ZEXTERN int ZEXPORT dwf_unzOpenCurrentFile OF((dwf_unzFile
+                                                      file,
+                                                      const DWFString &zPassword,
+                                                      const DWFString &zFilename = L"" ));
 
 /*
   Open for reading data the current file in the zipfile.
@@ -287,18 +302,22 @@ ZEXTERN int ZEXPORT unzOpenCurrentFile OF((unzFile file, const DWFString& zPassw
   should be set to NULL for non-protected files
 */
 
-ZEXTERN int ZEXPORT unzCloseCurrentFile OF((unzFile file));
+ZEXTERN int ZEXPORT dwf_unzCloseCurrentFile OF((dwf_unzFile
+                                                       file));
 /*
-  Close the file in zip opened with unzOpenCurrentFile
+  Close the file in zip opened with dwf_unzOpenCurrentFile
   Return UNZ_CRCERROR if all the file was read but the CRC is not good
 */
 
 
-ZEXTERN int ZEXPORT unzReadCurrentFile OF((unzFile file,
-                      voidp buf,
-                      unsigned len));
+ZEXTERN int ZEXPORT dwf_unzReadCurrentFile OF((dwf_unzFile
+                                                      file,
+                                                              voidp
+                                                      buf,
+                                                              unsigned
+                                                      len));
 /*
-  Read bytes from the current file (opened by unzOpenCurrentFile)
+  Read bytes from the current file (opened by dwf_unzOpenCurrentFile)
   buf contain buffer where data must be copied
   len the size of buf.
 
@@ -308,21 +327,26 @@ ZEXTERN int ZEXPORT unzReadCurrentFile OF((unzFile file,
     (UNZ_ERRNO for IO error, or zLib error for uncompress error)
 */
 
-ZEXTERN z_off_t ZEXPORT unztell OF((unzFile file));
+ZEXTERN z_off_t ZEXPORT dwf_unztell OF((dwf_unzFile
+                                               file));
 /*
   Give the current position in uncompressed data
 */
 
-ZEXTERN int ZEXPORT unzeof OF((unzFile file));
+ZEXTERN int ZEXPORT dwf_unzeof OF((dwf_unzFile
+                                          file));
 /*
   return 1 if the end of file was reached, 0 elsewhere
 */
 
-ZEXTERN int ZEXPORT unzGetLocalExtrafield OF((unzFile file,
-                                             voidp buf,
-                                             unsigned len));
+ZEXTERN int ZEXPORT dwf_unzGetLocalExtrafield OF((dwf_unzFile
+                                                         file,
+                                                                 voidp
+                                                         buf,
+                                                                 unsigned
+                                                         len));
 /*
-  Read extra field from the current file (opened by unzOpenCurrentFile)
+  Read extra field from the current file (opened by dwf_unzOpenCurrentFile)
   This is the local-header version of the extra field (sometimes, there is
     more info in the local-header version than in the central-header)
 
@@ -334,8 +358,9 @@ ZEXTERN int ZEXPORT unzGetLocalExtrafield OF((unzFile file,
     the error code
 */
 
-/*ZEXTERN int ZEXPORT unzIsEncrypted OF((const wchar_t *path));*/
-ZEXTERN int ZEXPORT unzIsEncrypted OF((unzFile file));
+/*ZEXTERN int ZEXPORT dwf_unzIsEncrypted OF((const wchar_t *path));*/
+ZEXTERN int ZEXPORT dwf_unzIsEncrypted OF((dwf_unzFile
+                                                  file));
 /*
   By looking at the current file (or first file if there isn't a
   current one) this routine determines whether the zip is password

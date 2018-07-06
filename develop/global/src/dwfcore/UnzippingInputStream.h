@@ -60,7 +60,7 @@ public:
     ///\throw   None
     ///
     _DWFCORE_API 
-    DWFUnzippingInputStream( unzFile pUnzipStream )
+    DWFUnzippingInputStream( dwf_unzFile pUnzipStream )
         throw();
 
     ///
@@ -127,7 +127,7 @@ private:
 
     bool    _bFileOpen;
     size_t  _nFileBytesRemaining;
-    unzFile _pUnzipStream;
+    dwf_unzFile _pUnzipStream;
     DWFZipFileDescriptor*   _pDescriptor;
     bool                    _bOwnDescriptor;
 

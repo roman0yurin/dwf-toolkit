@@ -110,11 +110,11 @@ throw( DWFException )
 
         if (_pInputStream)
         {
-            _pUnzipStream = unzOpenStream( *_pInputStream, pIndex->index() );
+            _pUnzipStream = dwf_unzOpenStream(*_pInputStream, pIndex->index());
         }
         else
         {
-            _pUnzipStream = unzOpenFile( _oFile.name(), pIndex->index() );
+            _pUnzipStream = dwf_unzOpenFile(_oFile.name(), pIndex->index());
         }
 
         if (_pUnzipStream == NULL)
@@ -157,7 +157,7 @@ throw( DWFException )
 {
     if (_pUnzipStream)
     {
-        unzClose( _pUnzipStream );
+        dwf_unzClose(_pUnzipStream);
         _pUnzipStream = NULL;
     }
     else if (_pZipStream)
@@ -205,7 +205,7 @@ throw( DWFException )
         //
         // get the underlying stream
         //
-        DWFInputStream* pUnzipStream = unzGetFilePointer( _pUnzipStream );
+        DWFInputStream* pUnzipStream = dwf_unzGetFilePointer(_pUnzipStream);
 
         //
         // perform read
@@ -233,12 +233,12 @@ throw( DWFException )
         //
         // get the underlying file descriptor
         //
-        DWFInputStream* pUnzipStream = unzGetFilePointer( _pUnzipStream );
+        DWFInputStream* pUnzipStream = dwf_unzGetFilePointer(_pUnzipStream);
 
         //
         // the current offset
         //
-        off_t nPrevOffset = unztell( _pUnzipStream );
+        off_t nPrevOffset = dwf_unztell(_pUnzipStream);
 
         //
         // perform seek
@@ -266,9 +266,9 @@ throw( DWFException )
         _DWFCORE_THROW( DWFIOException, /*NOXLATE*/L"No archive open for unzipping" );
     }
 
-    if (unzLocateFile(_pUnzipStream, rArchivedFile, 1) == UNZ_OK)
+    if (dwf_unzLocateFile(_pUnzipStream, rArchivedFile, 1) == UNZ_OK)
     {
-        int nEnc = unzIsEncrypted( _pUnzipStream );
+        int nEnc = dwf_unzIsEncrypted(_pUnzipStream);
         _eEncryption = ((nEnc == 1) ? eEncrypted : ((nEnc == 0) ? eNotEncrypted : eEncryptionUnknown));
 
         return true;

@@ -4,9 +4,7 @@
 
 #include <dgn/SemanticValue.hpp>
 #include "DwfUtilsImpl.h"
-#include "dgn/InputStream.hpp"
 #include "dgn/DwfStreamHandler.hpp"
-#include "DwfJavaInputStream.h"
 using namespace DWFCore;
 using namespace DWFToolkit;
 
@@ -95,6 +93,7 @@ public:
 //
 			string str =  string(this->m_string, this->m_length);
 			wstring wstr(str.begin(), str.end());
+			if ()
 //			auto const result = semantic.find(wstr);
 //			if (result != semantic.end()){
 //				OBJ_SEMANTIC sem = result->second;
@@ -117,7 +116,7 @@ public:
 		}
 
 		TK_Status Execute(BStreamFileToolkit &rW3DParser){
-			javaHandler->closeNone();
+			javaHandler->closeNone(1, std::vector<std::wstring>()); //TODO посчитать количество блоков и список колонок.
 			return TK_Close_Segment::Execute(rW3DParser);
 		}
 };
@@ -177,10 +176,126 @@ void GetDWFObjectDefinition(DWFObjectDefinition *pDef, DWFDefinedObjectInstance 
 	}
 }
 
+void c60::DwfUtilsImpl::readTreeStructure(const std::wstring &dwf, int32_t depth, const std::shared_ptr<dgn::DwfStreamHandler> &handler) {
+	DWFString fileName;
+	fileName.append(dwf.c_str());
+	DWFFile oDWF(fileName);
+	DWFPackageReader oReader(oDWF);
 
-void c60::DwfUtilsImpl::doImport(const std::shared_ptr<dgn::InputStream> &dwf, const std::shared_ptr<dgn::DwfStreamHandler> &handler) {
-	DwfJavaInputStream stream(dwf);
-	DWFPackageReader oReader(stream);
+	DWFPackageReader::tPackageInfo tInfo;
+	oReader.getPackageInfo(tInfo);
+
+	if (tInfo.eType != DWFPackageReader::eDWFPackage && tInfo.eType != DWFPackageReader::eDWFXPackage) {
+		exit(0);
+	}
+
+	DWFManifest &rManifest = oReader.getManifest();
+
+	std::map<std::wstring, OBJ_SEMANTIC> all_semantic;
+	DWFSection *pSection = NULL;
+	DWFManifest::SectionIterator *piSections = rManifest.getSections();
+	if (piSections) {
+		for (; piSections->valid(); piSections->next()) {
+			pSection = piSections->get();
+			pSection->readDescriptor();
+
+			DWFPropertyContainer *pContainer = NULL;
+			DWFDefinedObjectInstance::tList rRootInstances;
+			DWFResourceContainer::ResourceIterator *piObjDefs = pSection->findResourcesByRole(
+							DWFXML::kzRole_ObjectDefinition);
+			if (piObjDefs && piObjDefs->valid()) {
+				DWFObjectDefinition *pDef = pSection->getObjectDefinition();
+				if (pDef) {
+					pDef->getRootInstances(rRootInstances);
+
+					DWFDefinedObjectInstance *pInst = NULL;
+					DWFDefinedObjectInstance::tList::const_iterator iInst = rRootInstances.begin();
+					for (; iInst != rRootInstances.end(); iInst++) {
+						pInst = *iInst;
+						GetDWFObjectDefinition(pDef, pInst, all_semantic);
+					}
+				}
+			}
+
+			DWFResourceContainer::ResourceKVIterator *piResource = pSection->getResourcesByRole();
+			if (piResource) {
+				for (; piResource->valid(); piResource->next()) {
+					DWFResource *pResource = piResource->value();
+					DWFGraphicResource *pW3D = dynamic_cast<DWFGraphicResource *>(pResource);
+					if (pW3D) {
+						//
+						// get the data stream
+						//
+						DWFCore::DWFInputStream *pW3DStream = pW3D->getInputStream();
+
+						//
+						// Create the HSF toolkit object that does the stream I/O
+						//
+						BStreamFileToolkit oW3DStreamParser;
+
+						//
+						// For this sample, we are interested in those op-codes that might contain
+						// some interesting text.  Here is where we hook these handlers.
+						// Also note that the parser object will delete this object on it's own destruction
+						//
+						//oW3DStreamParser.SetOpcodeHandler(TKE_Start_User_Data, new StartUserDataHandler);
+						//oW3DStreamParser.SetOpcodeHandler(TKE_Stop_User_Data, new StartUserDataHandler);
+
+						oW3DStreamParser.SetOpcodeHandler(TKE_Shell, new ShellHandler(handler));
+
+						//oW3DStreamParser.SetOpcodeHandler(TKE_Comment, new CommentHandler);
+						//oW3DStreamParser.SetOpcodeHandler(TKE_Tag, new TAGOpcodeHandler(all_semantic));
+						//oW3DStreamParser.SetOpcodeHandler(TKE_Text_With_Encoding, new TextWithEncodingOpcodeHandler);
+						oW3DStreamParser.SetOpcodeHandler(TKE_Open_Segment, new OpenHandler(handler, all_semantic));
+						oW3DStreamParser.SetOpcodeHandler(TKE_Close_Segment, new CloseHandler(handler));
+
+						//
+						// Attach the stream to the parser
+						//
+						oW3DStreamParser.OpenStream(*pW3DStream);
+
+						size_t nBytesRead = 0;
+						char aBuffer[16384] = {0};
+
+						//
+						// read and process the stream
+						//
+						while (pW3DStream->available() > 0) {
+							//
+							// read from the stream ourselves, we could also use ReadBuffer()
+							// but it basically just performs this same action.
+							//
+							nBytesRead = pW3DStream->read(aBuffer, 16384);
+
+							//
+							// use the parser to process the buffer
+							//
+							if (oW3DStreamParser.ParseBuffer(aBuffer, nBytesRead, TK_Normal) == TK_Error) {
+								wcout << L"Error occured parsing buffer" << endl;
+								break;
+							}
+						}
+
+						//
+						// Done with the stream, we must delete it
+						//
+						oW3DStreamParser.CloseStream();
+						DWFCORE_FREE_OBJECT(pW3DStream);
+					}
+				}
+			}
+		}
+
+		DWFCORE_FREE_OBJECT(piSections);
+	}
+}
+
+
+void c60::DwfUtilsImpl::doImport(const std::wstring &dwf, const std::shared_ptr<dgn::DwfStreamHandler> &handler) {
+	DWFString fileName;
+	fileName.append(dwf.c_str());
+	DWFFile oDWF(fileName);
+	DWFPackageReader oReader(oDWF);
 
 	DWFPackageReader::tPackageInfo tInfo;
 	oReader.getPackageInfo(tInfo);

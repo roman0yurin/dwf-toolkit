@@ -28,7 +28,13 @@ namespace c60 {
 
 				/**выолнить импотр даных из потока dwf и передать их в обработчик handler */
 				void
-				doImport(const std::shared_ptr<dgn::InputStream> &dwf, const std::shared_ptr<dgn::DwfStreamHandler> &handler) override;
+				doImport(const std::wstring &dwf, const std::shared_ptr<dgn::DwfStreamHandler> &handler) override;
+
+				/**
+			 *Читает исключительно  структуру дерева (обрабатываются только методы openNode и closeNode)
+			 *Причем не глубже указанного уровня.
+			 */
+				virtual void readTreeStructure(const std::wstring & dwf, int32_t depth, const std::shared_ptr<dgn::DwfStreamHandler> & handler) override;
 		};
 
 

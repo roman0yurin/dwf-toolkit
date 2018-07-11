@@ -8,11 +8,25 @@
 using namespace DWFCore;
 using namespace DWFToolkit;
 
+DWFString toDwfString(std::wstring str){
+	DWFString name;
+	name.append(str.c_str());
+	return name;
+}
+
+c60::DwfUtilsImpl::DwfUtilsImpl(const std::wstring & dwfFile, int32_t layerDepth):
+				dgn::DwfUtils(),
+				layerDepth(layerDepth),
+				dwfFile(dwfFile),
+				oReader(DWFFile(toDwfString(dwfFile)))
+{
+	oReader.getPackageInfo(this->tInfo);
+	rManifest = oReader.getManifest();
+}
 
 /**получить синглтон утилит */
-std::shared_ptr<dgn::DwfUtils> dgn::DwfUtils::getInstance(){
-	static std::shared_ptr<c60::DwfUtilsImpl> instance(new c60::DwfUtilsImpl());
-	return instance;
+std::shared_ptr<dgn::DwfUtils> dgn::DwfUtils::getInstance(const std::wstring & dwfFile, int32_t layerDepth){
+	return std::static_pointer_cast<dgn::DwfUtils>(std::shared_ptr<c60::DwfUtilsImpl>(new c60::DwfUtilsImpl(dwfFile, layerDepth)));
 }
 
 
@@ -93,7 +107,7 @@ public:
 //
 			string str =  string(this->m_string, this->m_length);
 			wstring wstr(str.begin(), str.end());
-			if ()
+			//if ()
 //			auto const result = semantic.find(wstr);
 //			if (result != semantic.end()){
 //				OBJ_SEMANTIC sem = result->second;
@@ -176,17 +190,11 @@ void GetDWFObjectDefinition(DWFObjectDefinition *pDef, DWFDefinedObjectInstance 
 	}
 }
 
-void c60::DwfUtilsImpl::readTreeStructure(const std::wstring &dwf, int32_t depth, const std::shared_ptr<dgn::DwfStreamHandler> &handler) {
-	DWFString fileName;
-	fileName.append(dwf.c_str());
-	DWFFile oDWF(fileName);
-	DWFPackageReader oReader(oDWF);
+void c60::DwfUtilsImpl::readTreeStructure(const std::shared_ptr<dgn::DwfStreamHandler> &handler) {
 
-	DWFPackageReader::tPackageInfo tInfo;
-	oReader.getPackageInfo(tInfo);
-
-	if (tInfo.eType != DWFPackageReader::eDWFPackage && tInfo.eType != DWFPackageReader::eDWFXPackage) {
-		exit(0);
+	oReader.getPackageInfo(this->tInfo);
+	if (this->tInfo.eType != DWFPackageReader::eDWFPackage && this->tInfo.eType != DWFPackageReader::eDWFXPackage) {
+		return;
 	}
 
 	DWFManifest &rManifest = oReader.getManifest();
@@ -217,7 +225,7 @@ void c60::DwfUtilsImpl::readTreeStructure(const std::wstring &dwf, int32_t depth
 				}
 			}
 
-			DWFResourceContainer::ResourceKVIterator *piResource = pSection->getResourcesByRole();
+			DWFResourceContainer::ResourceKVIterator *piResource = pSection->getResourcesByRole()
 			if (piResource) {
 				for (; piResource->valid(); piResource->next()) {
 					DWFResource *pResource = piResource->value();
@@ -291,15 +299,7 @@ void c60::DwfUtilsImpl::readTreeStructure(const std::wstring &dwf, int32_t depth
 }
 
 
-void c60::DwfUtilsImpl::doImport(const std::wstring &dwf, const std::shared_ptr<dgn::DwfStreamHandler> &handler) {
-	DWFString fileName;
-	fileName.append(dwf.c_str());
-	DWFFile oDWF(fileName);
-	DWFPackageReader oReader(oDWF);
-
-	DWFPackageReader::tPackageInfo tInfo;
-	oReader.getPackageInfo(tInfo);
-
+void c60::DwfUtilsImpl::doImportNextLayer(const std::shared_ptr<dgn::DwfStreamHandler> &handler) {
 	char zBuffer[256] = {0};
 	const wchar_t *str;
 

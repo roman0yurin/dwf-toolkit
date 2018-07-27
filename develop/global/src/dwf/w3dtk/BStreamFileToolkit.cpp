@@ -428,12 +428,6 @@ TK_Status Internal_Data_Accumulator::start_decompression (void) alter {
 }
 
 TK_Status Internal_Data_Accumulator::stop_decompression (bool force) alter {
-    
-    
-
-    
-    
-
     if (force) {
         if (inflateEnd (m_z_stream) != Z_OK) {
             
@@ -1290,9 +1284,9 @@ TK_Status BStreamFileToolkit::ReadBuffer (char alter * buffer, int size, int alt
 {
     amount_read = 0;
 
-        //
-        // use the stream if available
-        //
+		//
+		// use the stream if available
+		//
     if (_pInputStream)
     {
         try

@@ -77,7 +77,7 @@ public:
 		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
 			TK_Status eStatus = TK_Open_Segment::Execute(rW3DParser);
 			if (eStatus == TK_Normal) {
-				wcout << L"\tУровень сегмента: " << rW3DParser.getNestingLevel() << endl;
+				wcout << L"\tNestingLevel : " << rW3DParser.getNestingLevel() << endl;
 			}
 
 			string str =  string(this->m_string, this->m_length);

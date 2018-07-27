@@ -37,7 +37,9 @@
 #define BOPCODE_HANDLER
 
 #ifndef BBINFILETK_TOOLKIT
-    #include "dwf/Toolkit.h"
+
+#include <dgn/DwfColor.hpp>
+#include "dwf/Toolkit.h"
     #include "dwf/w3dtk/BStream.h"
     #include "dwf/w3dtk/BStreamFileToolkit.h"
     #include "dwf/w3dtk/W3DOpcodeHandler.h"
@@ -2077,6 +2079,7 @@ class BBINFILETK_API TK_Color : public BBaseOpcodeHandler {
 		TK_Status   WriteAscii (BStreamFileToolkit & tk) alter;
 
 		void        Reset (void) alter;
+
 
 		/*! Sets the mask value which indicates which types of geometry are affected by this color setting.  Geometry types are specified by #TKO_Geometry_Bits.  */
 		void            SetGeometry (int m) alter {

@@ -399,7 +399,7 @@ throw( DWFException )
     //DWFDefinedObjectInstance** ppInstance = _oInstances.find( zInstanceID );
     //if (ppInstance == NULL)
     // else if using DWF STL Maps:
-	DWFDefinedObjectInstance::tMap::iterator inst = _oInstances.find( zInstanceID );
+	  DWFDefinedObjectInstance::tMap::iterator inst = _oInstances.find( zInstanceID );
     if (inst == _oInstances.end())
     {
         _DWFCORE_THROW( DWFDoesNotExistException, /*NOXLATE*/L"Unknown instance ID" );

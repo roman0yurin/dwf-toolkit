@@ -47,7 +47,12 @@ namespace c60 {
 				/**название слоя**/
 				wstring name;
 				/**название колонок**/
-				std::vector<wstring> fields;
+				//std::vector<wstring> fields;
+				std::map<std::wstring, std::wstring> fields;
+				/**Глубина в структуре узлов, на которой находится геометрия**/
+				int32_t bottomLevel = 0;
+				/**Глубина в структуре узлов, на которой находится семантика**/
+				int32_t semanticLevel = -1;
 				//**Позиция начала слоя**//
 				//int begin = -1;
 				//**Позиция конца слоя**/
@@ -57,8 +62,27 @@ namespace c60 {
 
 				LayerDWF (void){};
 
-				void SetFields(DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
-				void SetSemantic(DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
+				//void SetFields(DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
+				//void SetBottomLevel(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
+				bool SetFields();
+				void clearValue(){
+					for (auto pos = this->fields.begin(); pos != this->fields.end(); ++pos) {
+						pos->second = L"";
+					}
+				}
+				void setValues(OBJ_SEMANTIC semantic){
+					for (auto const &semv : semantic){
+						this->fields[semv.propName] = semv.propValue;
+					}
+				}
+				vector<wstring> getValues(){
+					vector<wstring> result;
+					for (auto pos = this->fields.begin(); pos != this->fields.end(); ++pos) {
+						result.push_back(pos->second);
+					}
+
+					return result;
+				}
 		};
 
 		/**секция файла DWF**/
@@ -74,16 +98,16 @@ namespace c60 {
 				//DWFObjectDefinition *pDef;
 
 
-				/**Глубина в структуре узлов, на которой находятся геометрия и стиль объекта**/
-				int32_t bottomLevel;
+				/**Глубина в структуре узлов, на которой находятся слои**/
+				int32_t levelLayers = 0;
 				/**слои секции**/
 				std::map<std::wstring, LayerDWF> layers;
 				/**Текущий обрабатываемый слой текущей DWFSection**/
 				LayerDWF *layer;
 
 
-				void SetbottomLevel(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
-				void SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
+				bool SetLevelLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
+				//bool SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
 				//void AddSemantic(DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
 		};
 

@@ -4432,6 +4432,11 @@ class BBINFILETK_API TK_Matrix : public BBaseOpcodeHandler {
 		float const *   GetMatrix (void) const              { return m_matrix;  }
 		/*! Returns the matrix as the address of the array of floats, which may be modified directly */
 		float alter *   GetMatrix (void) alter              { return m_matrix;  }
+
+		/**
+		* Преобразовать данные для передачи матрицы в java
+		*/
+		//dgn::     toDgnMatrix();
 };
 
 

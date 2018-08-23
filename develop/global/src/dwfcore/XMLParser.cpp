@@ -141,7 +141,7 @@ void
 DWFXMLParser::parseDocument( DWFInputStream& rDocumentStream)
 throw( DWFException )
 {
-	bool bAdvance = false;
+		bool bAdvance = false;
     XML_Status retCode = XML_STATUS_OK;
     XML_ParsingStatus status; 
     XML_GetParsingStatus(_pXMLParser, &status);
@@ -188,7 +188,8 @@ throw( DWFException )
 		size_t nBytesRead = 0;
 		try
 		{	
-			nBytesRead = pReadStream->read( _apParseBuffer, (size_t)DWFCORE_XML_PARSER_BUFFER_BYTES );			
+			nBytesRead = pReadStream->read( _apParseBuffer, (size_t)DWFCORE_XML_PARSER_BUFFER_BYTES );
+			//JLogger::info(L"Размер %lu", pReadStream->available());
 		}
         catch(...)
         {

@@ -129,6 +129,7 @@ public:
 private:
 
     bool                   _bInit;
+    pthread_mutexattr_t _mutexattr;
     pthread_mutex_t        _tMutex;
 
 private:

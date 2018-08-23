@@ -52,10 +52,12 @@ throw( DWFException )
         _DWFCORE_THROW( DWFIllegalStateException, /*NOXLATE*/L"Mutex already initialized" );
     }
 
-        //
-        // the default mutex attributes will provide a fast mutex (futex) implementation
-        //
-    if (pthread_mutex_init(&_tMutex, NULL) != 0)
+    pthread_mutexattr_init(&_mutexattr);
+    pthread_mutexattr_settype(&_mutexattr, PTHREAD_MUTEX_RECURSIVE);
+		//
+		// the default mutex attributes will provide a fast mutex (futex) implementation
+		//
+    if (pthread_mutex_init(&_tMutex, &_mutexattr) != 0)
     {
         _DWFCORE_THROW( DWFUnexpectedException, /*NOXLATE*/L"Failed to initialize mutex" );
     }

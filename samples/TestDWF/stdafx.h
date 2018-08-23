@@ -25,6 +25,8 @@
 #include "dwf/w3dtk/BStream.h"
 #include "dwf/w3dtk/BOpcodeShell.h"
 
+#include <c60/DwfUtilsImpl.h>
+
 
 
 

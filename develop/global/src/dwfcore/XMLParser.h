@@ -30,6 +30,7 @@
 #include "dwfcore/XML.h"
 #include "dwfcore/Pointer.h"
 #include "dwfcore/String.h"
+//#include "c60/JLogger.h"
 
 
 #if     defined(DWFCORE_SYSTEM_EXPAT) || defined(DWF_USE_SYSTEM_EXPAT)

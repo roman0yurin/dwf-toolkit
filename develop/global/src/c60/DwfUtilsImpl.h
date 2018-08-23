@@ -33,6 +33,7 @@ using namespace DWFToolkit;
 namespace c60 {
 		/**вектор с семантикой узлов дерева**/
 		typedef std::vector<dgn::SemanticValue> OBJ_SEMANTIC;
+
 		class SectionDWF;
 
 		/**слой для вызова метода doImportNextLayer**/
@@ -50,9 +51,9 @@ namespace c60 {
 				//std::vector<wstring> fields;
 				std::map<std::wstring, std::wstring> fields;
 				/**Глубина в структуре узлов, на которой находится геометрия**/
-				int32_t bottomLevel = 0;
+				//int32_t bottomLevel = 0;
 				/**Глубина в структуре узлов, на которой находится семантика**/
-				int32_t semanticLevel = -1;
+				//int32_t semanticLevel = -1;
 				//**Позиция начала слоя**//
 				//int begin = -1;
 				//**Позиция конца слоя**/
@@ -62,9 +63,11 @@ namespace c60 {
 
 				LayerDWF (void){};
 
+				bool GetSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
+				bool ReadSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
 				//void SetFields(DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
 				//void SetBottomLevel(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
-				bool SetFields();
+				//bool SetFields();
 				void clearValue(){
 					for (auto pos = this->fields.begin(); pos != this->fields.end(); ++pos) {
 						pos->second = L"";
@@ -79,6 +82,24 @@ namespace c60 {
 					vector<wstring> result;
 					for (auto pos = this->fields.begin(); pos != this->fields.end(); ++pos) {
 						result.push_back(pos->second);
+					}
+
+					return result;
+				}
+
+				vector<wstring> getFields(){
+					std::vector<wstring> result;
+					for (auto pos = this->fields.begin(); pos != this->fields.end(); ++pos) {
+						result.push_back(pos->first);
+					}
+
+					return result;
+				}
+
+				OBJ_SEMANTIC getOBJ_SEMANTIC(){
+					OBJ_SEMANTIC result;
+					for (auto pos = this->fields.begin(); pos != this->fields.end(); ++pos) {
+						result.push_back((dgn::SemanticValue(pos->first, pos->second)));
 					}
 
 					return result;
@@ -99,14 +120,15 @@ namespace c60 {
 
 
 				/**Глубина в структуре узлов, на которой находятся слои**/
-				int32_t levelLayers = 0;
+				int32_t levelLayers = -1;
 				/**слои секции**/
 				std::map<std::wstring, LayerDWF> layers;
 				/**Текущий обрабатываемый слой текущей DWFSection**/
 				LayerDWF *layer;
 
 
-				bool SetLevelLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
+				//bool SetLevelLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
+				bool SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
 				//bool SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
 				//void AddSemantic(DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
 		};
@@ -147,6 +169,16 @@ namespace c60 {
 				 */
 				void readTreeStructure(const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler) override;
 				void readAllLayers(const std::shared_ptr<dgn::DwfLayersFillStreamHandler> &handler) override;
+
+				static DWFString toDwfString(std::wstring str){
+					DWFString name;
+					name.append(str.c_str());
+					return name;
+				}
+
+				static std::wstring toStdString(const DWFString &str){
+					return std::wstring((const wchar_t *)str, str.chars());
+				}
 		};
 
 

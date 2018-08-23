@@ -4,28 +4,10 @@
 
 #include <dgn/ColorType.hpp>
 #include "DwfUtilsImpl.h"
+#include "JLogger.h"
 
-
-typedef std::vector<dgn::SemanticValue> OBJ_SEMANTIC;
-
-
-
-DWFString toDwfString(std::wstring str){
-	DWFString name;
-	name.append(str.c_str());
-	return name;
-}
-
-std::wstring toStdString(const DWFString &str){
-	return std::wstring((const wchar_t *)str, str.chars());
-}
-
-std::wstring getValue(const wstring str, OBJ_SEMANTIC semantic){
-	for (auto const &semv : semantic) {
-//		if (str->c)
-	}
-	return L"";
-}
+//typedef std::vector<dgn::SemanticValue> OBJ_SEMANTIC;
+//using namespace c60;
 
 
 c60::DwfUtilsImpl::DwfUtilsImpl(const std::wstring & dwfFile, int32_t layerDepth):
@@ -82,21 +64,23 @@ public:
 					this->javaHandler->openLayer();
 				}
 				else{
-					if (this->section->layer != NULL) {
-						if (level == this->section->layer->semanticLevel) {
-							/**читаем новый объект**/
-							string str = string(this->m_string, this->m_length);
-							wstring wstr(str.begin(), str.end());
-							OBJ_SEMANTIC semantic = this->section->layer->semantics[wstr];
+					if (level == this->section->levelLayers + 1) {
+						/**читаем новый объект**/
+						string str = string(this->m_string, this->m_length);
+						wstring wstr(str.begin(), str.end());
+						if (!wstr.empty()) {
+							c60::OBJ_SEMANTIC semantic = this->section->layer->semantics[wstr];
 							//vector<wstring> values;
 							//for (auto const &semv : semantic) {
 							//	this->section->layer->fields[semv.propName] = semv.propValue;
-								//values.push_back(semv.propValue);
+							//values.push_back(semv.propValue);
 							//}
 							//this->javaHandler->openNode(values);
 							this->section->layer->clearValue();
 							this->section->layer->setValues(semantic);
 							vector<wstring> values = this->section->layer->getValues();
+
+							printf(">>>>> CPP SEMANTIC LEN %lu\n", values.size());
 							this->javaHandler->openNode(values);
 						}
 					}
@@ -139,11 +123,9 @@ public:
 					this->section->layer = NULL;
 				}
 				else{
-					if (this->section->layer != NULL) {
-						if (level == this->section->layer->semanticLevel - 1) {
-							/*прочитали объект*/
-							javaHandler->closeNode();
-						}
+					if (level == this->section->levelLayers) {
+						/*прочитали объект*/
+						javaHandler->closeNode();
 					}
 				}
 			}
@@ -187,8 +169,9 @@ public:
 				dgn::DwfColor* dwfColor;
 				int level = rW3DParser.getNestingLevel();
 				if (level > this->section->levelLayers) {
+					/*
 					if (level == this->section->layer->bottomLevel + 1) {
-						/*m_mask=7; m_channels=3; m_diffuse и m_specular*/
+						///m_mask=7; m_channels=3; m_diffuse и m_specular
 						dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2],
 																				 0);
 						this->javaHandler->handleColor(dgn::ColorType::DIFFUSE, *dwfColor);
@@ -197,11 +180,12 @@ public:
 						this->javaHandler->handleColor(dgn::ColorType::SPECULAR, *dwfColor);
 					} else {
 						if (level == this->section->layer->bottomLevel + 2) {
-							/*m_mask=7; m_channels=1; m_diffuse*/
+							//m_mask=7; m_channels=1; m_diffuse
 							//dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2], 0);
 							//this->javaHandler->handleColor(dgn::ColorType::DIFFUSE, *dwfColor);
 						}
 					}
+					 */
 				}
 			}
 			return eStatus;
@@ -224,13 +208,13 @@ public:
 			TK_Status status = TK_Matrix::Execute(rW3DParser);
 			int level = rW3DParser.getNestingLevel();
 			if (level > this->section->levelLayers) {
-				if (level == this->section->layer->bottomLevel + 1) {
-					vector<float> matrix;
-					for (int i = 0; i < 16; ++i) {
-						matrix.push_back(this->m_matrix[i]);
-					}
-					this->javaHandler->handleMatrix(matrix);
+				//	if (level == this->section->layer->bottomLevel + 1) {
+				vector<float> matrix;
+				for (int i = 0; i < 16; ++i) {
+					matrix.push_back(this->m_matrix[i]);
 				}
+				this->javaHandler->handleMatrix(matrix);
+				//	}
 			}
 			return status;
 		}
@@ -251,7 +235,7 @@ wstring getMin(std::map<std::wstring, float > items){
  */
 
 
-bool c60::LayerDWF::SetFields() {
+//bool c60::LayerDWF::SetFields() {
 	/*
 	std::map<std::wstring, float > items;
 	for (auto i = this->semantics.begin(); i != this->semantics.end(); ++i) {
@@ -274,6 +258,7 @@ bool c60::LayerDWF::SetFields() {
 		items.erase(item);
 	}
 	 */
+	/*
 	for (auto i = this->semantics.begin(); i != this->semantics.end(); ++i) {
 		for (auto pos = i->second.begin(); pos != i->second.end(); ++pos) {
 			auto ob = this->fields.find(pos->propName);
@@ -284,6 +269,71 @@ bool c60::LayerDWF::SetFields() {
 	}
 	if (this->fields.size() == 0)
 		return false;
+	return true;
+}
+*/
+
+bool c60::LayerDWF::GetSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst){
+	int32_t currentlevel = level + 1;
+	//OBJ_SEMANTIC semantic;
+	DWFPropertyContainer *pInstProps = pDef->getInstanceProperties(*pInst);
+	DWFProperty::tMap::Iterator *piProp = pInstProps->getProperties();
+	if (piProp) {
+		for (; piProp->valid(); piProp->next()) {
+			DWFProperty *pProp = piProp->value();
+			/*
+			wstring name = DwfUtilsImpl::toStdString(pProp->name());
+			wstring value = DwfUtilsImpl::toStdString(pProp->value());
+
+			auto ob = this->fields.find(name);
+			if (ob == this->fields.end())
+				this->fields[name] = value;
+			else
+				ob->second = value;
+
+			semantic.push_back(dgn::SemanticValue(name, value));
+			 */
+			this->fields[DwfUtilsImpl::toStdString(pProp->name())] = DwfUtilsImpl::toStdString(pProp->value());
+		}
+
+		DWFCORE_FREE_OBJECT(piProp);
+	}
+
+	DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
+	if (piChildren) {
+		for (; piChildren->valid(); piChildren->next()) {
+			if (!this->GetSemantic(currentlevel, pDef, piChildren->value()))
+				return false;
+		}
+		DWFCORE_FREE_OBJECT(piChildren);
+	}
+
+	return true;
+}
+
+bool c60::LayerDWF::ReadSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst) {
+	int32_t currentlevel = level + 1;
+	DWFPropertyContainer *pInstProps = pDef->getInstanceProperties(*pInst);
+	DWFProperty::tMap::Iterator *piProp = pInstProps->getProperties();
+	if (piProp) {
+		for (; piProp->valid(); piProp->next()) {
+			DWFProperty *pProp = piProp->value();
+			this->fields[DwfUtilsImpl::toStdString(pProp->name())] = DwfUtilsImpl::toStdString(pProp->value());
+		}
+
+		DWFCORE_FREE_OBJECT(piProp);
+	}
+
+	DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
+	if (piChildren) {
+		for (; piChildren->valid(); piChildren->next()) {
+			if (!this->GetSemantic(currentlevel, pDef, piChildren->value()))
+				return false;
+		}
+		DWFCORE_FREE_OBJECT(piChildren);
+	}
+
+	this->semantics[DwfUtilsImpl::toStdString(pInst->object())] = this->getOBJ_SEMANTIC();
 	return true;
 }
 
@@ -401,6 +451,7 @@ bool c60::SectionDWF::SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDef
 //void GetDWFObjectDefinition(int32_t level, int32_t &bottomLevel, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, std::map<std::wstring, OBJ_SEMANTIC> &map_semantics){
 //void GetDWFObjectDefinition(int32_t level, int32_t &bottomLevel, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, std::map<std::wstring, OBJ_SEMANTIC> &map_semantics){
 //void SetbottomLevel(int32_t level, int32_t &bottomLevel, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, std::map<std::wstring, OBJ_SEMANTIC> semantics){
+/*
 bool c60::SectionDWF::SetLevelLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler) {
 	int32_t currentlevel = level + 1;
 	//if (currentlevel > this->bottomLevel)
@@ -415,8 +466,8 @@ bool c60::SectionDWF::SetLevelLayers(int32_t level, DWFObjectDefinition *pDef, D
 	if (piProp) {
 		for (; piProp->valid(); piProp->next()) {
 			DWFProperty *pProp = piProp->value();
-			name = toStdString(pProp->name());
-			value = toStdString(pProp->value());
+			name = DwfUtilsImpl::toStdString(pProp->name());
+			value = DwfUtilsImpl::toStdString(pProp->value());
 			semantic.push_back(dgn::SemanticValue(name, value));
 			//semantic.push_back(dgn::SemanticValue(toStdString(pProp->name()), toStdString(pProp->value())));
 		}
@@ -461,14 +512,14 @@ bool c60::SectionDWF::SetLevelLayers(int32_t level, DWFObjectDefinition *pDef, D
 
 	if (this->layer != NULL) {
 		if (currentlevel == this->layer->semanticLevel)
-			this->layer->semantics[toStdString(pInst->object())] = semantic;
+			this->layer->semantics[DwfUtilsImpl::toStdString(pInst->object())] = semantic;
 		else{
 			if (currentlevel == this->levelLayers){
 				this->layer->name = value;
 				if (!this->layer->SetFields()) return false;
 
 				handler->openLayer(this->layer->name);
-				wstring key = toStdString(pInst->object());
+				wstring key = DwfUtilsImpl::toStdString(pInst->object());
 				this->layers[key] = *this->layer;
 				//this->layers[toStdString(pInst->object())] = *this->layer;
 				//LayerDWF layerDWF = this->layers[key];
@@ -484,9 +535,70 @@ bool c60::SectionDWF::SetLevelLayers(int32_t level, DWFObjectDefinition *pDef, D
 
 	return true;
 }
+ */
+
+bool c60::SectionDWF::SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler) {
+	int32_t currentlevel = level + 1;
+	if (currentlevel < this->levelLayers){
+		DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
+		if (piChildren) {
+			for (; piChildren->valid(); piChildren->next()) {
+				if (!this->SetLayers(currentlevel, pDef, piChildren->value(), handler)) {
+					DWFCORE_FREE_OBJECT(piChildren);
+					return false;
+				}
+			}
+
+			DWFCORE_FREE_OBJECT(piChildren);
+			return true;
+		}
+
+		return false;
+	}
+
+
+	if (currentlevel == this->levelLayers) {
+		wstring layerName = L"";
+		DWFPropertyContainer *pInstProps = pDef->getInstanceProperties(*pInst);
+		DWFProperty::tMap::Iterator *piProp = pInstProps->getProperties();
+		if (piProp) {
+			for (; piProp->valid(); piProp->next()) {
+				DWFProperty *pProp = piProp->value();
+				wstring name = DwfUtilsImpl::toStdString(pProp->name());
+				if (name.compare(L"_name") == 0)
+					layerName = DwfUtilsImpl::toStdString(pProp->value());
+			}
+
+			DWFCORE_FREE_OBJECT(piProp);
+		}
+		if (layerName.empty())
+			return false;
+
+		this->layer = new LayerDWF();
+		this->layer->name = layerName;
+		handler->openLayer(this->layer->name);
+		DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
+		if (piChildren) {
+			for (; piChildren->valid(); piChildren->next()) {
+				if (!this->layer->ReadSemantic(currentlevel, pDef, piChildren->value()))
+					return false;
+			}
+			DWFCORE_FREE_OBJECT(piChildren);
+		}
+
+		wstring key = DwfUtilsImpl::toStdString(pInst->object());
+		this->layers[key] = *this->layer;
+		handler->closeLayer(this->layer->semantics.size(), this->layer->getFields());
+		this->layer = NULL;
+
+		return true;
+	}
+
+	return false;
+}
 
 void c60::DwfUtilsImpl::readTreeStructure(const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler) {
-
+	//ERROR(L"TEST ERROR %d", 123);
 	if ((this->tInfo.eType != DWFPackageReader::eDWFPackage) && (this->tInfo.eType != DWFPackageReader::eDWFXPackage)) {
 		return;
 	}
@@ -503,9 +615,11 @@ void c60::DwfUtilsImpl::readTreeStructure(const std::shared_ptr<dgn::DwfLayerStr
 			pSection->readDescriptor();
 
 			this->section = new SectionDWF();
+			this->section->levelLayers = this->layerDepth;
 			DWFDefinedObjectInstance::tList rRootInstances;
 			DWFResourceContainer::ResourceIterator *piObjDefs = pSection->findResourcesByRole(DWFXML::kzRole_ObjectDefinition);
 			if (piObjDefs && piObjDefs->valid()) {
+				//JLogger::info(L"getObjectDefinition");
 				DWFObjectDefinition *pDef = pSection->getObjectDefinition();
 				//this->section->pDef = pSection->getObjectDefinition();
 				if (pDef) {
@@ -519,7 +633,7 @@ void c60::DwfUtilsImpl::readTreeStructure(const std::shared_ptr<dgn::DwfLayerStr
 					for (; iInst != rRootInstances.end(); iInst++) {
 						pInst = *iInst;
 						//GetDWFObjectDefinition(level, this->bottomLevel, pDef, pInst, this->semantics);
-						this->section->SetLevelLayers(level, pDef, pInst, handler);
+						this->section->SetLayers(level, pDef, pInst, handler);
 						//this->section->SetLayers(level, pDef, pInst, handler);
 						this->sections.push_back(*this->section);
 					}

@@ -21,9 +21,9 @@ include_directories( ${ZLIB_INCLUDE_DIRS} )
 target_link_libraries( ${PROJECT_NAME} ${ZLIB_LIBRARIES} )
 
 
-find_package( EXPAT REQUIRED )
-include_directories( ${EXPAT_INCLUDE_DIRS} )
-target_link_libraries( ${PROJECT_NAME} ${EXPAT_LIBRARIES} )
+#find_package( EXPAT REQUIRED )
+#include_directories( ${EXPAT_INCLUDE_DIRS} )
+#target_link_libraries( ${PROJECT_NAME} ${EXPAT_LIBRARIES} )
 
 find_package( JPEG REQUIRED )
 include_directories( ${JPEG_INCLUDE_DIRS} )

@@ -56,33 +56,25 @@ public:
 			TK_Status eStatus = TK_Open_Segment::Execute(rW3DParser);
 			if (eStatus == TK_Normal) {
 				int level = rW3DParser.getNestingLevel();
-				if (level == this->section->levelLayers){
-					/**читаем новый слой**/
-					string str =  string(this->m_string, this->m_length);
-					wstring wstr(str.begin(), str.end());
-					this->section->layer = &this->section->layers[wstr];
-					this->javaHandler->openLayer();
-				}
-				else{
-					if (level == this->section->levelLayers + 1) {
-						/**читаем новый объект**/
+				if (level >= this->section->levelLayers) {
+					if (level == this->section->levelLayers) {
+						/**читаем новый слой**/
 						string str = string(this->m_string, this->m_length);
 						wstring wstr(str.begin(), str.end());
-						if (!wstr.empty()) {
-							c60::OBJ_SEMANTIC semantic = this->section->layer->semantics[wstr];
-							//vector<wstring> values;
-							//for (auto const &semv : semantic) {
-							//	this->section->layer->fields[semv.propName] = semv.propValue;
-							//values.push_back(semv.propValue);
-							//}
-							//this->javaHandler->openNode(values);
-							this->section->layer->clearValue();
-							this->section->layer->setValues(semantic);
-							vector<wstring> values = this->section->layer->getValues();
-
-							printf(">>>>> CPP SEMANTIC LEN %lu\n", values.size());
-							this->javaHandler->openNode(values);
-						}
+						this->section->layer = &this->section->layers[wstr];
+						this->javaHandler->openLayer();
+					} else {
+						//if (level <= this->section->layer->geomLevel) {
+							string str = string(this->m_string, this->m_length);
+							wstring wstr(str.begin(), str.end());
+							if (!wstr.empty()) {
+								/*читаем семантику текущего узла*/
+								c60::OBJ_SEMANTIC semantic = this->section->layer->semantics[wstr];
+								//this->section->layer->setCurrentSemantic(semantic);
+								//this->section->layer->bottomLevel = level;
+								this->section->layer->setValues(semantic);
+							}
+						//}
 					}
 				}
 			}
@@ -117,15 +109,32 @@ public:
 			TK_Status eStatus = TK_Close_Segment::Execute(rW3DParser);
 			if (eStatus == TK_Normal) {
 				int level = rW3DParser.getNestingLevel();
-				if (level == this->section->levelLayers - 1){
-					/*прочитали слой*/
-					javaHandler->closeLayer();
-					this->section->layer = NULL;
-				}
-				else{
-					if (level == this->section->levelLayers) {
-						/*прочитали объект*/
-						javaHandler->closeNode();
+				if (level > this->section->levelLayers - 2) {
+					if (level == this->section->levelLayers - 1) {
+						/*прочитали слой*/
+						JLogger::info(L"C++ close layer %S", this->section->layer->name.c_str());
+						javaHandler->closeLayer();
+						this->section->layer = NULL;
+					} else {
+						/*
+						if (level < this->section->layer->bottomLevel){
+							this->section->layer->setTopSemantic();
+						}
+						if (level == this->section->layer->geomLevel - 1){
+							this->section->layer->geomLevel = this->section->levelLayers;
+							javaHandler->closeNode();
+						}
+						 */
+						if (level == this->section->levelLayers) {
+							//прочитали дерево объектов
+							this->section->layer->clearValue();
+						//} else{
+						//	javaHandler->openChildNode();
+						}
+						if (level == this->section->layer->geomLevel - 1){
+							this->section->layer->geomLevel = this->section->levelLayers;
+							javaHandler->closeNode();
+						}
 					}
 				}
 			}
@@ -145,7 +154,30 @@ public:
 
 		TK_Status Execute(BStreamFileToolkit &parser) {
 			TK_Status status = TK_Shell::Execute(parser);
-			this->javaHandler->handleMesh(this->toDgnMesh());
+			if (status == TK_Normal) {
+				int level = parser.getNestingLevel();
+				dgn::Mesh mesh = this->toDgnMesh();
+				JLogger::info(L"#################num= %u", mesh.xyz.size());
+				//unsigned long num = mesh.xyz.size()/3;
+				//JLogger::info(L"count= %u", num);
+				int j = 0;
+				for (int i = 0; i < 9; ++i){
+					float x = mesh.xyz[i];
+					if (j == 0)
+						JLogger::info(L"x= %f", x);
+					else{
+						if (j == 1)
+							JLogger::info(L"y= %f", x);
+						else
+							JLogger::info(L"z= %f", x);
+					}
+					if (j == 2)
+						j = 0;
+					else
+						++j;
+				}
+				this->javaHandler->handleMesh(mesh);
+			}
 			return status;
 		}
 };
@@ -169,23 +201,24 @@ public:
 				dgn::DwfColor* dwfColor;
 				int level = rW3DParser.getNestingLevel();
 				if (level > this->section->levelLayers) {
-					/*
-					if (level == this->section->layer->bottomLevel + 1) {
-						///m_mask=7; m_channels=3; m_diffuse и m_specular
-						dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2],
-																				 0);
-						this->javaHandler->handleColor(dgn::ColorType::DIFFUSE, *dwfColor);
-						dwfColor = new dgn::DwfColor(this->m_specular.m_rgb[0], this->m_specular.m_rgb[1],
-																				 this->m_specular.m_rgb[2], 0);
-						this->javaHandler->handleColor(dgn::ColorType::SPECULAR, *dwfColor);
-					} else {
-						if (level == this->section->layer->bottomLevel + 2) {
-							//m_mask=7; m_channels=1; m_diffuse
-							//dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2], 0);
-							//this->javaHandler->handleColor(dgn::ColorType::DIFFUSE, *dwfColor);
+					if ((this->m_channels & (1 << TKO_Channel_Diffuse)) != 0) {
+						dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2], 0);
+						if (level == this->section->layer->geomLevel) {
+							this->javaHandler->handleColor(dgn::ColorType::DIFFUSE, *dwfColor);
+						} else{
+							this->javaHandler->handleColor(dgn::ColorType::AMBIENT, *dwfColor);
 						}
 					}
-					 */
+					if ((m_channels & (1 << TKO_Channel_Specular)) != 0) {
+						dwfColor = new dgn::DwfColor(this->m_specular.m_rgb[0], this->m_specular.m_rgb[1], this->m_specular.m_rgb[2], 0);
+						this->javaHandler->handleColor(dgn::ColorType::SPECULAR, *dwfColor);
+					}
+					if ((m_channels & (1 << TKO_Channel_Transmission)) != 0) {
+						dwfColor = new dgn::DwfColor(this->m_transmission.m_rgb[0], this->m_transmission.m_rgb[1], this->m_transmission.m_rgb[2], 0);
+						this->javaHandler->handleColor(dgn::ColorType::OPACITY, *dwfColor);
+					}
+				} else{
+					dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2], 0);
 				}
 			}
 			return eStatus;
@@ -206,15 +239,20 @@ public:
 
 		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
 			TK_Status status = TK_Matrix::Execute(rW3DParser);
-			int level = rW3DParser.getNestingLevel();
-			if (level > this->section->levelLayers) {
-				//	if (level == this->section->layer->bottomLevel + 1) {
+			if (status == TK_Normal) {
 				vector<float> matrix;
 				for (int i = 0; i < 16; ++i) {
 					matrix.push_back(this->m_matrix[i]);
 				}
-				this->javaHandler->handleMatrix(matrix);
-				//	}
+				int level = rW3DParser.getNestingLevel();
+				if (level > this->section->levelLayers) {
+					this->section->layer->geomLevel = level;
+					vector<wstring> values = this->section->layer->getValues();
+					this->javaHandler->openNode(values);
+					this->javaHandler->handleMatrix(matrix);
+				} else{
+					this->javaHandler->handleSectionMatrix(matrix);
+				}
 			}
 			return status;
 		}
@@ -273,26 +311,25 @@ wstring getMin(std::map<std::wstring, float > items){
 }
 */
 
+	/*
 bool c60::LayerDWF::GetSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst){
 	int32_t currentlevel = level + 1;
-	//OBJ_SEMANTIC semantic;
+	OBJ_SEMANTIC semantic;
 	DWFPropertyContainer *pInstProps = pDef->getInstanceProperties(*pInst);
 	DWFProperty::tMap::Iterator *piProp = pInstProps->getProperties();
 	if (piProp) {
 		for (; piProp->valid(); piProp->next()) {
 			DWFProperty *pProp = piProp->value();
-			/*
-			wstring name = DwfUtilsImpl::toStdString(pProp->name());
-			wstring value = DwfUtilsImpl::toStdString(pProp->value());
+			//wstring name = DwfUtilsImpl::toStdString(pProp->name());
+			//wstring value = DwfUtilsImpl::toStdString(pProp->value());
 
-			auto ob = this->fields.find(name);
-			if (ob == this->fields.end())
-				this->fields[name] = value;
-			else
-				ob->second = value;
+			//auto ob = this->fields.find(name);
+			//if (ob == this->fields.end())
+			//	this->fields[name] = value;
+			//else
+			//	ob->second = value;
 
-			semantic.push_back(dgn::SemanticValue(name, value));
-			 */
+			//semantic.push_back(dgn::SemanticValue(name, value));
 			this->fields[DwfUtilsImpl::toStdString(pProp->name())] = DwfUtilsImpl::toStdString(pProp->value());
 		}
 
@@ -310,30 +347,39 @@ bool c60::LayerDWF::GetSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDef
 
 	return true;
 }
+*/
 
 bool c60::LayerDWF::ReadSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst) {
 	int32_t currentlevel = level + 1;
+	OBJ_SEMANTIC semantic;
 	DWFPropertyContainer *pInstProps = pDef->getInstanceProperties(*pInst);
 	DWFProperty::tMap::Iterator *piProp = pInstProps->getProperties();
 	if (piProp) {
 		for (; piProp->valid(); piProp->next()) {
 			DWFProperty *pProp = piProp->value();
-			this->fields[DwfUtilsImpl::toStdString(pProp->name())] = DwfUtilsImpl::toStdString(pProp->value());
+			wstring name = DwfUtilsImpl::toStdString(pProp->name());
+			wstring value = DwfUtilsImpl::toStdString(pProp->value());
+			semantic.push_back(dgn::SemanticValue(name, value));
+			this->fields[name] = value;
 		}
 
 		DWFCORE_FREE_OBJECT(piProp);
 	}
+	this->semantics[DwfUtilsImpl::toStdString(pInst->object())] = semantic;
 
+	DWFString str = pInst->id();
+	std::wstring id = DwfUtilsImpl::toStdString(str);
+	JLogger::info(L"ID= %S", id.c_str());
 	DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
 	if (piChildren) {
 		for (; piChildren->valid(); piChildren->next()) {
-			if (!this->GetSemantic(currentlevel, pDef, piChildren->value()))
+			if (!this->ReadSemantic(currentlevel, pDef, piChildren->value()))
 				return false;
 		}
 		DWFCORE_FREE_OBJECT(piChildren);
 	}
 
-	this->semantics[DwfUtilsImpl::toStdString(pInst->object())] = this->getOBJ_SEMANTIC();
+	//this->semantics[DwfUtilsImpl::toStdString(pInst->object())] = this->getOBJ_SEMANTIC();
 	return true;
 }
 
@@ -576,6 +622,7 @@ bool c60::SectionDWF::SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDef
 
 		this->layer = new LayerDWF();
 		this->layer->name = layerName;
+		this->layer->geomLevel = this->levelLayers;
 		handler->openLayer(this->layer->name);
 		DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
 		if (piChildren) {
@@ -586,6 +633,7 @@ bool c60::SectionDWF::SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDef
 			DWFCORE_FREE_OBJECT(piChildren);
 		}
 
+		this->layer->clearValue();
 		wstring key = DwfUtilsImpl::toStdString(pInst->object());
 		this->layers[key] = *this->layer;
 		handler->closeLayer(this->layer->semantics.size(), this->layer->getFields());

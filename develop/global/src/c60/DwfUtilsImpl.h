@@ -35,9 +35,44 @@ namespace c60 {
 		typedef std::vector<dgn::SemanticValue> OBJ_SEMANTIC;
 
 		class SectionDWF;
+		class CurrentSemantic;
+
+		/**семантика текущего уровня**/
+		//class CurrentSemantic{
+		//public:
+		//		std::map<std::wstring, std::wstring> items;
+				/**семантика родителя**/
+		//		CurrentSemantic *parent = NULL;
+
+		//		CurrentSemantic (void){};
+
+		//		vector<wstring> getValues(){
+		//			vector<wstring> result;
+		//			for (auto pos = this->items.begin(); pos != this->items.end(); ++pos) {
+		//				result.push_back(pos->second);
+		//			}
+
+		//			return result;
+		//		}
+
+		//		void SetSemantic(std::map<std::wstring, std::wstring> fields, OBJ_SEMANTIC semantic){
+		//			for (auto pos = fields.begin(); pos != fields.end(); ++pos) {
+		//				this->items[pos->first] = pos->second;
+		//			}
+
+		//			for (auto const &semv : semantic){
+		//				if (this->items[semv.propName] == L"")
+		//					this->items[semv.propName] = semv.propValue;
+		//				else
+		//					this->items[semv.propName] += L" $$$ " + semv.propValue;
+		//			}
+		//		};
+		//};
 
 		/**слой для вызова метода doImportNextLayer**/
 		class LayerDWF{
+		private:
+				CurrentSemantic *_semantic = NULL;
 		public:
 				/**Секция которой принадлежит слой**/
 				//SectionDWF *section;
@@ -50,7 +85,7 @@ namespace c60 {
 				/**название колонок**/
 				//std::vector<wstring> fields;
 				std::map<std::wstring, std::wstring> fields;
-				/**Глубина в структуре узлов, на которой находится геометрия**/
+				/**Глубина в структуре узлов, на которой находится нижняя семантика**/
 				//int32_t bottomLevel = 0;
 				/**Глубина в структуре узлов, на которой находится семантика**/
 				//int32_t semanticLevel = -1;
@@ -60,10 +95,12 @@ namespace c60 {
 				//int end = -1;
 				/**Количество объектов**/
 				//int32_t countNode;
+				/*Глубина в структуре узлов, на которой находится геометрия нового объекта*/
+				int32_t geomLevel = -1;
 
 				LayerDWF (void){};
 
-				bool GetSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
+				//bool GetSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
 				bool ReadSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
 				//void SetFields(DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
 				//void SetBottomLevel(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
@@ -75,7 +112,10 @@ namespace c60 {
 				}
 				void setValues(OBJ_SEMANTIC semantic){
 					for (auto const &semv : semantic){
-						this->fields[semv.propName] = semv.propValue;
+						if (this->fields[semv.propName] == L"")
+							this->fields[semv.propName] = semv.propValue;
+						//else
+						//	this->fields[semv.propName] += L"\\" + semv.propValue;
 					}
 				}
 				vector<wstring> getValues(){
@@ -85,6 +125,7 @@ namespace c60 {
 					}
 
 					return result;
+					//return _semantic->getValues();
 				}
 
 				vector<wstring> getFields(){
@@ -104,6 +145,25 @@ namespace c60 {
 
 					return result;
 				}
+
+				/*
+				void setCurrentSemantic(OBJ_SEMANTIC semantic){
+					CurrentSemantic *ob = new CurrentSemantic();
+					ob->parent = this->_semantic;
+					if (ob->parent == NULL)
+						ob->SetSemantic(this->fields, semantic);
+					else
+						ob->SetSemantic(ob->parent->items, semantic);
+					this->_semantic = ob;
+				}
+
+				void setTopSemantic(){
+					CurrentSemantic *ob = this->_semantic;
+					if (ob) {
+						this->_semantic = ob->parent;
+					}
+				}
+				 */
 		};
 
 		/**секция файла DWF**/

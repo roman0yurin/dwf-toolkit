@@ -178,6 +178,7 @@ public:
 				}
 				this->javaHandler->handleMesh(mesh);
 			}
+
 			return status;
 		}
 };
@@ -200,7 +201,7 @@ public:
 			if (eStatus == TK_Normal) {
 				dgn::DwfColor* dwfColor;
 				int level = rW3DParser.getNestingLevel();
-				if (level > this->section->levelLayers) {
+				//if (level > this->section->levelLayers) {
 					if ((this->m_channels & (1 << TKO_Channel_Diffuse)) != 0) {
 						dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2], 0);
 						if (level == this->section->layer->geomLevel) {
@@ -217,9 +218,9 @@ public:
 						dwfColor = new dgn::DwfColor(this->m_transmission.m_rgb[0], this->m_transmission.m_rgb[1], this->m_transmission.m_rgb[2], 0);
 						this->javaHandler->handleColor(dgn::ColorType::OPACITY, *dwfColor);
 					}
-				} else{
-					dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2], 0);
-				}
+				//} else{
+				//	dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2], 0);
+				//}
 			}
 			return eStatus;
 		}

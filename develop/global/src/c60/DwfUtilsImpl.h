@@ -110,6 +110,7 @@ namespace c60 {
 						pos->second = L"";
 					}
 				}
+
 				void setValues(OBJ_SEMANTIC semantic){
 					for (auto const &semv : semantic){
 						if (this->fields[semv.propName] == L"")
@@ -118,6 +119,7 @@ namespace c60 {
 						//	this->fields[semv.propName] += L"\\" + semv.propValue;
 					}
 				}
+
 				vector<wstring> getValues(){
 					vector<wstring> result;
 					for (auto pos = this->fields.begin(); pos != this->fields.end(); ++pos) {

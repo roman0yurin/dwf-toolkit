@@ -72,7 +72,8 @@ public:
 								c60::OBJ_SEMANTIC semantic = this->section->layer->semantics[wstr];
 								//this->section->layer->setCurrentSemantic(semantic);
 								//this->section->layer->bottomLevel = level;
-								this->section->layer->setValues(semantic);
+								//this->section->layer->setValues(semantic);
+								this->section->layer->semantic.push_back(*new c60::CurrentSemantic(level, semantic));
 							}
 						//}
 					}
@@ -113,7 +114,7 @@ public:
 					if (level == this->section->levelLayers - 1) {
 						/*прочитали слой*/
 						JLogger::info(L"C++ close layer %S", this->section->layer->name.c_str());
-						javaHandler->closeLayer();
+						this->javaHandler->closeLayer();
 						this->section->layer = NULL;
 					} else {
 						/*
@@ -125,18 +126,22 @@ public:
 							javaHandler->closeNode();
 						}
 						 */
-						if (level == this->section->levelLayers) {
+						//if (level == this->section->levelLayers) {
 							//прочитали дерево объектов
-							this->section->layer->clearValue();
+						//	this->section->layer->clearValue();
 						//} else{
 						//	javaHandler->openChildNode();
-						}
+						//}
 						if (level == this->section->layer->geomLevel - 1){
+							//this->section->layer->setValues();
+							this->section->styleDWF->send(this->javaHandler);
 							this->section->layer->geomLevel = this->section->levelLayers;
-							javaHandler->closeNode();
+							this->javaHandler->closeNode();
 						}
+						this->section->layer->deleteSemantic(level);
 					}
 				}
+				this->section->styleDWF->deleteLevel(level);
 			}
 			return eStatus;
 		}
@@ -203,21 +208,49 @@ public:
 				int level = rW3DParser.getNestingLevel();
 				//if (level > this->section->levelLayers) {
 					if ((this->m_channels & (1 << TKO_Channel_Diffuse)) != 0) {
-						dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2], 0);
-						if (level == this->section->layer->geomLevel) {
+						this->section->styleDWF->addDiffuse(level, this->m_diffuse.m_rgb);
+						/*
+						if (level > this->section->levelLayers) {
+							dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1],
+											this->m_diffuse.m_rgb[2], 0);
+							//if (level == this->section->layer->geomLevel) {
 							this->javaHandler->handleColor(dgn::ColorType::DIFFUSE, *dwfColor);
-						} else{
-							this->javaHandler->handleColor(dgn::ColorType::AMBIENT, *dwfColor);
+							//} else{
+							//	this->javaHandler->handleColor(dgn::ColorType::AMBIENT, *dwfColor);
+							//}
 						}
+						 */
 					}
 					if ((m_channels & (1 << TKO_Channel_Specular)) != 0) {
-						dwfColor = new dgn::DwfColor(this->m_specular.m_rgb[0], this->m_specular.m_rgb[1], this->m_specular.m_rgb[2], 0);
-						this->javaHandler->handleColor(dgn::ColorType::SPECULAR, *dwfColor);
+						this->section->styleDWF->addSpecular(level, this->m_specular.m_rgb);
+						/*
+						if (level > this->section->levelLayers) {
+							dwfColor = new dgn::DwfColor(this->m_specular.m_rgb[0], this->m_specular.m_rgb[1],
+											this->m_specular.m_rgb[2], 0);
+							this->javaHandler->handleColor(dgn::ColorType::SPECULAR, *dwfColor);
+						}
+						 */
 					}
 					if ((m_channels & (1 << TKO_Channel_Transmission)) != 0) {
-						dwfColor = new dgn::DwfColor(this->m_transmission.m_rgb[0], this->m_transmission.m_rgb[1], this->m_transmission.m_rgb[2], 0);
-						this->javaHandler->handleColor(dgn::ColorType::OPACITY, *dwfColor);
+						this->section->styleDWF->addTransparence(level, this->m_transmission.m_rgb);
+						/*
+						if (level > this->section->levelLayers) {
+							dwfColor = new dgn::DwfColor(this->m_transmission.m_rgb[0], this->m_transmission.m_rgb[1],
+											this->m_transmission.m_rgb[2], 0);
+							this->javaHandler->handleColor(dgn::ColorType::OPACITY, *dwfColor);
+						}
+						 */
 					}
+
+				if ((m_channels & (1 << TKO_Channel_Emission)) != 0) {
+					this->section->styleDWF->addEmissive(level, this->m_emission.m_rgb);
+				}
+				if ((m_channels & (1 << TKO_Channel_Mirror)) != 0) {
+					this->section->styleDWF->addMirror(level, this->m_mirror.m_rgb);
+				}
+				if ((m_channels & (1 << TKO_Channel_Emission)) != 0) {
+					this->section->styleDWF->addGloss(level, this->m_gloss);
+				}
 				//} else{
 				//	dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2], 0);
 				//}
@@ -248,6 +281,7 @@ public:
 				int level = rW3DParser.getNestingLevel();
 				if (level > this->section->levelLayers) {
 					this->section->layer->geomLevel = level;
+					this->section->layer->setValues();
 					vector<wstring> values = this->section->layer->getValues();
 					this->javaHandler->openNode(values);
 					this->javaHandler->handleMatrix(matrix);

@@ -34,8 +34,336 @@ namespace c60 {
 		/**вектор с семантикой узлов дерева**/
 		typedef std::vector<dgn::SemanticValue> OBJ_SEMANTIC;
 
+		class LevelRGB{
+		public:
+				int level;
+				float rgb[3];
+				LevelRGB(){};
+				LevelRGB(int n, float ar[3]){
+					this->level = n;
+					this->rgb[0] = ar[0];
+					this->rgb[1] = ar[1];
+					this->rgb[2] = ar[2];
+				};
+		};
+
+		/*стили файла DWF*/
+		class StyleDWF {
+		private:
+				/*стиль диффузный*/
+				//std::map<std::int32_t , float[3]> _diffuse;
+				std::vector<LevelRGB> _diffuse;
+				/*стиль отражающий*/
+				std::vector<LevelRGB> _specular;
+				/*стиль рассеянный*/
+				std::vector<LevelRGB> _mirror;
+				/*стиль излучающий*/
+				std::vector<LevelRGB> _emissive;
+				/*стиль блеск*/
+				std::vector<LevelRGB> _gloss;
+				/*стиль прозрачность*/
+				std::vector<LevelRGB> _transparence;
+
+				bool deleteDiffuse(int level){
+					int size = this->_diffuse.size();
+					if (size > 0){
+						//LevelRGB ob = this->_diffuse.at(size - 1);
+						if (this->_diffuse.at(size - 1).level > level) {
+							this->_diffuse.pop_back();
+							return true;
+						}
+					}
+
+					return false;
+				}
+
+				bool deleteSpecular(int level){
+					int size = this->_specular.size();
+					if (size > 0){
+						if (this->_specular.at(size - 1).level > level) {
+							this->_specular.pop_back();
+							return true;
+						}
+					}
+
+					return false;
+				}
+
+				bool deleteMirror(int level){
+					int size = this->_mirror.size();
+					if (size > 0){
+						if (this->_mirror.at(size - 1).level > level) {
+							this->_mirror.pop_back();
+							return true;
+						}
+					}
+
+					return false;
+				}
+
+				bool deleteEmissive(int level){
+					int size = this->_emissive.size();
+					if (size > 0){
+						if (this->_emissive.at(size - 1).level > level) {
+							this->_emissive.pop_back();
+							return true;
+						}
+					}
+
+					return false;
+				}
+
+				bool deleteGloss(int level){
+					int size = this->_gloss.size();
+					if (size > 0){
+						if (this->_gloss.at(size - 1).level > level) {
+							this->_gloss.pop_back();
+							return true;
+						}
+					}
+
+					return false;
+				}
+
+				bool deleteTransparence(int level){
+					int size = this->_transparence.size();
+					if (size > 0){
+						if (this->_transparence.at(size - 1).level > level) {
+							this->_transparence.pop_back();
+							return true;
+						}
+					}
+
+					return false;
+				}
+		public:
+				StyleDWF(){};
+
+				void addDiffuse(int level, float rgb[3]){
+					int size = this->_diffuse.size();
+					if (size > 0){
+						LevelRGB ob = this->_diffuse.at(size - 1);
+						if (ob.level >= level)
+							return;
+					}
+					LevelRGB* ob = new LevelRGB(level, rgb);
+					this->_diffuse.push_back(*ob);
+				}
+
+				void addSpecular(int level, float rgb[3]){
+					int size = this->_specular.size();
+					if (size > 0){
+						LevelRGB ob = this->_specular.at(size - 1);
+						if (ob.level >= level)
+							return;
+					}
+					LevelRGB* ob = new LevelRGB(level, rgb);
+					this->_specular.push_back(*ob);
+				}
+
+				void addMirror(int level, float rgb[3]){
+					int size = this->_mirror.size();
+					if (size > 0){
+						LevelRGB ob = this->_mirror.at(size - 1);
+						if (ob.level >= level)
+							return;
+					}
+					LevelRGB* ob = new LevelRGB(level, rgb);
+					this->_mirror.push_back(*ob);
+				}
+
+				void addEmissive(int level, float rgb[3]){
+					int size = this->_emissive.size();
+					if (size > 0){
+						LevelRGB ob = this->_emissive.at(size - 1);
+						if (ob.level >= level)
+							return;
+					}
+					LevelRGB* ob = new LevelRGB(level, rgb);
+					this->_emissive.push_back(*ob);
+				}
+
+				void addGloss(int level, float gloss){
+					int size = this->_gloss.size();
+					if (size > 0){
+						LevelRGB ob = this->_gloss.at(size - 1);
+						if (ob.level >= level)
+							return;
+					}
+					LevelRGB* ob = new LevelRGB();
+					ob->level = level;
+					ob->rgb[0] = gloss;
+					ob->rgb[1] = gloss;
+					ob->rgb[2] = gloss;
+					this->_gloss.push_back(*ob);
+				}
+
+				void addTransparence(int level, float rgb[3]){
+					int size = this->_transparence.size();
+					if (size > 0){
+						LevelRGB ob = this->_transparence.at(size - 1);
+						if (ob.level >= level)
+							return;
+					}
+					LevelRGB* ob = new LevelRGB(level, rgb);
+					this->_transparence.push_back(*ob);
+				}
+
+				LevelRGB* getDiffuse(){
+					if (this->_diffuse.size() > 0)
+						return &this->_diffuse.at(this->_diffuse.size()-1);
+
+					return NULL;
+				}
+
+				LevelRGB* getSpecular(){
+					if (this->_specular.size() > 0)
+						return &this->_specular.at(this->_specular.size()-1);
+
+					return NULL;
+				}
+
+				LevelRGB* getMirror(){
+					if (this->_mirror.size() > 0)
+						return &this->_mirror.at(this->_mirror.size()-1);
+
+					return NULL;
+				}
+
+				LevelRGB* getEmissive(){
+					if (this->_emissive.size() > 0)
+						return &this->_emissive.at(this->_emissive.size()-1);
+
+					return NULL;
+				}
+
+				LevelRGB* getGloss(){
+					if (this->_gloss.size() > 0)
+						return &this->_gloss.at(this->_gloss.size()-1);
+
+					return NULL;
+				}
+
+				LevelRGB* getTransparence(){
+					if (this->_transparence.size() > 0)
+						return &this->_transparence.at(this->_transparence.size()-1);
+
+					return NULL;
+				}
+
+				/*
+				void addDiffuse(int32_t level, float red, float green, float blue){
+					int r = (int)red*256;
+					int g = 0 << (int)green*256;
+					int b = 0 << 0 << (int)blue*256;
+					int result = r+g+b;
+					this->_diffuse[level] = result;
+				}
+				int getDiffuse(){
+					if (this->_diffuse.size() > 0)
+						return this->_diffuse.end().operator*().second;
+					return -1;
+				}
+				 */
+				void deleteLevel(int level){
+					this->deleteDiffuse(level);
+					this->deleteSpecular(level);
+					this->deleteMirror(level);
+					this->deleteEmissive(level);
+					this->deleteGloss(level);
+					this->deleteTransparence(level);
+					/*
+					bool log = true;
+					while (log){
+						log = this->deleteDiffuse(level);
+					}
+					log = true;
+					while (log){
+						log = this->deleteSpecular(level);
+					}
+					log = true;
+					while (log){
+						log = this->deleteMirror(level);
+					}
+					log = true;
+					while (log){
+						log = this->deleteEmissive(level);
+					}
+					log = true;
+					while (log){
+						log = this->deleteGloss(level);
+					}
+					log = true;
+					while (log){
+						log = this->deleteTransparence(level);
+					}
+					 /*
+					/*
+					int size = this->_diffuse.size();
+					if (size > 0){
+						LevelRGB ob = this->_diffuse.at(size - 1);
+						if (ob.level == level)
+							this->_diffuse.pop_back();
+					}
+					 */
+				}
+
+				void send(std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler) {
+					dgn::DwfColor* dwfColor;
+					int	size = this->_diffuse.size();
+					if (size > 0){
+						LevelRGB ob = this->_diffuse.at(size - 1);
+						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0);
+						javaHandler->handleColor(dgn::ColorType::DIFFUSE, *dwfColor);
+					}
+
+					size = this->_specular.size();
+					if (size > 0){
+						LevelRGB ob = this->_specular.at(size - 1);
+						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0);
+						javaHandler->handleColor(dgn::ColorType::SPECULAR, *dwfColor);
+					}
+
+					size = this->_mirror.size();
+					if (size > 0){
+						LevelRGB ob = this->_mirror.at(size - 1);
+						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0);
+						javaHandler->handleColor(dgn::ColorType::AMBIENT, *dwfColor);
+					}
+
+					size = this->_emissive.size();
+					if (size > 0){
+						LevelRGB ob = this->_emissive.at(size - 1);
+						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0);
+						javaHandler->handleColor(dgn::ColorType::EMISSIVE, *dwfColor);
+					}
+
+					size = this->_gloss.size();
+					if (size > 0){
+						LevelRGB ob = this->_gloss.at(size - 1);
+						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0);
+						javaHandler->handleColor(dgn::ColorType::SHININESS, *dwfColor);
+					}
+					size = this->_transparence.size();
+					if (size > 0){
+						LevelRGB ob = this->_transparence.at(size - 1);
+						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0);
+						javaHandler->handleColor(dgn::ColorType::OPACITY, *dwfColor);
+					}
+				}
+		};
+
 		class SectionDWF;
-		class CurrentSemantic;
+		class CurrentSemantic{
+		public:
+				int level;
+				OBJ_SEMANTIC semantic;
+				CurrentSemantic(){};
+				CurrentSemantic(int level, OBJ_SEMANTIC semantic){
+					this->level = level;
+					this->semantic = semantic;
+				};
+		};
 
 		/**семантика текущего уровня**/
 		//class CurrentSemantic{
@@ -72,7 +400,7 @@ namespace c60 {
 		/**слой для вызова метода doImportNextLayer**/
 		class LayerDWF{
 		private:
-				CurrentSemantic *_semantic = NULL;
+		//		CurrentSemantic *_semantic = NULL;
 		public:
 				/**Секция которой принадлежит слой**/
 				//SectionDWF *section;
@@ -97,6 +425,8 @@ namespace c60 {
 				//int32_t countNode;
 				/*Глубина в структуре узлов, на которой находится геометрия нового объекта*/
 				int32_t geomLevel = -1;
+				/*Семантика текущего узла дерева*/
+				std::vector<CurrentSemantic> semantic;
 
 				LayerDWF (void){};
 
@@ -111,12 +441,29 @@ namespace c60 {
 					}
 				}
 
-				void setValues(OBJ_SEMANTIC semantic){
-					for (auto const &semv : semantic){
+				void deleteSemantic(int level){
+					int size = this->semantic.size();
+					if (size > 0){
+						//CurrentSemantic ob = this->semantic.at(size - 1);
+						if (this->semantic.at(size - 1).level > level)
+							this->semantic.pop_back();
+					}
+				}
+
+				void setValues(OBJ_SEMANTIC sem){
+					for (auto const &semv : sem){
 						if (this->fields[semv.propName] == L"")
 							this->fields[semv.propName] = semv.propValue;
 						//else
 						//	this->fields[semv.propName] += L"\\" + semv.propValue;
+					}
+				}
+
+				void setValues(){
+					this->clearValue();
+					for (auto pos = this->semantic.begin(); pos != this->semantic.end(); ++pos) {
+						OBJ_SEMANTIC sem = pos.base()->semantic;
+						this->setValues(sem);
 					}
 				}
 
@@ -187,8 +534,12 @@ namespace c60 {
 				std::map<std::wstring, LayerDWF> layers;
 				/**Текущий обрабатываемый слой текущей DWFSection**/
 				LayerDWF *layer;
+				/**Текущий стиль**/
+				StyleDWF *styleDWF;
 
-
+				SectionDWF(){
+					this->styleDWF = new StyleDWF();
+				};
 				//bool SetLevelLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
 				bool SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
 				//bool SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);

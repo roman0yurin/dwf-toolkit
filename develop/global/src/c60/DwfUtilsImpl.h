@@ -313,42 +313,127 @@ namespace c60 {
 					int	size = this->_diffuse.size();
 					if (size > 0){
 						LevelRGB ob = this->_diffuse.at(size - 1);
-						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0);
+						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
 						javaHandler->handleColor(dgn::ColorType::DIFFUSE, *dwfColor);
 					}
 
 					size = this->_specular.size();
 					if (size > 0){
 						LevelRGB ob = this->_specular.at(size - 1);
-						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0);
+						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
 						javaHandler->handleColor(dgn::ColorType::SPECULAR, *dwfColor);
 					}
 
 					size = this->_mirror.size();
 					if (size > 0){
 						LevelRGB ob = this->_mirror.at(size - 1);
-						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0);
+						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
 						javaHandler->handleColor(dgn::ColorType::AMBIENT, *dwfColor);
 					}
 
 					size = this->_emissive.size();
 					if (size > 0){
 						LevelRGB ob = this->_emissive.at(size - 1);
-						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0);
+						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
 						javaHandler->handleColor(dgn::ColorType::EMISSIVE, *dwfColor);
 					}
 
 					size = this->_gloss.size();
 					if (size > 0){
 						LevelRGB ob = this->_gloss.at(size - 1);
-						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0);
+						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
 						javaHandler->handleColor(dgn::ColorType::SHININESS, *dwfColor);
 					}
+
 					size = this->_transparence.size();
 					if (size > 0){
 						LevelRGB ob = this->_transparence.at(size - 1);
-						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0);
+						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
 						javaHandler->handleColor(dgn::ColorType::OPACITY, *dwfColor);
+					}
+				}
+		};
+
+
+		class LevelMatrix{
+		public:
+				int level;
+				vector<float> matrix;
+				LevelMatrix(){};
+				LevelMatrix(int n, vector<float> m){
+					this->level = n;
+					this->matrix = m;
+				};
+		};
+
+		/*матрицы файла DWF*/
+		class MatrixDWF {
+		private:
+				/*матрицы с уровнем*/
+				std::vector<LevelMatrix> _parts;
+
+				/**Перемножить матрицы 4x4 m1 на m2**/
+				vector<float> multiply(vector<float> m1, vector<float> m2){
+					vector<float> res;
+					res.push_back(m1[0]*m2[0]+m1[1]*m2[4]+m1[2]*m2[8]+m1[3]*m2[12]);
+					res.push_back(m1[0]*m2[1]+m1[1]*m2[5]+m1[2]*m2[9]+m1[3]*m2[13]);
+					res.push_back(m1[0]*m2[2]+m1[1]*m2[6]+m1[2]*m2[10]+m1[3]*m2[14]);
+					res.push_back(m1[0]*m2[3]+m1[1]*m2[7]+m1[2]*m2[11]+m1[3]*m2[15]);
+					res.push_back(m1[4]*m2[0]+m1[5]*m2[4]+m1[6]*m2[8]+m1[7]*m2[12]);
+					res.push_back(m1[4]*m2[1]+m1[5]*m2[5]+m1[6]*m2[9]+m1[7]*m2[13]);
+					res.push_back(m1[4]*m2[2]+m1[5]*m2[6]+m1[6]*m2[10]+m1[7]*m2[14]);
+					res.push_back(m1[4]*m2[3]+m1[5]*m2[7]+m1[6]*m2[11]+m1[7]*m2[15]);
+					res.push_back(m1[8]*m2[0]+m1[9]*m2[4]+m1[10]*m2[8]+m1[11]*m2[12]);
+					res.push_back(m1[8]*m2[1]+m1[9]*m2[5]+m1[10]*m2[9]+m1[11]*m2[13]);
+					res.push_back(m1[8]*m2[2]+m1[9]*m2[6]+m1[10]*m2[10]+m1[11]*m2[14]);
+					res.push_back(m1[8]*m2[3]+m1[9]*m2[7]+m1[10]*m2[11]+m1[11]*m2[15]);
+					res.push_back(m1[12]*m2[0]+m1[13]*m2[4]+m1[14]*m2[8]+m1[15]*m2[12]);
+					res.push_back(m1[12]*m2[1]+m1[13]*m2[5]+m1[14]*m2[9]+m1[15]*m2[13]);
+					res.push_back(m1[12]*m2[2]+m1[13]*m2[6]+m1[14]*m2[10]+m1[15]*m2[14]);
+					res.push_back(m1[12]*m2[3]+m1[13]*m2[7]+m1[14]*m2[11]+m1[15]*m2[15]);
+					return res;
+				}
+
+		public:
+				MatrixDWF(){};
+
+				bool add(int level, vector<float> m){
+					int size = this->_parts.size();
+					if (size == 0){
+						LevelMatrix* ob = new LevelMatrix(level, m);
+						this->_parts.push_back(*ob);
+						return true;
+					}
+					if (_parts.at(size - 1).level >= level) return false;
+
+					LevelMatrix* ob = new LevelMatrix(level, this->multiply(_parts.at(size - 1).matrix, m));
+					this->_parts.push_back(*ob);
+					return true;
+				}
+
+				LevelMatrix* get(){
+					if (this->_parts.size() > 0)
+						return &this->_parts.at(this->_parts.size()-1);
+
+					return NULL;
+				}
+
+				bool remove(int level){
+					int size = this->_parts.size();
+					if (size > 0){
+						if (this->_parts.at(size - 1).level > level) {
+							this->_parts.pop_back();
+							return true;
+						}
+					}
+
+					return false;
+				}
+
+				void send(std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler) {
+					int	size = this->_parts.size();
+					if (size > 0){
+						javaHandler->handleMatrix(this->_parts.at(size - 1).matrix);
 					}
 				}
 		};
@@ -536,9 +621,12 @@ namespace c60 {
 				LayerDWF *layer;
 				/**Текущий стиль**/
 				StyleDWF *styleDWF;
+				/**Текущая матрица**/
+				MatrixDWF *matrixDWF;
 
 				SectionDWF(){
 					this->styleDWF = new StyleDWF();
+					this->matrixDWF = new MatrixDWF();
 				};
 				//bool SetLevelLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
 				bool SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);

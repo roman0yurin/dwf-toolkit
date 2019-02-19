@@ -56,6 +56,7 @@ public:
 			TK_Status eStatus = TK_Open_Segment::Execute(rW3DParser);
 			if (eStatus == TK_Normal) {
 				int level = rW3DParser.getNestingLevel();
+				JLogger::info(L"Open level= %i", level);
 				if (level >= this->section->levelLayers) {
 					if (level == this->section->levelLayers) {
 						/**читаем новый слой**/
@@ -110,6 +111,7 @@ public:
 			TK_Status eStatus = TK_Close_Segment::Execute(rW3DParser);
 			if (eStatus == TK_Normal) {
 				int level = rW3DParser.getNestingLevel();
+				JLogger::info(L"Close level= %i", level);
 				if (level > this->section->levelLayers - 2) {
 					if (level == this->section->levelLayers - 1) {
 						/*прочитали слой*/
@@ -132,16 +134,19 @@ public:
 						//} else{
 						//	javaHandler->openChildNode();
 						//}
-						if (level == this->section->layer->geomLevel - 1){
+						//if (level == this->section->layer->geomLevel - 1){
+						if (level == this->section->layer->geomLevel){
 							//this->section->layer->setValues();
-							this->section->styleDWF->send(this->javaHandler);
-							this->section->layer->geomLevel = this->section->levelLayers;
+							//this->section->layer->geomLevel = this->section->levelLayers;
+							JLogger::info(L"CloseNode= %i", level);
+							this->section->layer->geomLevel = -1;
 							this->javaHandler->closeNode();
 						}
 						this->section->layer->deleteSemantic(level);
 					}
 				}
 				this->section->styleDWF->deleteLevel(level);
+				this->section->matrixDWF->remove(level);
 			}
 			return eStatus;
 		}
@@ -149,10 +154,12 @@ public:
 
 class ShellHandler : public TK_Shell {
 protected:
+		c60::SectionDWF *section;
 		std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler;
 public:
-		ShellHandler(std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler) : TK_Shell() {
+		ShellHandler(std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler, c60::SectionDWF *section) : TK_Shell() {
 			this->javaHandler = javaHandler;
+			this->section = section;
 		}
 
 		virtual ~ShellHandler() { ; }
@@ -160,11 +167,22 @@ public:
 		TK_Status Execute(BStreamFileToolkit &parser) {
 			TK_Status status = TK_Shell::Execute(parser);
 			if (status == TK_Normal) {
-				int level = parser.getNestingLevel();
+				if (this->section->layer->geomLevel < 0) {
+					int level = parser.getNestingLevel();
+					JLogger::info(L"OpenNode= %i", level);
+					this->section->layer->geomLevel = level - 2;
+					this->section->layer->setValues();
+					vector<wstring> values = this->section->layer->getValues();
+					this->javaHandler->openNode(values);
+					this->section->matrixDWF->send(this->javaHandler);
+					this->section->styleDWF->send(this->javaHandler);
+				}
+				//int level = parser.getNestingLevel();
 				dgn::Mesh mesh = this->toDgnMesh();
-				JLogger::info(L"#################num= %u", mesh.xyz.size());
+				//JLogger::info(L"mesh.xyz.size= %u", mesh.xyz.size());
 				//unsigned long num = mesh.xyz.size()/3;
 				//JLogger::info(L"count= %u", num);
+				/*
 				int j = 0;
 				for (int i = 0; i < 9; ++i){
 					float x = mesh.xyz[i];
@@ -181,6 +199,7 @@ public:
 					else
 						++j;
 				}
+				 */
 				this->javaHandler->handleMesh(mesh);
 			}
 
@@ -248,7 +267,7 @@ public:
 				if ((m_channels & (1 << TKO_Channel_Mirror)) != 0) {
 					this->section->styleDWF->addMirror(level, this->m_mirror.m_rgb);
 				}
-				if ((m_channels & (1 << TKO_Channel_Emission)) != 0) {
+				if ((m_channels & (1 << TKO_Channel_Gloss)) != 0) {
 					this->section->styleDWF->addGloss(level, this->m_gloss);
 				}
 				//} else{
@@ -279,6 +298,8 @@ public:
 					matrix.push_back(this->m_matrix[i]);
 				}
 				int level = rW3DParser.getNestingLevel();
+				this->section->matrixDWF->add(level, matrix);
+				/*
 				if (level > this->section->levelLayers) {
 					this->section->layer->geomLevel = level;
 					this->section->layer->setValues();
@@ -288,6 +309,7 @@ public:
 				} else{
 					this->javaHandler->handleSectionMatrix(matrix);
 				}
+				 */
 			}
 			return status;
 		}
@@ -619,8 +641,25 @@ bool c60::SectionDWF::SetLevelLayers(int32_t level, DWFObjectDefinition *pDef, D
  */
 
 bool c60::SectionDWF::SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler) {
+	wstring nodeName = L"";
+	DWFPropertyContainer *pInstProps = pDef->getInstanceProperties(*pInst);
+	DWFProperty::tMap::Iterator *piProp = pInstProps->getProperties();
+	if (piProp) {
+		for (; piProp->valid(); piProp->next()) {
+			DWFProperty *pProp = piProp->value();
+			wstring name = DwfUtilsImpl::toStdString(pProp->name());
+			if (name.compare(L"_name") == 0)
+				nodeName = DwfUtilsImpl::toStdString(pProp->value());
+		}
+
+		DWFCORE_FREE_OBJECT(piProp);
+	}
+	if (nodeName.empty())
+		return false;
+
 	int32_t currentlevel = level + 1;
 	if (currentlevel < this->levelLayers){
+		handler->openFolder(nodeName);
 		DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
 		if (piChildren) {
 			for (; piChildren->valid(); piChildren->next()) {
@@ -631,6 +670,7 @@ bool c60::SectionDWF::SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDef
 			}
 
 			DWFCORE_FREE_OBJECT(piChildren);
+			handler->closeFolder();
 			return true;
 		}
 
@@ -638,46 +678,29 @@ bool c60::SectionDWF::SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDef
 	}
 
 
-	if (currentlevel == this->levelLayers) {
-		wstring layerName = L"";
-		DWFPropertyContainer *pInstProps = pDef->getInstanceProperties(*pInst);
-		DWFProperty::tMap::Iterator *piProp = pInstProps->getProperties();
-		if (piProp) {
-			for (; piProp->valid(); piProp->next()) {
-				DWFProperty *pProp = piProp->value();
-				wstring name = DwfUtilsImpl::toStdString(pProp->name());
-				if (name.compare(L"_name") == 0)
-					layerName = DwfUtilsImpl::toStdString(pProp->value());
-			}
+	if (currentlevel != this->levelLayers)
+		return false;
 
-			DWFCORE_FREE_OBJECT(piProp);
+	this->layer = new LayerDWF();
+	this->layer->name = nodeName;
+	//this->layer->geomLevel = this->levelLayers;
+	handler->openLayer(this->layer->name);
+	DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
+	if (piChildren) {
+		for (; piChildren->valid(); piChildren->next()) {
+			if (!this->layer->ReadSemantic(currentlevel, pDef, piChildren->value()))
+				return false;
 		}
-		if (layerName.empty())
-			return false;
-
-		this->layer = new LayerDWF();
-		this->layer->name = layerName;
-		this->layer->geomLevel = this->levelLayers;
-		handler->openLayer(this->layer->name);
-		DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
-		if (piChildren) {
-			for (; piChildren->valid(); piChildren->next()) {
-				if (!this->layer->ReadSemantic(currentlevel, pDef, piChildren->value()))
-					return false;
-			}
-			DWFCORE_FREE_OBJECT(piChildren);
-		}
-
-		this->layer->clearValue();
-		wstring key = DwfUtilsImpl::toStdString(pInst->object());
-		this->layers[key] = *this->layer;
-		handler->closeLayer(this->layer->semantics.size(), this->layer->getFields());
-		this->layer = NULL;
-
-		return true;
+		DWFCORE_FREE_OBJECT(piChildren);
 	}
 
-	return false;
+	this->layer->clearValue();
+	wstring key = DwfUtilsImpl::toStdString(pInst->object());
+	this->layers[key] = *this->layer;
+	handler->closeLayer(this->layer->semantics.size(), this->layer->getFields());
+	this->layer = NULL;
+
+	return true;
 }
 
 void c60::DwfUtilsImpl::readTreeStructure(const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler) {
@@ -758,7 +781,7 @@ void c60::DwfUtilsImpl::readAllLayers(const std::shared_ptr<dgn::DwfLayersFillSt
 
 						oW3DStreamParser.SetOpcodeHandler(TKE_Open_Segment, new OpenHandler(handler, this->section));
 						oW3DStreamParser.SetOpcodeHandler(TKE_Close_Segment, new CloseHandler(handler, this->section));
-						oW3DStreamParser.SetOpcodeHandler(TKE_Shell, new ShellHandler(handler));
+						oW3DStreamParser.SetOpcodeHandler(TKE_Shell, new ShellHandler(handler, this->section));
 						oW3DStreamParser.SetOpcodeHandler(TKE_Color, new ColorHandler(handler, this->section));
 						oW3DStreamParser.SetOpcodeHandler(TKE_Modelling_Matrix, new MatrixHandler(handler, this->section));
 

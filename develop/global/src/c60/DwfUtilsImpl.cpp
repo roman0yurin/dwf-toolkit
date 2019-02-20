@@ -173,7 +173,8 @@ public:
 					this->section->layer->geomLevel = level - 2;
 					this->section->layer->setValues();
 					vector<wstring> values = this->section->layer->getValues();
-					this->javaHandler->openNode(values);
+					vector<wstring> names = this->section->layer->getNames();
+					this->javaHandler->openNode(values, names);
 					this->section->matrixDWF->send(this->javaHandler);
 					this->section->styleDWF->send(this->javaHandler);
 				}

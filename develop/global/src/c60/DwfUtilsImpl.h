@@ -440,13 +440,25 @@ namespace c60 {
 
 		class SectionDWF;
 		class CurrentSemantic{
+		private:
+				void setName(){
+					for (auto const &semv : semantic){
+						if (semv.propName.compare(L"_name") == 0)
+						{
+							this->name = semv.propValue;
+							return;
+						}
+					}
+				}
 		public:
 				int level;
+				std::wstring name = L"";
 				OBJ_SEMANTIC semantic;
 				CurrentSemantic(){};
 				CurrentSemantic(int level, OBJ_SEMANTIC semantic){
 					this->level = level;
 					this->semantic = semantic;
+					this->setName();
 				};
 		};
 
@@ -560,6 +572,15 @@ namespace c60 {
 
 					return result;
 					//return _semantic->getValues();
+				}
+
+				vector<wstring> getNames(){
+					vector<wstring> result;
+					for (auto pos = this->semantic.begin(); pos != this->semantic.end(); ++pos) {
+						result.push_back(pos.base()->name);
+					}
+
+					return result;
 				}
 
 				vector<wstring> getFields(){

@@ -34,7 +34,33 @@ std::shared_ptr<dgn::DwfUtils> dgn::DwfUtils::getInstance(const std::wstring & d
 }
 
 
+class BeforeOpenHandler : public TK_Open_Segment {
+protected:
+		std::shared_ptr<dgn::DwfLayerStructureStreamHandler> javaHandler;
+		int32_t levelLayers;
+public:
+		BeforeOpenHandler(std::shared_ptr<dgn::DwfLayerStructureStreamHandler> javaHandler, int32_t level) : TK_Open_Segment() {
+			this->javaHandler = javaHandler;
+			this->levelLayers = level;
+		}
 
+		virtual ~BeforeOpenHandler() { ; }
+
+		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
+
+			TK_Status eStatus = TK_Open_Segment::Execute(rW3DParser);
+			if (eStatus == TK_Normal) {
+				int level = rW3DParser.getNestingLevel();
+				if (level == this->levelLayers) {
+					string str = string(this->m_string, this->m_length);
+					wstring wstr(str.begin(), str.end());
+					this->javaHandler->layerData(wstr);
+				}
+			}
+
+			return eStatus;
+		}
+};
 
 
 class OpenHandler : public TK_Open_Segment {
@@ -55,8 +81,10 @@ public:
 
 			TK_Status eStatus = TK_Open_Segment::Execute(rW3DParser);
 			if (eStatus == TK_Normal) {
+				//clock_t time = clock();
+				//JLogger::info(L"Open time= %d", time);
 				int level = rW3DParser.getNestingLevel();
-				JLogger::info(L"Open level= %i", level);
+				//JLogger::info(L"Open level= %i", level);
 				if (level >= this->section->levelLayers) {
 					if (level == this->section->levelLayers) {
 						/**читаем новый слой**/
@@ -75,6 +103,7 @@ public:
 								//this->section->layer->bottomLevel = level;
 								//this->section->layer->setValues(semantic);
 								this->section->layer->semantic.push_back(*new c60::CurrentSemantic(level, semantic));
+								this->javaHandler->openMiddleNode(this->section->layer->getBottomName(), this->section->layer->getBottomSem());
 							}
 						//}
 					}
@@ -110,12 +139,14 @@ public:
 		TK_Status Execute(BStreamFileToolkit &rW3DParser){
 			TK_Status eStatus = TK_Close_Segment::Execute(rW3DParser);
 			if (eStatus == TK_Normal) {
+				//clock_t time = clock();
+				//JLogger::info(L"Close time= %d", time);
 				int level = rW3DParser.getNestingLevel();
-				JLogger::info(L"Close level= %i", level);
+				//JLogger::info(L"Close level= %i", level);
 				if (level > this->section->levelLayers - 2) {
 					if (level == this->section->levelLayers - 1) {
 						/*прочитали слой*/
-						JLogger::info(L"C++ close layer %S", this->section->layer->name.c_str());
+						//JLogger::info(L"C++ close layer %S", this->section->layer->name.c_str());
 						this->javaHandler->closeLayer();
 						this->section->layer = NULL;
 					} else {
@@ -138,11 +169,12 @@ public:
 						if (level == this->section->layer->geomLevel){
 							//this->section->layer->setValues();
 							//this->section->layer->geomLevel = this->section->levelLayers;
-							JLogger::info(L"CloseNode= %i", level);
+							//JLogger::info(L"CloseNode= %i", level);
 							this->section->layer->geomLevel = -1;
 							this->javaHandler->closeNode();
 						}
-						this->section->layer->deleteSemantic(level);
+						if (this->section->layer->deleteSemantic(level))
+							this->javaHandler->closeMiddleNode();
 					}
 				}
 				this->section->styleDWF->deleteLevel(level);
@@ -167,9 +199,11 @@ public:
 		TK_Status Execute(BStreamFileToolkit &parser) {
 			TK_Status status = TK_Shell::Execute(parser);
 			if (status == TK_Normal) {
+				//clock_t time = clock();
+				//JLogger::info(L"Shell time= %d", time);
 				if (this->section->layer->geomLevel < 0) {
 					int level = parser.getNestingLevel();
-					JLogger::info(L"OpenNode= %i", level);
+					//JLogger::info(L"OpenNode= %i", level);
 					this->section->layer->geomLevel = level - 2;
 					this->section->layer->setValues();
 					vector<wstring> values = this->section->layer->getValues();
@@ -202,6 +236,8 @@ public:
 				}
 				 */
 				this->javaHandler->handleMesh(mesh);
+				//time = clock() - time;
+				//JLogger::info(L"DShell time= %d", time);
 			}
 
 			return status;
@@ -224,6 +260,8 @@ public:
 		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
 			TK_Status eStatus = TK_Color::Execute(rW3DParser);
 			if (eStatus == TK_Normal) {
+				//clock_t time = clock();
+				//JLogger::info(L"Color time= %d", time);
 				dgn::DwfColor* dwfColor;
 				int level = rW3DParser.getNestingLevel();
 				//if (level > this->section->levelLayers) {
@@ -274,6 +312,8 @@ public:
 				//} else{
 				//	dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2], 0);
 				//}
+				//time = clock() - time;
+				//JLogger::info(L"DClolor time= %d", time);
 			}
 			return eStatus;
 		}
@@ -294,6 +334,8 @@ public:
 		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
 			TK_Status status = TK_Matrix::Execute(rW3DParser);
 			if (status == TK_Normal) {
+				//clock_t time = clock();
+				//JLogger::info(L"Matrix time= %d", time);
 				vector<float> matrix;
 				for (int i = 0; i < 16; ++i) {
 					matrix.push_back(this->m_matrix[i]);
@@ -311,6 +353,8 @@ public:
 					this->javaHandler->handleSectionMatrix(matrix);
 				}
 				 */
+				//time = clock() - time;
+				//JLogger::info(L"DMatrix time= %d", time);
 			}
 			return status;
 		}
@@ -427,7 +471,7 @@ bool c60::LayerDWF::ReadSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDe
 
 	DWFString str = pInst->id();
 	std::wstring id = DwfUtilsImpl::toStdString(str);
-	JLogger::info(L"ID= %S", id.c_str());
+	//JLogger::info(L"ID= %S", id.c_str());
 	DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
 	if (piChildren) {
 		for (; piChildren->valid(); piChildren->next()) {
@@ -682,10 +726,13 @@ bool c60::SectionDWF::SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDef
 	if (currentlevel != this->levelLayers)
 		return false;
 
+	wstring key = DwfUtilsImpl::toStdString(pInst->object());
 	this->layer = new LayerDWF();
 	this->layer->name = nodeName;
+	//JLogger::info(L"LayerName From semantic= %S", nodeName.c_str());
+	//JLogger::info(L"LayerKey= %S", key.c_str());
 	//this->layer->geomLevel = this->levelLayers;
-	handler->openLayer(this->layer->name);
+	handler->openLayer(this->layer->name, key);
 	DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
 	if (piChildren) {
 		for (; piChildren->valid(); piChildren->next()) {
@@ -696,12 +743,89 @@ bool c60::SectionDWF::SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDef
 	}
 
 	this->layer->clearValue();
-	wstring key = DwfUtilsImpl::toStdString(pInst->object());
+	//wstring key = DwfUtilsImpl::toStdString(pInst->object());
 	this->layers[key] = *this->layer;
 	handler->closeLayer(this->layer->semantics.size(), this->layer->getFields());
 	this->layer = NULL;
 
 	return true;
+}
+
+
+void c60::DwfUtilsImpl::readTreeStructureFromGraphics(const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler) {
+	DWFManifest &rManifest = this->oReader.getManifest();
+	DWFSection *pSection = NULL;
+	DWFManifest::SectionIterator *piSections = rManifest.getSections();
+	if (piSections) {
+		auto pos = this->sections.begin();
+		for (; piSections->valid(); piSections->next()) {
+			pSection = piSections->get();
+			pSection->readDescriptor();
+			this->section = pos.base();
+
+			DWFResourceContainer::ResourceIterator *piGraphics = pSection->findResourcesByRole(DWFXML::kzRole_Graphics3d);
+			if (piGraphics) {
+				for (; piGraphics->valid(); piGraphics->next()) {
+					DWFGraphicResource *pW3D = dynamic_cast<DWFGraphicResource *>(piGraphics->get());
+					if (pW3D) {
+						//
+						// get the data stream
+						//
+						DWFCore::DWFInputStream *pW3DStream = pW3D->getInputStream();
+
+						//
+						// Create the HSF toolkit object that does the stream I/O
+						//
+						BStreamFileToolkit oW3DStreamParser;
+
+						oW3DStreamParser.SetOpcodeHandler(TKE_Open_Segment, new BeforeOpenHandler(handler, this->section->levelLayers));
+						//oW3DStreamParser.SetOpcodeHandler(TKE_Close_Segment, new CloseHandler(handler, this->section));
+						//oW3DStreamParser.SetOpcodeHandler(TKE_Shell, new ShellHandler(handler, this->section));
+						//oW3DStreamParser.SetOpcodeHandler(TKE_Color, new ColorHandler(handler, this->section));
+						//oW3DStreamParser.SetOpcodeHandler(TKE_Modelling_Matrix, new MatrixHandler(handler, this->section));
+
+						//
+						// Attach the stream to the parser
+						//
+						oW3DStreamParser.OpenStream(*pW3DStream);
+
+						size_t nBytesRead = 0;
+						char aBuffer[16384] = {0};
+
+						//
+						// read and process the stream
+						//
+						while (pW3DStream->available() > 0) {
+							//
+							// read from the stream ourselves, we could also use ReadBuffer()
+							// but it basically just performs this same action.
+							//
+							nBytesRead = pW3DStream->read(aBuffer, 16384);
+
+							//
+							// use the parser to process the buffer
+							//
+							if (oW3DStreamParser.ParseBuffer(aBuffer, nBytesRead, TK_Normal) == TK_Error) {
+								wcout << L"Error occured parsing buffer" << endl;
+								break;
+							}
+						}
+
+						//
+						// Done with the stream, we must delete it
+						//
+						oW3DStreamParser.CloseStream();
+						DWFCORE_FREE_OBJECT(pW3DStream);
+					}
+				}
+
+				if (pos != this->sections.end())
+					++pos;
+			}
+		}
+
+		DWFCORE_FREE_OBJECT(piSections);
+	}
 }
 
 void c60::DwfUtilsImpl::readTreeStructure(const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler) {
@@ -750,11 +874,15 @@ void c60::DwfUtilsImpl::readTreeStructure(const std::shared_ptr<dgn::DwfLayerStr
 
 		DWFCORE_FREE_OBJECT(piSections);
 	}
+
+	c60::DwfUtilsImpl::readTreeStructureFromGraphics(handler);
 }
 
 
 void c60::DwfUtilsImpl::readAllLayers(const std::shared_ptr<dgn::DwfLayersFillStreamHandler> &handler) {
 
+	//clock_t time = clock();
+	//JLogger::info(L"readAllLayers time= %d", time);
 	DWFManifest &rManifest = this->oReader.getManifest();
 	DWFSection *pSection = NULL;
 	DWFManifest::SectionIterator *piSections = rManifest.getSections();
@@ -828,4 +956,7 @@ void c60::DwfUtilsImpl::readAllLayers(const std::shared_ptr<dgn::DwfLayersFillSt
 
 		DWFCORE_FREE_OBJECT(piSections);
 	}
+
+	//time = clock() - time;
+	//JLogger::info(L"DreadAllLayers time= %d", time);
 }

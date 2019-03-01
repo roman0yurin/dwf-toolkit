@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <string>
+#include <time.h>
 
 #include "dgn/DwfUtils.hpp"
 #include <dgn/SemanticValue.hpp>
@@ -439,6 +440,7 @@ namespace c60 {
 		};
 
 		class SectionDWF;
+
 		class CurrentSemantic{
 		private:
 				void setName(){
@@ -454,12 +456,22 @@ namespace c60 {
 				int level;
 				std::wstring name = L"";
 				OBJ_SEMANTIC semantic;
+
 				CurrentSemantic(){};
 				CurrentSemantic(int level, OBJ_SEMANTIC semantic){
 					this->level = level;
 					this->semantic = semantic;
 					this->setName();
 				};
+
+				vector<wstring> getValues(){
+					vector<wstring> result;
+					for (auto const &semv : semantic){
+						result.push_back(semv.propValue);
+					}
+
+					return result;
+				}
 		};
 
 		/**семантика текущего уровня**/
@@ -538,13 +550,36 @@ namespace c60 {
 					}
 				}
 
-				void deleteSemantic(int level){
+				bool deleteSemantic(int level){
 					int size = this->semantic.size();
 					if (size > 0){
 						//CurrentSemantic ob = this->semantic.at(size - 1);
-						if (this->semantic.at(size - 1).level > level)
+						if (this->semantic.at(size - 1).level > level) {
 							this->semantic.pop_back();
+							return true;
+						}
 					}
+
+					return false;
+				}
+
+				wstring getBottomName(){
+					int size = this->semantic.size();
+					if (size > 0){
+						return this->semantic.at(size - 1).name;
+					}
+
+					return L"";
+				}
+
+				vector<wstring> getBottomSem(){
+					vector<wstring> result;
+					int size = this->semantic.size();
+					if (size > 0){
+						return this->semantic.at(size - 1).getValues();
+					}
+
+					return result;
 				}
 
 				void setValues(OBJ_SEMANTIC sem){
@@ -658,6 +693,8 @@ namespace c60 {
 
 		/**реализация синглтона утилит для вызова из Java**/
 		class DwfUtilsImpl : public dgn::DwfUtils {
+		private:
+				void readTreeStructureFromGraphics(const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
 		protected:
 				/**Открытый на чтение файл DWF**/
 				DWFToolkit::DWFPackageReader oReader;

@@ -104,6 +104,8 @@ public:
 								//this->section->layer->setValues(semantic);
 								this->section->layer->semantic.push_back(*new c60::CurrentSemantic(level, semantic));
 								this->javaHandler->openMiddleNode(this->section->layer->getBottomName(), this->section->layer->getBottomSem());
+								//JLogger::info(L"name= %S", this->section->layer->getBottomName().c_str());
+								//JLogger::info(L"openMiddleNode= %i", level);
 							}
 						//}
 					}
@@ -207,8 +209,9 @@ public:
 					this->section->layer->geomLevel = level - 2;
 					this->section->layer->setValues();
 					vector<wstring> values = this->section->layer->getValues();
-					vector<wstring> names = this->section->layer->getNames();
-					this->javaHandler->openNode(values, names);
+					this->javaHandler->openNode(values);
+					//vector<wstring> names = this->section->layer->getNames();
+					//this->javaHandler->openNode(values, names);
 					this->section->matrixDWF->send(this->javaHandler);
 					this->section->styleDWF->send(this->javaHandler);
 				}

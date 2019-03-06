@@ -26,6 +26,7 @@
 
 #include "dwf/w3dtk/BStream.h"
 #include "dwf/w3dtk/BOpcodeShell.h"
+#include "JLogger.h"
 
 using namespace DWFCore;
 using namespace DWFToolkit;
@@ -555,6 +556,7 @@ namespace c60 {
 					if (size > 0){
 						//CurrentSemantic ob = this->semantic.at(size - 1);
 						if (this->semantic.at(size - 1).level > level) {
+							//JLogger::info(L"name= %S", this->semantic.at(size - 1).name.c_str());
 							this->semantic.pop_back();
 							return true;
 						}
@@ -609,6 +611,8 @@ namespace c60 {
 					//return _semantic->getValues();
 				}
 
+				/**возращает имена родительских узлов текущего объекта(до названия слоя)**/
+				/*
 				vector<wstring> getNames(){
 					vector<wstring> result;
 					for (auto pos = this->semantic.begin(); pos != this->semantic.end(); ++pos) {
@@ -617,7 +621,9 @@ namespace c60 {
 
 					return result;
 				}
+				 */
 
+				/**возращает название колонок**/
 				vector<wstring> getFields(){
 					std::vector<wstring> result;
 					for (auto pos = this->fields.begin(); pos != this->fields.end(); ++pos) {
@@ -738,6 +744,30 @@ namespace c60 {
 				static std::wstring toStdString(const DWFString &str){
 					return std::wstring((const wchar_t *)str, str.chars());
 				}
+
+				/**Возращает значение колонки с именем _name**/
+				/*
+				static wstring getName(OBJ_SEMANTIC semantic){
+					for (auto const &semv : semantic){
+						if (semv.propName.compare(L"_name") == 0)
+							return semv.propValue;
+					}
+
+					return L"";
+				}
+				 */
+
+				/**Возращает семантику текущего узла**/
+				/*
+				static vector<wstring> getValues(OBJ_SEMANTIC semantic){
+					vector<wstring> result;
+					for (auto const &semv : semantic){
+						result.push_back(semv.propValue);
+					}
+
+					return result;
+				}
+				 */
 		};
 
 

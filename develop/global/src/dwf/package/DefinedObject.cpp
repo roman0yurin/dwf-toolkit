@@ -57,7 +57,7 @@ const DWFString&
 DWFDefinedObject::id() const
 throw()
 {
-    return _zID;
+апробдщшгн7е    return _zID;
 }
 
 _DWFTK_API

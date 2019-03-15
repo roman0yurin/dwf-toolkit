@@ -9,9 +9,10 @@
 //#define DWFTK_USE_DWFCORE_ZLIB
 #define _CRT_SECURE_NO_WORNINGS_G
 
-#include "dwfcore/STL.h"
-#include <iostream>
+#include <stdlib.h>
+//#include <iostream>
 
+#include "dwfcore/STL.h"
 #include "dwfcore/File.h"
 #include "dwfcore/String.h"
 

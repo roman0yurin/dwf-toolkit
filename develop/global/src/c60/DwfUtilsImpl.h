@@ -40,13 +40,16 @@ namespace c60 {
 		public:
 				int level;
 				float rgb[3];
-				LevelRGB(){};
+				LevelRGB(){}
 				LevelRGB(int n, float ar[3]){
 					this->level = n;
 					this->rgb[0] = ar[0];
 					this->rgb[1] = ar[1];
 					this->rgb[2] = ar[2];
-				};
+				}
+				~LevelRGB(){
+					;
+				}
 		};
 
 		/*стили файла DWF*/
@@ -139,7 +142,11 @@ namespace c60 {
 					return false;
 				}
 		public:
-				StyleDWF(){};
+				StyleDWF(){}
+
+				~StyleDWF(){
+					;
+				}
 
 				void addDiffuse(int level, float rgb[3]){
 					int size = this->_diffuse.size();
@@ -148,8 +155,7 @@ namespace c60 {
 						if (ob.level >= level)
 							return;
 					}
-					LevelRGB* ob = new LevelRGB(level, rgb);
-					this->_diffuse.push_back(*ob);
+					this->_diffuse.emplace_back(level, rgb);
 				}
 
 				void addSpecular(int level, float rgb[3]){
@@ -159,8 +165,7 @@ namespace c60 {
 						if (ob.level >= level)
 							return;
 					}
-					LevelRGB* ob = new LevelRGB(level, rgb);
-					this->_specular.push_back(*ob);
+					this->_specular.emplace_back(level, rgb);
 				}
 
 				void addMirror(int level, float rgb[3]){
@@ -170,8 +175,7 @@ namespace c60 {
 						if (ob.level >= level)
 							return;
 					}
-					LevelRGB* ob = new LevelRGB(level, rgb);
-					this->_mirror.push_back(*ob);
+					this->_mirror.emplace_back(level, rgb);
 				}
 
 				void addEmissive(int level, float rgb[3]){
@@ -181,8 +185,7 @@ namespace c60 {
 						if (ob.level >= level)
 							return;
 					}
-					LevelRGB* ob = new LevelRGB(level, rgb);
-					this->_emissive.push_back(*ob);
+					this->_emissive.emplace_back(level, rgb);
 				}
 
 				void addGloss(int level, float gloss){
@@ -192,12 +195,8 @@ namespace c60 {
 						if (ob.level >= level)
 							return;
 					}
-					LevelRGB* ob = new LevelRGB();
-					ob->level = level;
-					ob->rgb[0] = gloss;
-					ob->rgb[1] = gloss;
-					ob->rgb[2] = gloss;
-					this->_gloss.push_back(*ob);
+					float rgb[3]{gloss, gloss, gloss};
+					this->_gloss.emplace_back(level, rgb);
 				}
 
 				void addTransparence(int level, float rgb[3]){
@@ -207,8 +206,7 @@ namespace c60 {
 						if (ob.level >= level)
 							return;
 					}
-					LevelRGB* ob = new LevelRGB(level, rgb);
-					this->_transparence.push_back(*ob);
+					this->_transparence.emplace_back(level, rgb);
 				}
 
 				LevelRGB* getDiffuse(){
@@ -310,50 +308,7 @@ namespace c60 {
 					 */
 				}
 
-				void send(std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler) {
-					dgn::DwfColor* dwfColor;
-					int	size = this->_diffuse.size();
-					if (size > 0){
-						LevelRGB ob = this->_diffuse.at(size - 1);
-						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
-						javaHandler->handleColor(dgn::ColorType::DIFFUSE, *dwfColor);
-					}
-
-					size = this->_specular.size();
-					if (size > 0){
-						LevelRGB ob = this->_specular.at(size - 1);
-						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
-						javaHandler->handleColor(dgn::ColorType::SPECULAR, *dwfColor);
-					}
-
-					size = this->_mirror.size();
-					if (size > 0){
-						LevelRGB ob = this->_mirror.at(size - 1);
-						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
-						javaHandler->handleColor(dgn::ColorType::AMBIENT, *dwfColor);
-					}
-
-					size = this->_emissive.size();
-					if (size > 0){
-						LevelRGB ob = this->_emissive.at(size - 1);
-						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
-						javaHandler->handleColor(dgn::ColorType::EMISSIVE, *dwfColor);
-					}
-
-					size = this->_gloss.size();
-					if (size > 0){
-						LevelRGB ob = this->_gloss.at(size - 1);
-						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
-						javaHandler->handleColor(dgn::ColorType::SHININESS, *dwfColor);
-					}
-
-					size = this->_transparence.size();
-					if (size > 0){
-						LevelRGB ob = this->_transparence.at(size - 1);
-						dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
-						javaHandler->handleColor(dgn::ColorType::OPACITY, *dwfColor);
-					}
-				}
+				void send(std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler);
 		};
 
 
@@ -361,11 +316,11 @@ namespace c60 {
 		public:
 				int level;
 				vector<float> matrix;
-				LevelMatrix(){};
+				LevelMatrix(){}
 				LevelMatrix(int n, vector<float> m){
 					this->level = n;
 					this->matrix = m;
-				};
+				}
 		};
 
 		/*матрицы файла DWF*/
@@ -397,19 +352,19 @@ namespace c60 {
 				}
 
 		public:
-				MatrixDWF(){};
+				MatrixDWF(){}
+
+				~MatrixDWF(){}
 
 				bool add(int level, vector<float> m){
 					int size = this->_parts.size();
 					if (size == 0){
-						LevelMatrix* ob = new LevelMatrix(level, m);
-						this->_parts.push_back(*ob);
+						this->_parts.emplace_back(level, m);
 						return true;
 					}
 					if (_parts.at(size - 1).level >= level) return false;
 
-					LevelMatrix* ob = new LevelMatrix(level, this->multiply(_parts.at(size - 1).matrix, m));
-					this->_parts.push_back(*ob);
+					this->_parts.emplace_back(level, this->multiply(_parts.at(size - 1).matrix, m));
 					return true;
 				}
 
@@ -440,6 +395,7 @@ namespace c60 {
 				}
 		};
 
+		/*
 		class SectionDWF;
 
 		class CurrentSemantic{
@@ -474,6 +430,7 @@ namespace c60 {
 					return result;
 				}
 		};
+		/*
 
 		/**семантика текущего уровня**/
 		//class CurrentSemantic{
@@ -514,7 +471,7 @@ namespace c60 {
 		public:
 				/**Секция которой принадлежит слой**/
 				//SectionDWF *section;
-				/**семантика объектов слоя**/
+				/**семантика дочерних узлов слоя**/
 				std::map<std::wstring, OBJ_SEMANTIC> semantics;
 				//**Поток с деревом геометрии**//
 				//DWFCore::DWFInputStream *pW3DStream;
@@ -536,9 +493,17 @@ namespace c60 {
 				/*Глубина в структуре узлов, на которой находится геометрия нового объекта*/
 				int32_t geomLevel = -1;
 				/*Семантика текущего узла дерева*/
-				std::vector<CurrentSemantic> semantic;
+				//std::vector<CurrentSemantic> semantic;
+				/**Глубина в структуре узлов, на которой находится нижняя семантика**/
+				int32_t semLevel = -1;
 
-				LayerDWF (void){};
+				LayerDWF (){}
+
+				LayerDWF (const std::wstring& name) : name(name) {}
+
+				~LayerDWF(){
+					name = L"";
+				}
 
 				//bool GetSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
 				bool ReadSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
@@ -546,11 +511,12 @@ namespace c60 {
 				//void SetBottomLevel(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
 				//bool SetFields();
 				void clearValue(){
-					for (auto pos = this->fields.begin(); pos != this->fields.end(); ++pos) {
-						pos->second = L"";
+					for (auto &keyVal: this->fields) {
+						keyVal.second = L"";
 					}
 				}
 
+				/*
 				bool deleteSemantic(int level){
 					int size = this->semantic.size();
 					if (size > 0){
@@ -583,16 +549,19 @@ namespace c60 {
 
 					return result;
 				}
+				*/
 
 				void setValues(OBJ_SEMANTIC sem){
+					this->clearValue();
 					for (auto const &semv : sem){
-						if (this->fields[semv.propName] == L"")
+						//if (this->fields[semv.propName] == L"")
 							this->fields[semv.propName] = semv.propValue;
 						//else
 						//	this->fields[semv.propName] += L"\\" + semv.propValue;
 					}
 				}
 
+				/*
 				void setValues(){
 					this->clearValue();
 					for (auto pos = this->semantic.begin(); pos != this->semantic.end(); ++pos) {
@@ -600,6 +569,7 @@ namespace c60 {
 						this->setValues(sem);
 					}
 				}
+				 */
 
 				vector<wstring> getValues(){
 					vector<wstring> result;
@@ -679,17 +649,23 @@ namespace c60 {
 				int32_t levelLayers = -1;
 				/**слои секции**/
 				std::map<std::wstring, LayerDWF> layers;
-				/**Текущий обрабатываемый слой текущей DWFSection**/
+				/**Текущий обрабатываемый слой**/
 				LayerDWF *layer;
 				/**Текущий стиль**/
-				StyleDWF *styleDWF;
-				/**Текущая матрица**/
-				MatrixDWF *matrixDWF;
+				StyleDWF styleDWF;
+				/**матрицы файла DWF**/
+				MatrixDWF matrixDWF;
 
 				SectionDWF(){
-					this->styleDWF = new StyleDWF();
-					this->matrixDWF = new MatrixDWF();
+					//this->styleDWF = new StyleDWF();
+					//this->matrixDWF = new MatrixDWF();
 				};
+
+				~SectionDWF(){
+					this->layer = NULL;
+					//delete this->styleDWF;
+					//delete this->matrixDWF;
+				}
 				//bool SetLevelLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
 				bool SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
 				//bool SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
@@ -700,14 +676,15 @@ namespace c60 {
 		/**реализация синглтона утилит для вызова из Java**/
 		class DwfUtilsImpl : public dgn::DwfUtils {
 		private:
-				void readTreeStructureFromGraphics(const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
+				void readTreeStructureFromGraphics(const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler, DWFSection *pSection);
 		protected:
 				/**Открытый на чтение файл DWF**/
-				DWFToolkit::DWFPackageReader oReader;
+				//DWFToolkit::DWFPackageReader oReader;
 				/**Содержит информацию о файле DWF**/
 				DWFToolkit::DWFPackageReader::tPackageInfo tInfo;
 
 		public:
+				DWFToolkit::DWFPackageReader oReader;
 				/**Из какого файла читать**/
 				const std::wstring dwfFile;
 				/**Глубина в структуре узлов, на которой находятся слои**/
@@ -726,7 +703,10 @@ namespace c60 {
 				//int32_t countNode;
 
 				DwfUtilsImpl(const std::wstring & dwfFile, int32_t layerDepth);
-				//virtual ~DwfUtilsImpl ();
+
+				~DwfUtilsImpl() override {
+					this->section = NULL;
+				}
 
 
 				/*
@@ -743,6 +723,26 @@ namespace c60 {
 
 				static std::wstring toStdString(const DWFString &str){
 					return std::wstring((const wchar_t *)str, str.chars());
+				}
+
+				static std::wstring getName(OBJ_SEMANTIC sem){
+					for (auto const &s : sem){
+						if (s.propName.compare(L"_name") == 0)
+							return s.propValue;
+					}
+
+					return L"";
+				}
+
+				static std::pair<vector<wstring>, vector<wstring>> getPair(OBJ_SEMANTIC sem){
+					vector<wstring> fields;
+					vector<wstring> values;
+					for (auto const &s : sem){
+						fields.push_back(s.propName);
+						values.push_back(s.propValue);
+					}
+
+					return {fields, values};
 				}
 
 				/**Возращает значение колонки с именем _name**/

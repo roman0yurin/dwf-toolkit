@@ -65,295 +65,6 @@ void GetContentInfo(DWFContent *pContent) {
 	GetClassInformation(pContent);
 }
 
-//typedef std::vector<std::pair<std::wstring, std::wstring>> OBJ_SEMANTIC;
-/*
-class OpenHandler : public TK_Open_Segment {
-protected:
-		 std::map<std::wstring, OBJ_SEMANTIC> &semantic;
-public:
-		OpenHandler(std::map<std::wstring, OBJ_SEMANTIC> &semantic) : TK_Open_Segment(), semantic(semantic) {
-		}
-
-		virtual ~OpenHandler() { ; }
-
-		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
-			TK_Status eStatus = TK_Open_Segment::Execute(rW3DParser);
-			if (eStatus == TK_Normal) {
-				wcout << L"\tNestingLevel : " << rW3DParser.getNestingLevel() << endl;
-			}
-
-			string str =  string(this->m_string, this->m_length);
-			wstring wstr(str.begin(), str.end());
-			auto const result = semantic.find(wstr);
-			if (result != semantic.end()){
-				OBJ_SEMANTIC sem = result->second;
-				for(auto const &pair : sem){
-					wcout << pair.first << L" -> " << pair.second << endl;
-				}
-			}
-			wcout << L"\n" << endl;
-
-			return eStatus;
-		}
-};
-
-class TAGOpcodeHandler : public TK_Tag {
-protected:
-		std::map<std::wstring, OBJ_SEMANTIC> &semantic;
-public:
-		TAGOpcodeHandler(std::map<std::wstring, OBJ_SEMANTIC> &semantic) : TK_Tag(), semantic(semantic) {
-		}
-
-		virtual ~TAGOpcodeHandler() { ; }
-
-		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
-		TK_Status eStatus = TK_Tag::Execute(rW3DParser);
-		if (eStatus == TK_Normal) {
-		}
-		return eStatus;
-}
-};
-
-class ShellHandler : public TK_Shell {
-public:
-		ShellHandler() : TK_Shell() { ; }
-
-		virtual ~ShellHandler() { ; }
-
-		TK_Status Execute(BStreamFileToolkit &parser) {
-			TK_Status status = TK_Shell::Execute(parser);
-			if (status == TK_Normal) {
-				//FILE* fp = fopen("C:\\Users\\Den\\Desktop\\Work\\Temp\\coord.txt", "a+");
-				int i = 0;
-				float x, y, z;
-				while (i < this->mp_pointcount) {
-					x = this->mp_points[i];
-					y = this->mp_points[i + 1];
-					z = this->mp_points[i + 2];
-					i += 3;
-				}
-				//fprintf(fp, "%s\n", this->GetString());
-				//fclose(fp);
-			}
-			return status;
-		}
-};
- */
-
-/*
-DWFString toDwfString(std::wstring str){
-	DWFString name;
-	name.append(str.c_str());
-	return name;
-}
-
-std::wstring toStdString(const DWFString &str){
-	return std::wstring((const wchar_t *)str, str.chars());
-}
-*/
-
-/*
-void GetDWFObjectDefinition(DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, std::map<std::wstring, OBJ_SEMANTIC> &all_semantic){
-	const wchar_t *str = (const wchar_t *) pInst->node();
-	wcout << L"Object [" << (const wchar_t *) pInst->object() << L"] Node [" << str << L"]  sequence="
-				<< pInst->sequence() << endl;
-	DWFDefinedObject *ob = NULL;
-
-	DWFProperty *pProp = NULL;
-	DWFPropertyContainer *pInstProps = pDef->getInstanceProperties(*pInst);
-
-	DWFProperty::tMap::Iterator *piProp = pInstProps->getProperties();
-	OBJ_SEMANTIC semantic;
-	if (piProp) {
-		for (; piProp->valid(); piProp->next()) {
-			pProp = piProp->value();
-			semantic.push_back(std::make_pair(toStdString(pProp->name()), toStdString(pProp->value())));
-			wcout << (const wchar_t *) pProp->name() << L", " << (const wchar_t *) pProp->value() << L"    ["
-						<< (const wchar_t *) pProp->category() << L"]" << endl;
-
-		}
-
-		DWFCORE_FREE_OBJECT(piProp);
-	}
-	all_semantic[toStdString(pInst->object())] = semantic;
-	DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
-
-	if (piChildren) {
-		for (; piChildren->valid(); piChildren->next()) {
-			GetDWFObjectDefinition(pDef, piChildren->value(), all_semantic);
-		}
-		DWFCORE_FREE_OBJECT(piChildren);
-	}
-}
- */
-
-
-
-class OpenHandler : public TK_Open_Segment {
-protected:
-		c60::SectionDWF *section;
-public:
-		OpenHandler(c60::SectionDWF *section) : TK_Open_Segment() {
-			this->section = section;
-		}
-
-		virtual ~OpenHandler() { ; }
-
-		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
-
-			TK_Status eStatus = TK_Open_Segment::Execute(rW3DParser);
-			if (eStatus == TK_Normal) {
-				int level = rW3DParser.getNestingLevel();
-				std::cout << "Open: level=" << level << endl;
-				if (level == this->section->levelLayers){
-					/**читаем новый слой**/
-					string str =  string(this->m_string, this->m_length);
-					wstring wstr(str.begin(), str.end());
-					this->section->layer = &this->section->layers[wstr];
-				}
-				else{
-					if (this->section->layer != NULL) {
-						if (level == this->section->levelLayers - 1) {
-							/**читаем новый объект**/
-							string str = string(this->m_string, this->m_length);
-							wstring wstr(str.begin(), str.end());
-							c60::OBJ_SEMANTIC semantic = this->section->layer->semantics[wstr];
-							this->section->layer->clearValue();
-							this->section->layer->setValues(semantic);
-						}
-					}
-				}
-			}
-
-			return eStatus;
-		}
-};
-
-class CloseHandler: public TK_Close_Segment{
-protected:
-		c60::SectionDWF *section;
-public:
-		CloseHandler(c60::SectionDWF *section) : TK_Close_Segment(){
-			this->section = section;
-		}
-
-		TK_Status Execute(BStreamFileToolkit &rW3DParser){
-			TK_Status eStatus = TK_Close_Segment::Execute(rW3DParser);
-			if (eStatus == TK_Normal) {
-				int level = rW3DParser.getNestingLevel();
-				std::cout << "Close: level=" << level << endl;
-				if (level == this->section->levelLayers - 1){
-					/*прочитали слой*/
-					this->section->layer = NULL;
-				}
-				else{
-					if (this->section->layer != NULL) {
-						if (level == this->section->levelLayers) {
-							/*прочитали объект*/
-						}
-					}
-				}
-			}
-			return eStatus;
-		}
-};
-
-class ShellHandler : public TK_Shell {
-protected:
-		c60::SectionDWF *section;
-public:
-		ShellHandler(c60::SectionDWF *section) : TK_Shell() {
-			this->section = section;
-		}
-
-		virtual ~ShellHandler() { ; }
-
-		TK_Status Execute(BStreamFileToolkit &parser) {
-			TK_Status status = TK_Shell::Execute(parser);
-			int level = parser.getNestingLevel();
-			std::cout << "pointCount " << this->mp_pointcount << endl;
-			std::cout << "item[0].x=" << this->mp_points[0] << endl;
-			std::cout << "item[0].y= " << this->mp_points[1] << endl;
-			std::cout << "item[0].z= " << this->mp_points[2] << endl;
-			std::cout << "########################" << endl;
-			/*
-			std::cout << "flistlen " << this->m_flistlen << endl;
-			std::cout << "pointCount " << this->mp_pointcount << endl;
-			std::cout << "faceCount " << this->mp_facecount << endl;
-			std::cout << "stage " << this->mp_stage << endl;
-			std::cout << "optopcode " << (int)mp_optopcode << endl;
-			std::cout << "bitssample " << (int)this->mp_bits_per_sample << endl;
-			std::cout << "workspace " << (size_t)this->mp_workspace<< endl;
-			std::cout << "w_allocated " << this->mp_workspace_allocated << endl;
-			std::cout << "w_used " << this->mp_workspace_used << endl;
-			std::cout << "scheme " << (int)this->mp_compression_scheme << endl;
-			std::cout << "subop " << (int)this->mp_subop << endl;
-			std::cout << "########################" << endl;
-			 */
-			/*
-			for (int i = 0; i < this->mp_pointcount; ++i){
-				printf("x= %i", this->);
-			}
-			 */
-			return status;
-		}
-};
-
-class ColorHandler : public TK_Color {
-protected:
-		c60::SectionDWF *section;
-public:
-		ColorHandler(c60::SectionDWF *section) : TK_Color() {
-			this->section = section;
-		}
-
-		virtual ~ColorHandler() { ; }
-
-		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
-			TK_Status eStatus = TK_Color::Execute(rW3DParser);
-			if (eStatus == TK_Normal) {
-				dgn::DwfColor* dwfColor;
-				int level = rW3DParser.getNestingLevel();
-				if (this->section->layer != NULL) {
-					if (level > this->section->levelLayers) {
-						/*
-						if (level == this->section->layer->bottomLevel + 1) {
-							//m_mask=7; m_channels=3; m_diffuse и m_specular
-							dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2],
-																					 0);
-							dwfColor = new dgn::DwfColor(this->m_specular.m_rgb[0], this->m_specular.m_rgb[1],
-																					 this->m_specular.m_rgb[2], 0);
-						} else {
-							if (level == this->section->layer->bottomLevel + 2) {
-								//m_mask=7; m_channels=1; m_diffuse
-							}
-						}
-						 */
-					}
-				}
-			}
-			return eStatus;
-		}
-};
-
-class MatrixHandler : public TK_Matrix {
-protected:
-		c60::SectionDWF *section;
-public:
-		MatrixHandler(c60::SectionDWF *section) : TK_Matrix(0) {
-			this->section = section;
-		}
-
-		virtual ~MatrixHandler() { ; }
-
-		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
-			TK_Status status = TK_Matrix::Execute(rW3DParser);
-			int level = rW3DParser.getNestingLevel();
-			std::cout << "Matrix: level=" << level << endl;
-			return status;
-		}
-};
-
 class TestDWF {
 public:
 		/**секции файла DWF**/
@@ -388,12 +99,6 @@ int32_t GetLevelLayers(DWFSection *pSection){
 				// Create the HSF toolkit object that does the stream I/O
 				//
 				BStreamFileToolkit oW3DStreamParser;
-
-				oW3DStreamParser.SetOpcodeHandler(TKE_Open_Segment, new OpenHandler(section));
-				oW3DStreamParser.SetOpcodeHandler(TKE_Close_Segment, new CloseHandler(section));
-				oW3DStreamParser.SetOpcodeHandler(TKE_Shell, new ShellHandler(section));
-				oW3DStreamParser.SetOpcodeHandler(TKE_Color, new ColorHandler(section));
-				oW3DStreamParser.SetOpcodeHandler(TKE_Modelling_Matrix, new MatrixHandler(section));
 
 				//
 				// Attach the stream to the parser
@@ -619,11 +324,616 @@ bool SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstanc
 }
 
 
+class OpenHandler : public TK_Open_Segment {
+protected:
+		//std::map<std::wstring, OBJ_SEMANTIC> &semantic;
+		c60::SectionDWF *section;
+public:
+		//OpenHandler(std::shared_ptr<dgn::DwfStreamHandler> javaHandler,  std::map<std::wstring, OBJ_SEMANTIC> &semantic) : TK_Open_Segment(), semantic(semantic) {
+		OpenHandler(c60::SectionDWF *section) : TK_Open_Segment() {
+			this->section = section;
+		}
+
+		virtual ~OpenHandler() { ; }
+
+		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
+
+			TK_Status eStatus = TK_Open_Segment::Execute(rW3DParser);
+			if (eStatus == TK_Normal) {
+				//clock_t time = clock();
+				//JLogger::info(L"Open time= %d", time);
+				int level = rW3DParser.getNestingLevel();
+				//JLogger::info(L"Open level= %i", level);
+				if (level >= this->section->levelLayers) {
+					if (level == this->section->levelLayers) {
+						/**читаем новый слой**/
+						string str = string(this->m_string, this->m_length);
+						wstring wstr(str.begin(), str.end());
+						this->section->layer = &this->section->layers[wstr];
+					} else {
+						//if (level <= this->section->layer->geomLevel) {
+						string str = string(this->m_string, this->m_length);
+						wstring wstr(str.begin(), str.end());
+						if (!wstr.empty()) {
+							/*читаем семантику текущего узла*/
+							this->section->layer->semLevel = level;
+							c60::OBJ_SEMANTIC semantic = this->section->layer->semantics[wstr];
+							this->section->layer->setValues(semantic);
+							wstr = c60::DwfUtilsImpl::getName(semantic);
+							vector<wstring> values = this->section->layer->getValues();
+							//this->javaHandler->openMiddleNode(c60::DwfUtilsImpl::getName(semantic), this->section->layer->getValues());
+							//this->section->layer->setCurrentSemantic(semantic);
+							//this->section->layer->bottomLevel = level;
+							//this->section->layer->setValues(semantic);
+							//this->section->layer->semantic.push_back(*new c60::CurrentSemantic(level, semantic));
+							//this->javaHandler->openMiddleNode(this->section->layer->getBottomName(), this->section->layer->getBottomSem());
+							//JLogger::info(L"name= %S", this->section->layer->getBottomName().c_str());
+							//JLogger::info(L"openMiddleNode= %i", level);
+						}
+						//}
+					}
+				}
+			}
+//
+//			string str =  string(this->m_string, this->m_length);
+//			wstring wstr(str.begin(), str.end());
+			//if ()
+//			auto const result = semantic.find(wstr);
+//			if (result != semantic.end()){
+//				OBJ_SEMANTIC sem = result->second;
+//				for(auto const &pair : sem){
+//					wcout << pair.first << L" -> " << pair.second << endl;
+//				}
+//			}
+//			wcout << L"\n" << endl;
+			///javaHandler->openNode(semantic[wstr]);
+			return eStatus;
+		}
+};
+
+class CloseHandler: public TK_Close_Segment{
+protected:
+		c60::SectionDWF *section;
+public:
+		CloseHandler(c60::SectionDWF *section) : TK_Close_Segment(){
+			this->section = section;
+		}
+
+		TK_Status Execute(BStreamFileToolkit &rW3DParser){
+			TK_Status eStatus = TK_Close_Segment::Execute(rW3DParser);
+			if (eStatus == TK_Normal) {
+				//clock_t time = clock();
+				//JLogger::info(L"Close time= %d", time);
+				int level = rW3DParser.getNestingLevel();
+				//JLogger::info(L"Close level= %i", level);
+				if (level > this->section->levelLayers - 2) {
+					if (level == this->section->levelLayers - 1) {
+						/*прочитали слой*/
+						//JLogger::info(L"C++ close layer %S", this->section->layer->name.c_str());
+						//this->javaHandler->closeLayer();
+						this->section->layer = NULL;
+					} else {
+						/*
+						if (level < this->section->layer->bottomLevel){
+							this->section->layer->setTopSemantic();
+						}
+						if (level == this->section->layer->geomLevel - 1){
+							this->section->layer->geomLevel = this->section->levelLayers;
+							javaHandler->closeNode();
+						}
+						 */
+						//if (level == this->section->levelLayers) {
+						//прочитали дерево объектов
+						//	this->section->layer->clearValue();
+						//} else{
+						//	javaHandler->openChildNode();
+						//}
+						//if (level == this->section->layer->geomLevel - 1){
+						if (level == this->section->layer->geomLevel){
+							//this->section->layer->setValues();
+							//this->section->layer->geomLevel = this->section->levelLayers;
+							//JLogger::info(L"CloseNode= %i", level);
+							this->section->layer->geomLevel = -1;
+							//this->javaHandler->closeNode();
+						}
+						//if (this->section->layer->deleteSemantic(level))
+						/*
+						if (level < this->section->layer->semLevel)
+							wcout << level << endl;
+						 */
+							//JLogger::info(L"Semantic= %i", level);
+					}
+				}
+				this->section->styleDWF.deleteLevel(level);
+				this->section->matrixDWF.remove(level);
+			}
+			return eStatus;
+		}
+};
+
+class ShellHandler : public TK_Shell {
+protected:
+		c60::SectionDWF *section;
+public:
+		ShellHandler(c60::SectionDWF *section) : TK_Shell() {
+			this->section = section;
+		}
+
+		virtual ~ShellHandler() { ; }
+
+		TK_Status Execute(BStreamFileToolkit &parser) {
+			TK_Status status = TK_Shell::Execute(parser);
+			if (status == TK_Normal) {
+				//clock_t time = clock();
+				//JLogger::info(L"Shell time= %d", time);
+				if (this->section->layer->geomLevel < 0) {
+					int level = parser.getNestingLevel();
+					//JLogger::info(L"OpenNode= %i", level);
+					this->section->layer->geomLevel = level - 2;
+					//this->section->layer->setValues();
+					//vector<wstring> values = this->section->layer->getValues();
+					//this->javaHandler->openNode(values);
+					//vector<wstring> names = this->section->layer->getNames();
+					//this->javaHandler->openNode(values, names);
+					//this->javaHandler->openNode();
+					//this->section->matrixDWF.send(this->javaHandler);
+					//this->section->styleDWF.send(this->javaHandler);
+				}
+				//int level = parser.getNestingLevel();
+				dgn::Mesh mesh = this->toDgnMesh();
+				//JLogger::info(L"mesh.xyz.size= %u", mesh.xyz.size());
+				//unsigned long num = mesh.xyz.size()/3;
+				//JLogger::info(L"count= %u", num);
+				/*
+				int j = 0;
+				for (int i = 0; i < 9; ++i){
+					float x = mesh.xyz[i];
+					if (j == 0)
+						JLogger::info(L"x= %f", x);
+					else{
+						if (j == 1)
+							JLogger::info(L"y= %f", x);
+						else
+							JLogger::info(L"z= %f", x);
+					}
+					if (j == 2)
+						j = 0;
+					else
+						++j;
+				}
+				 */
+				//this->javaHandler->handleMesh(mesh);
+				//time = clock() - time;
+				//JLogger::info(L"DShell time= %d", time);
+			}
+
+			return status;
+		}
+};
+
+class ColorHandler : public TK_Color {
+protected:
+		c60::SectionDWF *section;
+public:
+		ColorHandler(c60::SectionDWF *section) : TK_Color() {
+			this->section = section;
+		}
+
+		virtual ~ColorHandler() { ; }
+
+		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
+			TK_Status eStatus = TK_Color::Execute(rW3DParser);
+			if (eStatus == TK_Normal) {
+				//clock_t time = clock();
+				//JLogger::info(L"Color time= %d", time);
+				dgn::DwfColor* dwfColor;
+				int level = rW3DParser.getNestingLevel();
+				//if (level > this->section->levelLayers) {
+				if ((this->m_channels & (1 << TKO_Channel_Diffuse)) != 0) {
+					this->section->styleDWF.addDiffuse(level, this->m_diffuse.m_rgb);
+					/*
+					if (level > this->section->levelLayers) {
+						dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1],
+										this->m_diffuse.m_rgb[2], 0);
+						//if (level == this->section->layer->geomLevel) {
+						this->javaHandler->handleColor(dgn::ColorType::DIFFUSE, *dwfColor);
+						//} else{
+						//	this->javaHandler->handleColor(dgn::ColorType::AMBIENT, *dwfColor);
+						//}
+					}
+					 */
+				}
+				if ((m_channels & (1 << TKO_Channel_Specular)) != 0) {
+					this->section->styleDWF.addSpecular(level, this->m_specular.m_rgb);
+					/*
+					if (level > this->section->levelLayers) {
+						dwfColor = new dgn::DwfColor(this->m_specular.m_rgb[0], this->m_specular.m_rgb[1],
+										this->m_specular.m_rgb[2], 0);
+						this->javaHandler->handleColor(dgn::ColorType::SPECULAR, *dwfColor);
+					}
+					 */
+				}
+				if ((m_channels & (1 << TKO_Channel_Transmission)) != 0) {
+					this->section->styleDWF.addTransparence(level, this->m_transmission.m_rgb);
+					/*
+					if (level > this->section->levelLayers) {
+						dwfColor = new dgn::DwfColor(this->m_transmission.m_rgb[0], this->m_transmission.m_rgb[1],
+										this->m_transmission.m_rgb[2], 0);
+						this->javaHandler->handleColor(dgn::ColorType::OPACITY, *dwfColor);
+					}
+					 */
+				}
+
+				if ((m_channels & (1 << TKO_Channel_Emission)) != 0) {
+					this->section->styleDWF.addEmissive(level, this->m_emission.m_rgb);
+				}
+				if ((m_channels & (1 << TKO_Channel_Mirror)) != 0) {
+					this->section->styleDWF.addMirror(level, this->m_mirror.m_rgb);
+				}
+				if ((m_channels & (1 << TKO_Channel_Gloss)) != 0) {
+					this->section->styleDWF.addGloss(level, this->m_gloss);
+				}
+				//} else{
+				//	dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2], 0);
+				//}
+				//time = clock() - time;
+				//JLogger::info(L"DClolor time= %d", time);
+			}
+			return eStatus;
+		}
+};
+
+class MatrixHandler : public TK_Matrix {
+protected:
+		c60::SectionDWF *section;
+public:
+		MatrixHandler(c60::SectionDWF *section) : TK_Matrix(0) {
+			this->section = section;
+		}
+
+		virtual ~MatrixHandler() { ; }
+
+		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
+			TK_Status status = TK_Matrix::Execute(rW3DParser);
+			if (status == TK_Normal) {
+				//clock_t time = clock();
+				//JLogger::info(L"Matrix time= %d", time);
+				vector<float> matrix;
+				for (int i = 0; i < 16; ++i) {
+					matrix.push_back(this->m_matrix[i]);
+				}
+				int level = rW3DParser.getNestingLevel();
+				this->section->matrixDWF.add(level, matrix);
+				/*
+				if (level > this->section->levelLayers) {
+					this->section->layer->geomLevel = level;
+					this->section->layer->setValues();
+					vector<wstring> values = this->section->layer->getValues();
+					this->javaHandler->openNode(values);
+					this->javaHandler->handleMatrix(matrix);
+				} else{
+					this->javaHandler->handleSectionMatrix(matrix);
+				}
+				 */
+				//time = clock() - time;
+				//JLogger::info(L"DMatrix time= %d", time);
+			}
+			return status;
+		}
+};
+
+
+
+void runThroughNodeSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, DwfUtilsImpl *ob) {
+	int32_t currentlevel = level + 1;
+	wstring key = DwfUtilsImpl::toStdString(pInst->object());
+
+	OBJ_SEMANTIC semantic;
+	DWFPropertyContainer *pInstProps = pDef->getInstanceProperties(*pInst);
+	if (pInstProps) {
+		DWFProperty::tMap::Iterator *piProp = pInstProps->getProperties();
+		if (piProp) {
+			for (; piProp->valid(); piProp->next()) {
+				DWFProperty *pProp = piProp->value();
+				wstring name = DwfUtilsImpl::toStdString(pProp->name());
+				wstring value = DwfUtilsImpl::toStdString(pProp->value());
+				semantic.push_back(dgn::SemanticValue(name, value));
+				ob->section->layer->fields[name] = value;
+			}
+
+			DWFCORE_FREE_OBJECT(piProp);
+		}
+
+		DWFCORE_FREE_OBJECT(pInstProps);
+	}
+	ob->section->layer->semantics[DwfUtilsImpl::toStdString(pInst->object())] = semantic;
+
+	DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
+	if (piChildren) {
+		for (; piChildren->valid(); piChildren->next()) {
+			runThroughNodeSemantic(currentlevel, pDef, piChildren->value(), ob);
+		}
+
+		DWFCORE_FREE_OBJECT(piChildren);
+	}
+
+}
+
+void runThroughSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, DwfUtilsImpl *ob) {
+	int32_t currentlevel = level + 1;
+	wstring key = DwfUtilsImpl::toStdString(pInst->object());
+	wstring nodeName = L"";
+
+	DWFPropertyContainer *pInstProps = pDef->getInstanceProperties(*pInst);
+	if (pInstProps) {
+		DWFProperty::tMap::Iterator *piProp = pInstProps->getProperties();
+		if (piProp) {
+			for (; piProp->valid(); piProp->next()) {
+				DWFProperty *pProp = piProp->value();
+				wstring name = DwfUtilsImpl::toStdString(pProp->name());
+				if (name.compare(L"_name") == 0)
+					nodeName = DwfUtilsImpl::toStdString(pProp->value());
+			}
+
+			DWFCORE_FREE_OBJECT(piProp);
+		}
+
+		DWFCORE_FREE_OBJECT(pInstProps);
+	}
+	if (nodeName.empty()) return;
+
+	if (currentlevel < ob->layerDepth){
+		DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
+		if (piChildren) {
+			for (; piChildren->valid(); piChildren->next()) {
+				runThroughSemantic(currentlevel, pDef, piChildren->value(), ob);
+			}
+
+			DWFCORE_FREE_OBJECT(piChildren);
+		}
+		return;
+	}
+
+	if (currentlevel != ob->layerDepth) return;
+
+//	auto [iter, inserted] = ob->section->layers.emplace(std::make_pair(key, LayerDWF(nodeName)));
+	auto pair = ob->section->layers.emplace(std::piecewise_construct,
+																											std::forward_as_tuple(key),
+																											std::forward_as_tuple(nodeName));
+	auto& iter = pair.first;
+	bool inserted = pair.second;
+
+	if (!inserted) return;
+
+	ob->section->layer = &iter->second;
+
+	DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
+	if (piChildren) {
+		for (; piChildren->valid(); piChildren->next()) {
+			runThroughNodeSemantic(currentlevel, pDef, piChildren->value(), ob);
+		}
+
+		DWFCORE_FREE_OBJECT(piChildren);
+	}
+
+	//ob->section->layer->clearValue();
+	//ob->section->layers[key] = *ob->section->layer;
+	//delete ob->section->layer;
+	ob->section->layer = NULL;
+
+}
+
+void runThrough(DWFSection *pSection, DwfUtilsImpl *ob) {
+	DWFDefinedObjectInstance::tList rRootInstances;
+	DWFResourceContainer::ResourceIterator *piObjDefs = pSection->findResourcesByRole(DWFXML::kzRole_ObjectDefinition);
+	if (piObjDefs && piObjDefs->valid()) {
+		clock_t time = clock();
+		/*
+		DWFObjectDefinition *pDef = pSection->getObjectDefinition(DWFObjectDefinitionReader::eProvideObjects
+																															| DWFObjectDefinitionReader::eProvideProperties
+																															| DWFObjectDefinitionReader::eProvideInstances);
+																															*/
+		DWFObjectDefinition *pDef = pSection->getObjectDefinition();
+		wcout << L"getObjectDefinition " << clock() - time << endl;
+		if (pDef) {
+			time = clock();
+			pDef->getRootInstances(rRootInstances);
+			wcout << L"getRootInstances " << clock() - time << endl;
+
+			int32_t level;
+			DWFDefinedObjectInstance *pInst = NULL;
+			DWFDefinedObjectInstance::tList::const_iterator iInst = rRootInstances.begin();
+			for (; iInst != rRootInstances.end(); iInst++) {
+				pInst = *iInst;
+				level = 0;
+				runThroughSemantic(level, pDef, pInst, ob);
+			}
+
+			DWFCORE_FREE_OBJECT(pDef);
+		}
+
+		DWFCORE_FREE_OBJECT(piObjDefs);
+	}
+}
+
+void runThroughGeometry(DWFSection *pSection, DwfUtilsImpl *ob) {
+	DWFResourceContainer::ResourceIterator *piGraphics = pSection->findResourcesByRole(DWFXML::kzRole_Graphics3d);
+	if (piGraphics) {
+		for (; piGraphics->valid(); piGraphics->next()) {
+			DWFGraphicResource *pW3D = dynamic_cast<DWFGraphicResource *>(piGraphics->get());
+			if (pW3D) {
+				//
+				// get the data stream
+				//
+				DWFCore::DWFInputStream *pW3DStream = pW3D->getInputStream();
+
+				//
+				// Create the HSF toolkit object that does the stream I/O
+				//
+				BStreamFileToolkit oW3DStreamParser;
+
+				oW3DStreamParser.SetOpcodeHandler(TKE_Open_Segment, new OpenHandler(ob->section));
+				oW3DStreamParser.SetOpcodeHandler(TKE_Close_Segment, new CloseHandler(ob->section));
+				oW3DStreamParser.SetOpcodeHandler(TKE_Shell, new ShellHandler(ob->section));
+				oW3DStreamParser.SetOpcodeHandler(TKE_Color, new ColorHandler(ob->section));
+				oW3DStreamParser.SetOpcodeHandler(TKE_Modelling_Matrix, new MatrixHandler(ob->section));
+
+				//
+				// Attach the stream to the parser
+				//
+				oW3DStreamParser.OpenStream(*pW3DStream);
+
+				size_t nBytesRead = 0;
+				char aBuffer[16384] = {0};
+
+				//
+				// read and process the stream
+				//
+				while (pW3DStream->available() > 0) {
+					//
+					// read from the stream ourselves, we could also use ReadBuffer()
+					// but it basically just performs this same action.
+					//
+					nBytesRead = pW3DStream->read(aBuffer, 16384);
+
+					//
+					// use the parser to process the buffer
+					//
+					if (oW3DStreamParser.ParseBuffer(aBuffer, nBytesRead, TK_Normal) == TK_Error) {
+						wcout << L"Error occured parsing buffer" << endl;
+						break;
+					}
+				}
+
+				//
+				// Done with the stream, we must delete it
+				//
+				oW3DStreamParser.CloseStream();
+				DWFCORE_FREE_OBJECT(pW3DStream);
+			}
+		}
+
+		DWFCORE_FREE_OBJECT(piGraphics);
+	}
+}
+
+void runThroughDwf(DwfUtilsImpl *ob) {
+	//DWFPackageReader oReader(oDWF);
+
+	//DWFPackageReader::tPackageInfo tInfo;
+	//oReader.getPackageInfo(tInfo);
+
+	//if ((tInfo.eType != DWFPackageReader::eDWFPackage) && (tInfo.eType != DWFPackageReader::eDWFXPackage)) {
+		// не тот тип файла
+	//	return ;
+	//}
+
+	DWFManifest &rManifest = ob->oReader.getManifest();
+
+	DWFSection *pSection = NULL;
+	DWFManifest::SectionIterator *piSections = rManifest.getSections();
+	if (piSections) {
+		for (; piSections->valid(); piSections->next()) {
+			pSection = piSections->get();
+			pSection->readDescriptor();
+
+			ob->sections.emplace_back();
+			ob->section = &ob->sections.back();
+			ob->section->levelLayers = ob->layerDepth;
+			clock_t time = clock();
+			wcout << L"" << time << endl;
+			runThrough(pSection, ob);
+			clock_t dtime = clock() - time;
+			wcout << dtime << endl;
+			time = clock();
+			runThroughGeometry(pSection, ob);
+			dtime = clock() - time;
+			wcout << dtime << endl;
+			//ob->sections.push_back(*ob->section);
+			//delete ob->section;
+			ob->section = NULL;
+
+			/*
+			DWFResourceContainer::ResourceIterator *piGraphics = pSection->findResourcesByRole(DWFXML::kzRole_Graphics3d);
+			if (piGraphics) {
+				for (; piGraphics->valid(); piGraphics->next()) {
+					DWFGraphicResource *pW3D = dynamic_cast<DWFGraphicResource *>(piGraphics->get());
+					if (pW3D) {
+						//
+						// get the data stream
+						//
+						DWFCore::DWFInputStream *pW3DStream = pW3D->getInputStream();
+
+						//
+						// Create the HSF toolkit object that does the stream I/O
+						//
+						BStreamFileToolkit oW3DStreamParser;
+
+						oW3DStreamParser.SetOpcodeHandler(TKE_Open_Segment, new OpenHandler(section));
+						oW3DStreamParser.SetOpcodeHandler(TKE_Close_Segment, new CloseHandler(section));
+						oW3DStreamParser.SetOpcodeHandler(TKE_Shell, new ShellHandler(section));
+						oW3DStreamParser.SetOpcodeHandler(TKE_Color, new ColorHandler(section));
+						oW3DStreamParser.SetOpcodeHandler(TKE_Modelling_Matrix, new MatrixHandler(section));
+
+						//
+						// Attach the stream to the parser
+						//
+						oW3DStreamParser.OpenStream(*pW3DStream);
+
+						size_t nBytesRead = 0;
+						char aBuffer[16384] = {0};
+
+						//
+						// read and process the stream
+						//
+						while (pW3DStream->available() > 0) {
+							//
+							// read from the stream ourselves, we could also use ReadBuffer()
+							// but it basically just performs this same action.
+							//
+							nBytesRead = pW3DStream->read(aBuffer, 16384);
+
+							//
+							// use the parser to process the buffer
+							//
+							if (oW3DStreamParser.ParseBuffer(aBuffer, nBytesRead, TK_Normal) == TK_Error) {
+								wcout << L"Error occured parsing buffer" << endl;
+								break;
+							}
+						}
+
+						//
+						// Done with the stream, we must delete it
+						//
+						oW3DStreamParser.CloseStream();
+						DWFCORE_FREE_OBJECT(pW3DStream);
+					}
+				}
+			}
+			 */
+		}
+
+		DWFCORE_FREE_OBJECT(piSections);
+	}
+}
+
+
 int main(int argc, char *argv[]) {
 	//DWFFile oDWF(argv[1]);
 	//wstring name = L"/home/Documents/Bashny.dwf";
 	//DWFFile oDWF(L"/home/den/Documents/TestDWF/Zabor2.dwf");
-	DWFFile oDWF(L"/home/den/Documents/TestDWF/Bashny.dwf");
+	//DWFFile oDWF(L"/home/den/Documents/TestDWF/Bashny.dwf");
+	//DWFFile oDWF(L"/home/den/Documents/TestDWF/DWF/Все.dwf");
+	//DWFFile oDWF(L"/home/den/Documents/TestDWF/Zabor2.dwf");
+	//c60::DwfUtilsImpl* ob = new DwfUtilsImpl(L"/home/den/Documents/TestDWF/Zabor2.dwf", 4);
+//	c60::DwfUtilsImpl* ob = new DwfUtilsImpl(L"/home/den/Documents/TestDWF/2514_DRV_NWD.dwf", 3);
+	//c60::DwfUtilsImpl* ob = new DwfUtilsImpl(L"/home/den/Documents/TestDWF/DWF/Все.dwf", 5);
+	c60::DwfUtilsImpl ob(L"/home/den/Documents/TestDWF/DWF/блок.dwf", 5);
+	runThroughDwf(&ob);
+	//for (int i = 0; i < 1; ++i) {
+	//}
+	//delete ob;
+	/*
 	DWFPackageReader oReader(oDWF);
 
 	DWFPackageReader::tPackageInfo tInfo;
@@ -652,6 +962,7 @@ int main(int argc, char *argv[]) {
 				return 2;
 			 */
 
+	/*
 			DWFDefinedObjectInstance::tList rRootInstances;
 			DWFResourceContainer::ResourceIterator *piObjDefs = pSection->findResourcesByRole(DWFXML::kzRole_ObjectDefinition);
 			if (piObjDefs && piObjDefs->valid()) {
@@ -731,6 +1042,7 @@ int main(int argc, char *argv[]) {
 				}
 			}
 			 */
+	/*
 		}
 
 		DWFCORE_FREE_OBJECT(piSections);

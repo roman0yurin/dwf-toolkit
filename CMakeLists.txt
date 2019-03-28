@@ -31,7 +31,7 @@ target_link_libraries( ${PROJECT_NAME} ${JPEG_LIBRARIES} )
 
 
 find_package ( Threads REQUIRED )
-target_link_libraries ( ${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries ( ${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} expat)
 
 add_subdirectory(samples/DWFToolkit/SimpleW3DStreamProcessor)
 add_subdirectory(samples/TestDWF)

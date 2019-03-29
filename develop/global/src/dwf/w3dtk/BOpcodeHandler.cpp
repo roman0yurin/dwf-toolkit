@@ -55,6 +55,8 @@
 #endif
     }
     #include <setjmp.h>
+#include <assert.h>
+
 #endif
 
 #define ASSERT(x) 
@@ -4916,6 +4918,28 @@ TK_Status TK_Circle::Read (BStreamFileToolkit & tk) alter {
     return status;
 }
 
+dgn::Circle TK_Circle::toDgnCircle() {
+	std::vector<float> xyz;
+
+	xyz.push_back(this->m_start[0]);
+	xyz.push_back(this->m_start[1]);
+	xyz.push_back(this->m_start[2]);
+
+	xyz.push_back(this->m_middle[0]);
+	xyz.push_back(this->m_middle[1]);
+	xyz.push_back(this->m_middle[2]);
+
+	xyz.push_back(this->m_end[0]);
+	xyz.push_back(this->m_end[1]);
+	xyz.push_back(this->m_end[2]);
+
+	xyz.push_back(this->m_center[0]);
+	xyz.push_back(this->m_center[1]);
+	xyz.push_back(this->m_center[2]);
+
+	return dgn::Circle(xyz, this->m_flags);
+}
+
 void TK_Circle::Reset (void) {
 	m_flags = 0;
     BBaseOpcodeHandler::Reset();
@@ -5248,6 +5272,19 @@ TK_Status TK_Cylinder::Read (BStreamFileToolkit & tk) alter {
     }
 
     return status;
+}
+
+dgn::Cylinder TK_Cylinder::toDgnCylinder() {
+	std::vector<float> xyz;
+
+	xyz.push_back(this->m_axis[0]);
+	xyz.push_back(this->m_axis[1]);
+	xyz.push_back(this->m_axis[2]);
+	xyz.push_back(this->m_axis[3]);
+	xyz.push_back(this->m_axis[4]);
+	xyz.push_back(this->m_axis[5]);
+
+	return dgn::Cylinder(xyz, this->m_radius, this->m_flags);
 }
 
 

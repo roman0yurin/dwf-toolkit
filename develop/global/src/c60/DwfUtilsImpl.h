@@ -468,6 +468,8 @@ namespace c60 {
 		class LayerDWF{
 		private:
 		//		CurrentSemantic *_semantic = NULL;
+				/**секции файла DWF**/
+				std::vector<int> _levels;
 		public:
 				/**Секция которой принадлежит слой**/
 				//SectionDWF *section;
@@ -495,7 +497,7 @@ namespace c60 {
 				/*Семантика текущего узла дерева*/
 				//std::vector<CurrentSemantic> semantic;
 				/**Глубина в структуре узлов, на которой находится нижняя семантика**/
-				int32_t semLevel = -1;
+				//int32_t semLevel = -1;
 
 				LayerDWF (){}
 
@@ -610,6 +612,24 @@ namespace c60 {
 					}
 
 					return result;
+				}
+
+				/**Добавляет узел семантики**/
+				void openNode(int level){
+					_levels.push_back(level);
+				}
+
+				/**Возращает true, если на данном уровне имелась семантика**/
+				bool closeNode(int level){
+					int size = this->_levels.size();
+					if (size > 0){
+						if (this->_levels.at(size - 1) > level) {
+							this->_levels.pop_back();
+							return true;
+						}
+					}
+
+					return false;
 				}
 
 				/*

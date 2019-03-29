@@ -39,6 +39,8 @@
 #ifndef BBINFILETK_TOOLKIT
 
 #include <dgn/DwfColor.hpp>
+#include <dgn/Circle.hpp>
+#include <dgn/Cylinder.hpp>
 #include "dwf/Toolkit.h"
     #include "dwf/w3dtk/BStream.h"
     #include "dwf/w3dtk/BStreamFileToolkit.h"
@@ -6171,6 +6173,9 @@ class BBINFILETK_API TK_Circle : public BBaseOpcodeHandler {
 		TK_Status   ReadAscii (BStreamFileToolkit & tk) alter;
 		TK_Status   WriteAscii (BStreamFileToolkit & tk) alter;
 
+		/*Преобразовать данные для передачи в java*/
+		dgn::Circle toDgnCircle();
+
 		void		Reset (void) alter;
 
 		/*! Sets the start point of the arc using discrete float values */
@@ -6401,6 +6406,9 @@ class BBINFILETK_API TK_Cylinder : public BBaseOpcodeHandler {
 
 		TK_Status   ReadAscii (BStreamFileToolkit & tk) alter;
 		TK_Status   WriteAscii (BStreamFileToolkit & tk) alter;
+
+		/*Преобразовать данные для передачи в java*/
+		dgn::Cylinder toDgnCylinder();
 
 		/*! Sets the axis of the cylinder using discrete float values */
 		void            SetAxis (float x1, float y1, float z1, float x2, float y2, float z2) alter {

@@ -356,7 +356,7 @@ public:
 						wstring wstr(str.begin(), str.end());
 						if (!wstr.empty()) {
 							/*читаем семантику текущего узла*/
-							this->section->layer->semLevel = level;
+							this->section->layer->openNode(level);
 							c60::OBJ_SEMANTIC semantic = this->section->layer->semantics[wstr];
 							this->section->layer->setValues(semantic);
 							wstr = c60::DwfUtilsImpl::getName(semantic);

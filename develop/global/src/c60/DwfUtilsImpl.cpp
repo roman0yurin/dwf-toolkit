@@ -101,10 +101,12 @@ public:
 							wstring wstr(str.begin(), str.end());
 							if (!wstr.empty()) {
 								/*читаем семантику текущего узла*/
-								this->section->layer->semLevel = level;
+								//this->section->layer->semLevel = level;
+								this->section->layer->openNode(level);
 								c60::OBJ_SEMANTIC semantic = this->section->layer->semantics[wstr];
 								//this->section->layer->setValues(semantic);
 								//this->javaHandler->openMiddleNode(c60::DwfUtilsImpl::getName(semantic), this->section->layer->getValues());
+								cout << "openMiddle=" << level << "\n";
 								std::pair<vector<wstring>, vector<wstring>> ob = c60::DwfUtilsImpl::getPair(semantic);
 								this->javaHandler->openMiddleNode(c60::DwfUtilsImpl::getName(semantic), ob.first, ob.second);
 								//this->section->layer->setCurrentSemantic(semantic);
@@ -184,7 +186,7 @@ public:
 							this->javaHandler->closeNode();
 						}
 						//if (this->section->layer->deleteSemantic(level))
-						if (level < this->section->layer->semLevel)
+						if (this->section->layer->closeNode(level))
 							this->javaHandler->closeMiddleNode();
 					}
 				}
@@ -251,6 +253,66 @@ public:
 				this->javaHandler->handleMesh(mesh);
 				//time = clock() - time;
 				//JLogger::info(L"DShell time= %d", time);
+			}
+
+			return status;
+		}
+};
+
+class CircleHandler : public TK_Circle {
+protected:
+		c60::SectionDWF *section;
+		std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler;
+public:
+		CircleHandler(std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler, c60::SectionDWF *section) : TK_Circle(m_opcode) {
+			this->javaHandler = javaHandler;
+			this->section = section;
+		}
+
+		virtual ~CircleHandler() { ; }
+
+		TK_Status Execute(BStreamFileToolkit &parser) {
+			TK_Status status = TK_Circle::Execute(parser);
+			if (status == TK_Normal) {
+				if (this->section->layer->geomLevel < 0) {
+					int level = parser.getNestingLevel();
+					this->section->layer->geomLevel = level - 2;
+					this->javaHandler->openNode();
+					this->section->matrixDWF.send(this->javaHandler);
+					this->section->styleDWF.send(this->javaHandler);
+				}
+				dgn::Circle circle = this->toDgnCircle();
+				this->javaHandler->handleCircle(circle);
+			}
+
+			return status;
+		}
+};
+
+class CylinderHandler : public TK_Cylinder {
+protected:
+		c60::SectionDWF *section;
+		std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler;
+public:
+		CylinderHandler(std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler, c60::SectionDWF *section) : TK_Cylinder() {
+			this->javaHandler = javaHandler;
+			this->section = section;
+		}
+
+		virtual ~CylinderHandler() { ; }
+
+		TK_Status Execute(BStreamFileToolkit &parser) {
+			TK_Status status = TK_Cylinder::Execute(parser);
+			if (status == TK_Normal) {
+				if (this->section->layer->geomLevel < 0) {
+					int level = parser.getNestingLevel();
+					this->section->layer->geomLevel = level - 2;
+					this->javaHandler->openNode();
+					this->section->matrixDWF.send(this->javaHandler);
+					this->section->styleDWF.send(this->javaHandler);
+				}
+				dgn::Cylinder cylinder = this->toDgnCylinder();
+				this->javaHandler->handleCylinder(cylinder);
 			}
 
 			return status;
@@ -962,6 +1024,8 @@ void c60::DwfUtilsImpl::readAllLayers(const std::shared_ptr<dgn::DwfLayersFillSt
 						oW3DStreamParser.SetOpcodeHandler(TKE_Open_Segment, new OpenHandler(handler, this->section));
 						oW3DStreamParser.SetOpcodeHandler(TKE_Close_Segment, new CloseHandler(handler, this->section));
 						oW3DStreamParser.SetOpcodeHandler(TKE_Shell, new ShellHandler(handler, this->section));
+						oW3DStreamParser.SetOpcodeHandler(TKE_Circle, new CircleHandler(handler, this->section));
+						oW3DStreamParser.SetOpcodeHandler(TKE_Cylinder, new CylinderHandler(handler, this->section));
 						oW3DStreamParser.SetOpcodeHandler(TKE_Color, new ColorHandler(handler, this->section));
 						oW3DStreamParser.SetOpcodeHandler(TKE_Modelling_Matrix, new MatrixHandler(handler, this->section));
 

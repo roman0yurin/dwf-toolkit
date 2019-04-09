@@ -106,7 +106,7 @@ public:
 								c60::OBJ_SEMANTIC semantic = this->section->layer->semantics[wstr];
 								//this->section->layer->setValues(semantic);
 								//this->javaHandler->openMiddleNode(c60::DwfUtilsImpl::getName(semantic), this->section->layer->getValues());
-								cout << "openMiddle=" << level << "\n";
+								//cout << "openMiddle=" << level << "\n";
 								std::pair<vector<wstring>, vector<wstring>> ob = c60::DwfUtilsImpl::getPair(semantic);
 								this->javaHandler->openMiddleNode(c60::DwfUtilsImpl::getName(semantic), ob.first, ob.second);
 								//this->section->layer->setCurrentSemantic(semantic);

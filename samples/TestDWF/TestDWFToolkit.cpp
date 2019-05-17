@@ -928,7 +928,8 @@ int main(int argc, char *argv[]) {
 	//c60::DwfUtilsImpl* ob = new DwfUtilsImpl(L"/home/den/Documents/TestDWF/Zabor2.dwf", 4);
 //	c60::DwfUtilsImpl* ob = new DwfUtilsImpl(L"/home/den/Documents/TestDWF/2514_DRV_NWD.dwf", 3);
 	//c60::DwfUtilsImpl* ob = new DwfUtilsImpl(L"/home/den/Documents/TestDWF/DWF/Все.dwf", 5);
-	c60::DwfUtilsImpl ob(L"/home/den/Documents/TestDWF/DWF/блок.dwf", 5);
+	//c60::DwfUtilsImpl ob(L"/home/den/Documents/TestDWF/DWF/блок.dwf", 5);
+	c60::DwfUtilsImpl ob(L"/home/den/Documents/TestDWF/Stairs.dwf", 3);
 	runThroughDwf(&ob);
 	//for (int i = 0; i < 1; ++i) {
 	//}

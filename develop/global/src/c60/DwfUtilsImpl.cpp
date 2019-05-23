@@ -448,28 +448,28 @@ void c60::StyleDWF::send(std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHa
 	size = this->_specular.size();
 	if (size > 0){
 		LevelRGB ob = this->_specular.at(size - 1);
-		dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
+		dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0.2);
 		javaHandler->handleColor(dgn::ColorType::SPECULAR, *dwfColor);
 	}
 
 	size = this->_mirror.size();
 	if (size > 0){
 		LevelRGB ob = this->_mirror.at(size - 1);
-		dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
+		dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0.05);
 		javaHandler->handleColor(dgn::ColorType::AMBIENT, *dwfColor);
 	}
 
 	size = this->_emissive.size();
 	if (size > 0){
 		LevelRGB ob = this->_emissive.at(size - 1);
-		dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
+		dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0);
 		javaHandler->handleColor(dgn::ColorType::EMISSIVE, *dwfColor);
 	}
 
 	size = this->_gloss.size();
 	if (size > 0){
 		LevelRGB ob = this->_gloss.at(size - 1);
-		dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 1);
+		dwfColor = new dgn::DwfColor(ob.rgb[0], ob.rgb[1], ob.rgb[2], 0.1);
 		javaHandler->handleColor(dgn::ColorType::SHININESS, *dwfColor);
 	}
 

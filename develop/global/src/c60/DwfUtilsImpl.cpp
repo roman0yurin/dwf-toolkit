@@ -214,45 +214,49 @@ public:
 			if (status == TK_Normal) {
 				//clock_t time = clock();
 				//JLogger::info(L"Shell time= %d", time);
-				if (this->section->layer->geomLevel < 0) {
-					int level = parser.getNestingLevel();
-					//JLogger::info(L"OpenNode= %i", level);
-					this->section->layer->geomLevel = level - 2;
-					//this->section->layer->setValues();
-					//vector<wstring> values = this->section->layer->getValues();
-					//this->javaHandler->openNode(values);
-					//vector<wstring> names = this->section->layer->getNames();
-					//this->javaHandler->openNode(values, names);
-					this->javaHandler->openNode();
-					this->section->matrixDWF.send(this->javaHandler);
-					this->section->styleDWF.send(this->javaHandler);
-				}
-				//int level = parser.getNestingLevel();
-				dgn::Mesh mesh = this->toDgnMesh();
-				//JLogger::info(L"mesh.xyz.size= %u", mesh.xyz.size());
-				//unsigned long num = mesh.xyz.size()/3;
-				//JLogger::info(L"count= %u", num);
-				/*
-				int j = 0;
-				for (int i = 0; i < 9; ++i){
-					float x = mesh.xyz[i];
-					if (j == 0)
-						JLogger::info(L"x= %f", x);
-					else{
-						if (j == 1)
-							JLogger::info(L"y= %f", x);
-						else
-							JLogger::info(L"z= %f", x);
+				if (this->section->layer == NULL)
+					JLogger::info(L"Shell level= %u", parser.getNestingLevel());
+				else {
+					if (this->section->layer->geomLevel < 0) {
+						int level = parser.getNestingLevel();
+						//JLogger::info(L"OpenNode= %i", level);
+						this->section->layer->geomLevel = level - 2;
+						//this->section->layer->setValues();
+						//vector<wstring> values = this->section->layer->getValues();
+						//this->javaHandler->openNode(values);
+						//vector<wstring> names = this->section->layer->getNames();
+						//this->javaHandler->openNode(values, names);
+						this->javaHandler->openNode();
+						this->section->matrixDWF.send(this->javaHandler);
+						this->section->styleDWF.send(this->javaHandler);
 					}
-					if (j == 2)
-						j = 0;
-					else
-						++j;
+					//int level = parser.getNestingLevel();
+					dgn::Mesh mesh = this->toDgnMesh();
+					//JLogger::info(L"mesh.xyz.size= %u", mesh.xyz.size());
+					//unsigned long num = mesh.xyz.size()/3;
+					//JLogger::info(L"count= %u", num);
+					/*
+					int j = 0;
+					for (int i = 0; i < 9; ++i){
+						float x = mesh.xyz[i];
+						if (j == 0)
+							JLogger::info(L"x= %f", x);
+						else{
+							if (j == 1)
+								JLogger::info(L"y= %f", x);
+							else
+								JLogger::info(L"z= %f", x);
+						}
+						if (j == 2)
+							j = 0;
+						else
+							++j;
+					}
+					 */
+					this->javaHandler->handleMesh(mesh);
+					//time = clock() - time;
+					//JLogger::info(L"DShell time= %d", time);
 				}
-				 */
-				this->javaHandler->handleMesh(mesh);
-				//time = clock() - time;
-				//JLogger::info(L"DShell time= %d", time);
 			}
 
 			return status;
@@ -274,15 +278,19 @@ public:
 		TK_Status Execute(BStreamFileToolkit &parser) {
 			TK_Status status = TK_Circle::Execute(parser);
 			if (status == TK_Normal) {
-				if (this->section->layer->geomLevel < 0) {
-					int level = parser.getNestingLevel();
-					this->section->layer->geomLevel = level - 2;
-					this->javaHandler->openNode();
-					this->section->matrixDWF.send(this->javaHandler);
-					this->section->styleDWF.send(this->javaHandler);
+				if (this->section->layer == NULL)
+					JLogger::info(L"Circle level= %u", parser.getNestingLevel());
+				else {
+					if (this->section->layer->geomLevel < 0) {
+						int level = parser.getNestingLevel();
+						this->section->layer->geomLevel = level - 2;
+						this->javaHandler->openNode();
+						this->section->matrixDWF.send(this->javaHandler);
+						this->section->styleDWF.send(this->javaHandler);
+					}
+					dgn::Circle circle = this->toDgnCircle();
+					this->javaHandler->handleCircle(circle);
 				}
-				dgn::Circle circle = this->toDgnCircle();
-				this->javaHandler->handleCircle(circle);
 			}
 
 			return status;
@@ -304,15 +312,19 @@ public:
 		TK_Status Execute(BStreamFileToolkit &parser) {
 			TK_Status status = TK_Cylinder::Execute(parser);
 			if (status == TK_Normal) {
-				if (this->section->layer->geomLevel < 0) {
-					int level = parser.getNestingLevel();
-					this->section->layer->geomLevel = level - 2;
-					this->javaHandler->openNode();
-					this->section->matrixDWF.send(this->javaHandler);
-					this->section->styleDWF.send(this->javaHandler);
+				if (this->section->layer == NULL)
+					JLogger::info(L"Cylinder level= %u", parser.getNestingLevel());
+				else {
+					if (this->section->layer->geomLevel < 0) {
+						int level = parser.getNestingLevel();
+						this->section->layer->geomLevel = level - 2;
+						this->javaHandler->openNode();
+						this->section->matrixDWF.send(this->javaHandler);
+						this->section->styleDWF.send(this->javaHandler);
+					}
+					dgn::Cylinder cylinder = this->toDgnCylinder();
+					this->javaHandler->handleCylinder(cylinder);
 				}
-				dgn::Cylinder cylinder = this->toDgnCylinder();
-				this->javaHandler->handleCylinder(cylinder);
 			}
 
 			return status;

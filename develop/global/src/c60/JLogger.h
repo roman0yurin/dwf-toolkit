@@ -3,7 +3,7 @@
  */
 #pragma once
 
-#include "dgn/LoggerSetup.hpp"
+#include <dgn/LoggerSetup.hpp>
 class JLogger: dgn::LoggerSetup{
 public:
 		/**Сообщение для отладки**/

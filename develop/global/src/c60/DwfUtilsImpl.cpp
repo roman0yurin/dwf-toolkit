@@ -215,7 +215,7 @@ public:
 				//clock_t time = clock();
 				//JLogger::info(L"Shell time= %d", time);
 				if (this->section->layer == NULL)
-					JLogger::info(L"Shell level= %u", parser.getNestingLevel());
+					JLogger::info(L"Попалась геометрия Shell выше уровня слоя, level= %u", parser.getNestingLevel());
 				else {
 					if (this->section->layer->geomLevel < 0) {
 						int level = parser.getNestingLevel();
@@ -279,7 +279,7 @@ public:
 			TK_Status status = TK_Circle::Execute(parser);
 			if (status == TK_Normal) {
 				if (this->section->layer == NULL)
-					JLogger::info(L"Circle level= %u", parser.getNestingLevel());
+					JLogger::info(L"Попалась геометрия Circle выше уровня слоя, level= %u", parser.getNestingLevel());
 				else {
 					if (this->section->layer->geomLevel < 0) {
 						int level = parser.getNestingLevel();
@@ -313,7 +313,7 @@ public:
 			TK_Status status = TK_Cylinder::Execute(parser);
 			if (status == TK_Normal) {
 				if (this->section->layer == NULL)
-					JLogger::info(L"Cylinder level= %u", parser.getNestingLevel());
+					JLogger::info(L"Попалась геометрия Cylinder выше уровня слоя, level= %u", parser.getNestingLevel());
 				else {
 					if (this->section->layer->geomLevel < 0) {
 						int level = parser.getNestingLevel();

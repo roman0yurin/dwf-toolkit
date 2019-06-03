@@ -232,10 +232,10 @@ public:
 					}
 					//int level = parser.getNestingLevel();
 					dgn::Mesh mesh = this->toDgnMesh();
-					//JLogger::info(L"mesh.xyz.size= %u", mesh.xyz.size());
-					//unsigned long num = mesh.xyz.size()/3;
-					//JLogger::info(L"count= %u", num);
 					/*
+					JLogger::info(L"mesh.xyz.size= %u", mesh.xyz.size());
+					unsigned long num = mesh.xyz.size()/3;
+					JLogger::info(L"count= %u", num);
 					int j = 0;
 					for (int i = 0; i < 9; ++i){
 						float x = mesh.xyz[i];

@@ -364,7 +364,7 @@ namespace c60 {
 					}
 					if (_parts.at(size - 1).level >= level) return false;
 
-					this->_parts.emplace_back(level, this->multiply(_parts.at(size - 1).matrix, m));
+					this->_parts.emplace_back(level, this->multiply(m, _parts.at(size - 1).matrix));
 					return true;
 				}
 

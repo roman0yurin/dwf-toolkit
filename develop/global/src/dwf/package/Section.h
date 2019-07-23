@@ -1044,7 +1044,14 @@ public:
         throw( DWFException );
 
 #endif
+    _DWFTK_API
+    void pthreadDataTable(DWFStringTable * pthreadDataTable)
+        throw()
+        {
+            _pthreadDataTablePropertyContainer = pthreadDataTable;
+            _pthreadDataTableXML = pthreadDataTable;
 
+        }
 protected:
 
     static const wchar_t* const kzProperty_Label;

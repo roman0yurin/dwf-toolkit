@@ -1149,7 +1149,7 @@ public:
     ///
     ///         Destroys all string data from the table.
     ///
-    _DWFCORE_API static void Purge();
+    _DWFCORE_API void Purge();
 
 	///
     ///         Insert a string into lookup table and return an index
@@ -1160,29 +1160,27 @@ public:
     ///
 	_DWFCORE_API const DWFString* insert( const DWFString& zText );
 
+	DWFStringTable();
+	~DWFStringTable();
+
 private:
-    struct _Less
+	struct _Less
 	{
 		bool operator()(const DWFString* lhs, const DWFString* rhs) const
 		{
 			return (*lhs) < (*rhs);
 		}
 	};
-
-	DWFStringTable();
-	~DWFStringTable();
-
 private:
 	DWFStringTable (const DWFStringTable&);
 	DWFStringTable& operator=( const DWFStringTable&);			
-
 private:
 	std::deque<DWFString> _oTable;
 
 	typedef std::set< const DWFString*, _Less >  _tIndex;
 	_tIndex              _oIndex;
 
-    DWFThreadMutex*         _pMutex;
+	DWFThreadMutex*         _pMutex;
 
 };
 

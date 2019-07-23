@@ -194,6 +194,12 @@ public:
     _DWFCORE_API
     virtual void parseDocument( DWFInputStream& rDocumentStream ) 
         throw( DWFException );
+    _DWFCORE_API
+    void pthreadDataTable(DWFStringTable * pthreadDataTable) 
+        throw()
+    {
+       _pthreadDataTable = pthreadDataTable;
+    }
 
 private:
 	DWFPointer<char>		   _apParseBuffer;
@@ -201,6 +207,7 @@ private:
     DWFXMLCallback*            _pCallBack;
 	//Flags
     bool	                   _bIsParsingFinished;
+    DWFStringTable * _pthreadDataTable;
 };
 
 }

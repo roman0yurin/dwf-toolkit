@@ -2936,30 +2936,31 @@ struct _scoped_lock
 DWFStringTable& 
 DWFStringTable::Instance()
 {
-	static DWFStringTable koSingleton;
-	return koSingleton;
+   static DWFStringTable koSingleton;
+   return koSingleton;
 }
 
-void 
+void
 DWFStringTable::Purge()
 {
-    _scoped_lock oLock( Instance()._pMutex );
+   _scoped_lock oLock(this->_pMutex);
 
-    Instance()._oTable.clear();
-    Instance()._oIndex.clear();
+   this->_oTable.clear();
+   this->_oIndex.clear();
 
-    Instance()._oTable.resize( 1 );
+   this->_oTable.resize(1);
 
-	Instance()._oIndex.insert( &Instance()._oTable[0]);
+   this->_oIndex.insert(&this->_oTable[0]);
 }
+
 
 DWFStringTable::DWFStringTable() 
               : _pMutex( 0 )
 {
     _pMutex = DWFCORE_ALLOC_OBJECT( DWFThreadMutex );
     _pMutex->init();
-	_oTable.resize( 1 );
-	_oIndex.insert(&_oTable[0]);
+    _oTable.resize( 1 );
+    _oIndex.insert(&_oTable[0]);
 }
 
 DWFStringTable::~DWFStringTable()
@@ -2976,17 +2977,17 @@ DWFStringTable::insert( const DWFString& zText )
 {
     _scoped_lock oLock( _pMutex );
 
-	_tIndex::const_iterator itr = _oIndex.find( &zText );
-	
+    _tIndex::const_iterator itr = _oIndex.find( &zText );
+
     if (itr != _oIndex.end())
     {
-		return *itr;
+        return *itr;
     }
 
-	_oTable.push_back( zText );
-	_oIndex.insert( &_oTable.back());
+   _oTable.push_back( zText );
+   _oIndex.insert( &_oTable.back());
 
-	return &_oTable.back();
+   return &_oTable.back();
 }
 
 #endif

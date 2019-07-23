@@ -211,21 +211,17 @@ DWFProperty*
 DWFXMLElementBuilder::buildProperty( const char** ppAttributeList, bool bIgnoreCustomizeAttribute )
 throw( DWFException )
 {
-	if(bIgnoreCustomizeAttribute)
-	{
-		DWFProperty* pElement = DWFCORE_ALLOC_OBJECT( DWFProperty() );
-
-		if (pElement == NULL)
-		{
-			_DWFCORE_THROW( DWFMemoryException, /*NOXLATE*/L"Failed to allocate DWFProperty object" );
-		}
-
-		pElement->parseAttributeList( ppAttributeList, bIgnoreCustomizeAttribute );
-		return pElement;
+	DWFProperty* pElement = DWFCORE_ALLOC_OBJECT( DWFProperty(this->_pthreadDataTableXML) );
+	if (pElement == NULL) {
+		_DWFCORE_THROW( DWFMemoryException, /*NOXLATE*/L"Failed to allocate DWFProperty object" );
 	}
-
-    DWFProperty* pElement = _build( pElement, ppAttributeList );
-    return pElement;
+	if (bIgnoreCustomizeAttribute) {
+		pElement->parseAttributeList( ppAttributeList, bIgnoreCustomizeAttribute );
+	}
+	else {
+		pElement->parseAttributeList( ppAttributeList );
+	}
+	return pElement;
 }
 
 DWFSource*

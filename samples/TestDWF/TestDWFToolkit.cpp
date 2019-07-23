@@ -3,6 +3,7 @@
 
 
 #include "stdafx.h"
+#include <thread>
 
 using namespace std;
 using namespace DWFCore;
@@ -139,7 +140,7 @@ int32_t GetLevelLayers(DWFSection *pSection){
 	return section->levelLayers;
 }
 
-
+#if 0
 bool SetLevelLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, TestDWF* ob) {
 	int32_t currentlevel = level + 1;
 	//if (currentlevel > this->bottomLevel)
@@ -323,6 +324,7 @@ bool SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstanc
 	return false;
 }
 
+#endif
 
 class OpenHandler : public TK_Open_Segment {
 protected:
@@ -627,7 +629,6 @@ public:
 void runThroughNodeSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, DwfUtilsImpl *ob) {
 	int32_t currentlevel = level + 1;
 	wstring key = DwfUtilsImpl::toStdString(pInst->object());
-
 	OBJ_SEMANTIC semantic;
 	DWFPropertyContainer *pInstProps = pDef->getInstanceProperties(*pInst);
 	if (pInstProps) {
@@ -646,8 +647,8 @@ void runThroughNodeSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefined
 
 		DWFCORE_FREE_OBJECT(pInstProps);
 	}
-	ob->section->layer->semantics[DwfUtilsImpl::toStdString(pInst->object())] = semantic;
 
+	ob->section->layer->semantics[DwfUtilsImpl::toStdString(pInst->object())] = semantic;
 	DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
 	if (piChildren) {
 		for (; piChildren->valid(); piChildren->next()) {
@@ -686,6 +687,7 @@ void runThroughSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObje
 		DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
 		if (piChildren) {
 			for (; piChildren->valid(); piChildren->next()) {
+				piChildren->value()->pthreadDataTablePropertyContainer(pInst->pthreadDataTablePropertyContainer());
 				runThroughSemantic(currentlevel, pDef, piChildren->value(), ob);
 			}
 
@@ -710,6 +712,7 @@ void runThroughSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObje
 	DWFDefinedObjectInstance::tMap::Iterator *piChildren = pInst->resolvedChildren();
 	if (piChildren) {
 		for (; piChildren->valid(); piChildren->next()) {
+			piChildren->value()->pthreadDataTablePropertyContainer(pInst->pthreadDataTablePropertyContainer());
 			runThroughNodeSemantic(currentlevel, pDef, piChildren->value(), ob);
 		}
 
@@ -746,9 +749,9 @@ void runThrough(DWFSection *pSection, DwfUtilsImpl *ob) {
 			for (; iInst != rRootInstances.end(); iInst++) {
 				pInst = *iInst;
 				level = 0;
+				pInst->pthreadDataTablePropertyContainer(pSection->pthreadDataTablePropertyContainer());
 				runThroughSemantic(level, pDef, pInst, ob);
 			}
-
 			DWFCORE_FREE_OBJECT(pDef);
 		}
 
@@ -827,7 +830,6 @@ void runThroughDwf(DwfUtilsImpl *ob) {
 		// не тот тип файла
 	//	return ;
 	//}
-
 	DWFManifest &rManifest = ob->oReader.getManifest();
 
 	DWFSection *pSection = NULL;
@@ -835,6 +837,7 @@ void runThroughDwf(DwfUtilsImpl *ob) {
 	if (piSections) {
 		for (; piSections->valid(); piSections->next()) {
 			pSection = piSections->get();
+			pSection->pthreadDataTable(rManifest.pthreadDataTable());
 			pSection->readDescriptor();
 
 			ob->sections.emplace_back();
@@ -917,8 +920,8 @@ void runThroughDwf(DwfUtilsImpl *ob) {
 	}
 }
 
-
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
 	//DWFFile oDWF(argv[1]);
 	//wstring name = L"/home/Documents/Bashny.dwf";
 	//DWFFile oDWF(L"/home/den/Documents/TestDWF/Zabor2.dwf");
@@ -926,14 +929,21 @@ int main(int argc, char *argv[]) {
 	//DWFFile oDWF(L"/home/den/Documents/TestDWF/DWF/Все.dwf");
 	//DWFFile oDWF(L"/home/den/Documents/TestDWF/Zabor2.dwf");
 	//c60::DwfUtilsImpl* ob = new DwfUtilsImpl(L"/home/den/Documents/TestDWF/Zabor2.dwf", 4);
-//	c60::DwfUtilsImpl* ob = new DwfUtilsImpl(L"/home/den/Documents/TestDWF/2514_DRV_NWD.dwf", 3);
+	//c60::DwfUtilsImpl* ob = new DwfUtilsImpl(L"/home/den/Documents/TestDWF/2514_DRV_NWD.dwf", 3);
 	//c60::DwfUtilsImpl* ob = new DwfUtilsImpl(L"/home/den/Documents/TestDWF/DWF/Все.dwf", 5);
 	//c60::DwfUtilsImpl ob(L"/home/den/Documents/TestDWF/DWF/блок.dwf", 5);
-	c60::DwfUtilsImpl ob(L"/home/den/Documents/TestDWF/Stairs.dwf", 3);
-	runThroughDwf(&ob);
-	//for (int i = 0; i < 1; ++i) {
-	//}
-	//delete ob;
+	//c60::DwfUtilsImpl ob(L"/home/den/Documents/TestDWF/Stairs.dwf", 3);
+	std::wstring file_name(L"/home/yaroslav/work/sgaz/project/data/4-1-8-30-210_0.dwf");
+	c60::DwfUtilsImpl ob1(file_name, 1);
+	c60::DwfUtilsImpl ob2(file_name, 1);
+
+
+	std::thread thread_id1(runThroughDwf, &ob1);
+  std::thread thread_id2(runThroughDwf, &ob2);
+//	runThroughDwf(&ob1);
+	thread_id1.join();
+	thread_id2.join();
+
 	/*
 	DWFPackageReader oReader(oDWF);
 

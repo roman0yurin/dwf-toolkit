@@ -46,14 +46,15 @@ throw()
                  , _pCurrentElement( NULL )
                  , _pFilter( NULL )
 {
-    ;
+	_pthreadDataTable = DWFCORE_ALLOC_OBJECT(DWFStringTable());
 }
 
 _DWFTK_API
 DWFManifestReader::~DWFManifestReader()
 throw()
 {
-    ;
+	_pthreadDataTable->Purge();
+	DWFCORE_FREE_OBJECT(_pthreadDataTable);
 }
 
 _DWFTK_API
@@ -145,6 +146,8 @@ throw()
         //
         // skip over any "dwf:" in the element name
         //
+	_pElementBuilder->pthreadDataTableXML(this->_pthreadDataTable);
+
     if (DWFCORE_COMPARE_MEMORY(DWFXML::kzNamespace_DWF, zName, 4) == 0)
     {
         zName+=4;

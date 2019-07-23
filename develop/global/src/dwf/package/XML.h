@@ -517,6 +517,15 @@ public:
                                                         DWFPackageReader* pPackageReader )
         throw( DWFException );
 
+    _DWFTK_API
+    void pthreadDataTableXML(DWFStringTable * pthreadDataTableXML) 
+        throw()
+    {
+        _pthreadDataTableXML = pthreadDataTableXML;
+    }
+
+protected:
+    DWFStringTable * _pthreadDataTableXML;
 };
 
 

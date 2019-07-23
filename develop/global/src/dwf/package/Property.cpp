@@ -36,8 +36,6 @@ using namespace DWFToolkit;
 
 const DWFString DWFProperty::_koEmpty;
 
-DWFStringTable* DWFProperty::_kpDataTable = &DWFStringTable::Instance();
-
 DWFProperty::tPropertyContent::tPropertyContent() 
 	: _pszName(&_koEmpty)    
 	, _pszCategory(&_koEmpty)
@@ -45,7 +43,6 @@ DWFProperty::tPropertyContent::tPropertyContent()
 	, _pszUnits(&_koEmpty)
 	, _pszValue(&_koEmpty)
 	, _pOwner(0)
-
 #ifndef DWFTK_READ_ONLY
 
 	, _oAttributes()
@@ -67,7 +64,12 @@ DWFProperty::tPropertyContent::tPropertyContent(const DWFProperty::tPropertyCont
 	, _oAttributes(rhs._oAttributes)
 
 #endif
-{}
+{
+}
+
+DWFProperty::tPropertyContent::~tPropertyContent()
+{
+}
 
 DWFProperty::tPropertyContent& DWFProperty::tPropertyContent::operator=(const DWFProperty::tPropertyContent& rhs) 
 {
@@ -86,31 +88,34 @@ DWFProperty::tPropertyContent& DWFProperty::tPropertyContent::operator=(const DW
 }
 
 _DWFTK_API
-DWFProperty::DWFProperty()
+DWFProperty::DWFProperty(DWFStringTable * kpDataTable)
 throw()
+:_kpDataTable(kpDataTable)
 {
-    ;
 }
 
 _DWFTK_API
-DWFProperty::DWFProperty( const DWFString& zName,
+DWFProperty::DWFProperty( DWFStringTable * kpDataTable,
+                          const DWFString& zName,
                           const DWFString& zValue,
                           const DWFString& zCategory,
                           const DWFString& zType,
                           const DWFString& zUnits )
 throw()
+:_kpDataTable(kpDataTable)
 {
-    oPropertyContent->_pszName = _kpDataTable->insert(zName);
-	oPropertyContent->_pszCategory = _kpDataTable->insert(zCategory);
-	oPropertyContent->_pszType = _kpDataTable->insert(zType);
-	oPropertyContent->_pszUnits = _kpDataTable->insert(zUnits);
-	oPropertyContent->_pszValue = _kpDataTable->insert(zValue);
+	oPropertyContent._pszName = _kpDataTable->insert(zName);
+	oPropertyContent._pszCategory = _kpDataTable->insert(zCategory);
+	oPropertyContent._pszType = _kpDataTable->insert(zType);
+	oPropertyContent._pszUnits = _kpDataTable->insert(zUnits);
+	oPropertyContent._pszValue = _kpDataTable->insert(zValue);
 }
 
 _DWFTK_API
 DWFProperty::DWFProperty( const DWFProperty& rProperty )
 throw()
-: oPropertyContent(rProperty.oPropertyContent)
+:_kpDataTable(rProperty._kpDataTable),
+ oPropertyContent(rProperty.oPropertyContent)
 {
     ;
 }
@@ -120,9 +125,9 @@ DWFProperty&
 DWFProperty::operator=( const DWFProperty& rProperty )
 throw()
 {
-	tImpType(rProperty.oPropertyContent).swap(oPropertyContent);
-
-    return *this;
+	oPropertyContent = rProperty.oPropertyContent;
+	_kpDataTable = rProperty._kpDataTable;
+	return *this;
 }
 
 _DWFTK_API
@@ -189,8 +194,7 @@ throw( DWFException )
              (DWFCORE_COMPARE_ASCII_STRINGS(pAttrib, DWFXML::kzAttribute_Name) == 0))
         {
             nFound |= 0x01;
-
-			oPropertyContent->_pszName = _kpDataTable->insert(ppAttributeList[iAttrib+1]);
+            oPropertyContent._pszName = _kpDataTable->insert(ppAttributeList[iAttrib+1]);
         }
             //
             // set the value
@@ -200,7 +204,7 @@ throw( DWFException )
         {
             nFound |= 0x02;
 
-			oPropertyContent->_pszValue = _kpDataTable->insert(ppAttributeList[iAttrib+1]);
+            oPropertyContent._pszValue = _kpDataTable->insert(ppAttributeList[iAttrib+1]);
         }
             //
             // set the type
@@ -210,7 +214,7 @@ throw( DWFException )
         {
             nFound |= 0x04;
 
-			oPropertyContent->_pszType = _kpDataTable->insert(ppAttributeList[iAttrib+1]);
+			oPropertyContent._pszType = _kpDataTable->insert(ppAttributeList[iAttrib+1]);
         }
             //
             // set the units
@@ -220,7 +224,7 @@ throw( DWFException )
         {
             nFound |= 0x08;
 
-			oPropertyContent->_pszUnits = _kpDataTable->insert(ppAttributeList[iAttrib+1]);
+			oPropertyContent._pszUnits = _kpDataTable->insert(ppAttributeList[iAttrib+1]);
         }
             //
             // set the category
@@ -230,7 +234,7 @@ throw( DWFException )
         {
             nFound |= 0x10;
 
-			oPropertyContent->_pszCategory = _kpDataTable->insert(ppAttributeList[iAttrib+1]);
+			oPropertyContent._pszCategory = _kpDataTable->insert(ppAttributeList[iAttrib+1]);
         }
 		//
 		// Here, we handle the customer defined attributes.
@@ -276,88 +280,83 @@ _DWFTK_API
 const DWFProperty::tAttributeMap& DWFProperty::getCustomizedAttributeList()
 throw()
 {
-	return oPropertyContent->_oAttributes;
+	return oPropertyContent._oAttributes;
 }
 
 _DWFTK_API
 void DWFProperty::setName( const DWFString& zName )
 throw()
 {
-	oPropertyContent->_pszName = _kpDataTable->insert(zName);
+	oPropertyContent._pszName = _kpDataTable->insert(zName);
 }
 
 _DWFTK_API
 void DWFProperty::setValue( const DWFString& zValue )
 throw()
 {
-	oPropertyContent->_pszValue = _kpDataTable->insert(zValue);
+	oPropertyContent._pszValue = _kpDataTable->insert(zValue);
 }
 
 _DWFTK_API
 void DWFProperty::setCategory( const DWFString& zCategory )
 throw()
 {
-	oPropertyContent->_pszCategory = _kpDataTable->insert(zCategory);
+	oPropertyContent._pszCategory = _kpDataTable->insert(zCategory);
 }
 
 _DWFTK_API
 void DWFProperty::setType( const DWFString& zType )
 throw()
 {
-	oPropertyContent->_pszType = _kpDataTable->insert(zType);
+	oPropertyContent._pszType = _kpDataTable->insert(zType);
 }
 
 _DWFTK_API
 void DWFProperty::setUnits( const DWFString& zUnits )
 throw()
 {
-	oPropertyContent->_pszUnits = _kpDataTable->insert(zUnits);
+	oPropertyContent._pszUnits = _kpDataTable->insert(zUnits);
 }
 
 _DWFTK_API
 void
 DWFProperty::own( DWFOwner& rOwner )
-throw( DWFException )
-{
-    if (oPropertyContent->_pOwner == &rOwner)
-    {
-        return;
-    }
+throw( DWFException ) {
+	if (oPropertyContent._pOwner == &rOwner) {
+		return;
+	}
+	if (oPropertyContent._pOwner) {
+		oPropertyContent._pOwner->notifyOwnerChanged(this->_toOwnable());
+	}
 
-    if (oPropertyContent->_pOwner)
-    {
-		oPropertyContent->_pOwner->notifyOwnerChanged( this->_toOwnable() );
-    }
-
-    oPropertyContent->_pOwner = &rOwner;
-    oPropertyContent->_oOwnerObservers.insert( &rOwner );
+	oPropertyContent._pOwner = &rOwner;
+	oPropertyContent._oOwnerObservers.insert(&rOwner);
 }
-
 _DWFTK_API
 bool
 DWFProperty::disown( DWFOwner& rOwner, bool bForget )
 throw( DWFException )
 {
-    if (oPropertyContent->_pOwner)
+    if (oPropertyContent._pOwner)
     {
             //
             // can only disown what we own
             //
-        if (oPropertyContent->_pOwner == &rOwner)
+        if (oPropertyContent._pOwner == &rOwner)
         {
                 //
                 // remove owner from observers
                 //
             if (bForget)
             {
-                oPropertyContent->_oOwnerObservers.erase( oPropertyContent->_pOwner );
+                oPropertyContent._oOwnerObservers.erase( oPropertyContent._pOwner );
             }
 
             //
             //
             //
-			oPropertyContent->_pOwner->notifyOwnerChanged( this->_toOwnable() );
-            oPropertyContent->_pOwner = NULL;
+			oPropertyContent._pOwner->notifyOwnerChanged( this->_toOwnable() );
+            oPropertyContent._pOwner = NULL;
 
             return true;
         }
@@ -371,7 +370,7 @@ DWFOwner*
 DWFProperty::owner()
 throw( DWFException )
 {
-    return oPropertyContent->_pOwner;
+    return oPropertyContent._pOwner;
 }
 
 _DWFTK_API
@@ -379,13 +378,13 @@ void
 DWFProperty::observe( DWFOwner& rOwner )
 throw( DWFException )
 {
-    if (oPropertyContent->_pOwner == &rOwner)
+    if (oPropertyContent._pOwner == &rOwner)
     {
         // can't observe something that you already own.
         return;
     }
 
-    oPropertyContent->_oOwnerObservers.insert( &rOwner );
+    oPropertyContent._oOwnerObservers.insert( &rOwner );
 }
 
 _DWFTK_API
@@ -397,7 +396,7 @@ throw( DWFException )
         // Ensure that observe and own aren't being confused.
         // We'd better not be the owner if we're just observing.
         //
-    if (oPropertyContent->_pOwner == &rOwner)
+    if (oPropertyContent._pOwner == &rOwner)
     {
         return false;
     }
@@ -405,7 +404,7 @@ throw( DWFException )
     //
     // remove observer from observers
     //
-    oPropertyContent->_oOwnerObservers.erase( &rOwner );
+    oPropertyContent._oOwnerObservers.erase( &rOwner );
 
     return true;
 }
@@ -415,10 +414,10 @@ void
 DWFProperty::_notifyDelete()
 throw()
 {
-    if (oPropertyContent->_oOwnerObservers.size() > 0)
+    if (oPropertyContent._oOwnerObservers.size() > 0)
     {
         DWFOwner* pOwner = NULL;
-        DWFSortedList<DWFOwner*>::Iterator* piOwner = oPropertyContent->_oOwnerObservers.iterator();
+        DWFSortedList<DWFOwner*>::Iterator* piOwner = oPropertyContent._oOwnerObservers.iterator();
 
         for (; piOwner->valid(); )
         {
@@ -435,7 +434,7 @@ throw()
                 // owner should be the only one deleting this object
                 // so there is no need to notify him
                 //
-            if (pOwner != oPropertyContent->_pOwner)
+            if (pOwner != oPropertyContent._pOwner)
             {
 				pOwner->notifyOwnableDeletion( this->_toOwnable() );
             }
@@ -467,8 +466,8 @@ throw( DWFException )
         _DWFCORE_THROW( DWFInvalidArgumentException, /*NOXLATE*/L"Attribute name and value parameters must be provided." );
     }
 
-    tPropertyContent::_tAttributeMap::iterator iAttributeList = oPropertyContent->_oAttributes.find( rNamespace.prefix() );
-    if (iAttributeList != oPropertyContent->_oAttributes.end())
+    tPropertyContent::_tAttributeMap::iterator iAttributeList = oPropertyContent._oAttributes.find( rNamespace.prefix() );
+    if (iAttributeList != oPropertyContent._oAttributes.end())
     {
 		iAttributeList->second.push_back( tPropertyContent::_tAttribute(zName, zValue) );
     }
@@ -476,7 +475,7 @@ throw( DWFException )
     {
 		tPropertyContent::_tAttributeList oNewList;
 		oNewList.push_back( tPropertyContent::_tAttribute(zName, zValue) );
-        oPropertyContent->_oAttributes[rNamespace.prefix()] = oNewList;
+        oPropertyContent._oAttributes[rNamespace.prefix()] = oNewList;
     }
 }
 
@@ -517,8 +516,8 @@ throw( DWFException )
 
     zNamespace.destroy();
 
-    tPropertyContent::_tAttributeMap::iterator iAttributeList = oPropertyContent->_oAttributes.begin();
-    for (; iAttributeList != oPropertyContent->_oAttributes.end(); iAttributeList++)
+    tPropertyContent::_tAttributeMap::iterator iAttributeList = oPropertyContent._oAttributes.begin();
+    for (; iAttributeList != oPropertyContent._oAttributes.end(); iAttributeList++)
     {
         zNamespace.assign( iAttributeList->first );
         zNamespace.append( /*NOXLATE*/L":" );

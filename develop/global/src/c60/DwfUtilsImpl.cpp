@@ -966,6 +966,7 @@ void c60::DwfUtilsImpl::readTreeStructure(const std::shared_ptr<dgn::DwfLayerStr
 	if (piSections) {
 		for (; piSections->valid(); piSections->next()) {
 			pSection = piSections->get();
+			pSection->pthreadDataTable(rManifest.pthreadDataTable());
 			pSection->readDescriptor();
 
 			this->section = new SectionDWF();
@@ -983,6 +984,7 @@ void c60::DwfUtilsImpl::readTreeStructure(const std::shared_ptr<dgn::DwfLayerStr
 					DWFDefinedObjectInstance::tList::const_iterator iInst = rRootInstances.begin();
 					for (; iInst != rRootInstances.end(); iInst++) {
 						pInst = *iInst;
+						pInst->pthreadDataTablePropertyContainer(pSection->pthreadDataTablePropertyContainer());
 						this->section->SetLayers(level, pDef, pInst, handler);
 					}
 

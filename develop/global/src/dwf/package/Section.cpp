@@ -590,7 +590,7 @@ const
 throw( DWFException )
 {
     DWFObjectDefinition* pDefs = DWFCORE_ALLOC_OBJECT( DWFObjectDefinition(_pPackageReader, nProviderFlags) );
-
+    pDefs->PElementBuilder()->pthreadDataTableXML(this->_pthreadDataTableXML);
     if (pDefs == NULL)
     {
         _DWFCORE_THROW( DWFMemoryException, /*NOXLATE*/L"Failed to allocate instance tree" );
@@ -716,6 +716,7 @@ const
 throw( DWFException )
 {
 	DWFXMLParser docParser(&rDocumentReader);
+    docParser.pthreadDataTable(this->_pthreadDataTableXML);
     docParser.parseDocument( rDocumentStream);
 }
 

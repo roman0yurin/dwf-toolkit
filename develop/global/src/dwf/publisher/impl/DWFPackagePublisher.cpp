@@ -919,7 +919,7 @@ void
 DWFPackagePublisher::postprocessModel( DWFModel* pW3DModel )
 throw( DWFException )
 {
-	DWFGraphicResource * pGraphicResource = getGraphicResource();
+    DWFGraphicResource * pGraphicResource = getGraphicResource();
     DWFEModelSection* pModelSection = dynamic_cast<DWFEModelSection*>(_pCurrentSection);
 
     if (pModelSection == NULL)
@@ -961,7 +961,7 @@ throw( DWFException )
     // Properties
     //
     //
-    DWFProperty oModelProp( /*NOXLATE*/L"", /*NOXLATE*/L"", DWFPublishedDefinedObject::Visitor::kz_PropCategory_Hidden );
+    DWFProperty oModelProp(pGraphicResource->pthreadDataTablePropertyContainer(), /*NOXLATE*/L"", /*NOXLATE*/L"", DWFPublishedDefinedObject::Visitor::kz_PropCategory_Hidden );
 
     //
     // tell the viewer how to light the scene

@@ -1257,7 +1257,7 @@ throw( DWFException )
 
     if (zSourceProductVendor.bytes() > 0)
     {
-        pStandardProperty = DWFCORE_ALLOC_OBJECT( DWFProperty(DWFXML::kzDWFProperty_SourceProductVendor, zSourceProductVendor) );
+        pStandardProperty = DWFCORE_ALLOC_OBJECT( DWFProperty(_pPackageManifest->pthreadDataTable(), DWFXML::kzDWFProperty_SourceProductVendor, zSourceProductVendor) );
         if (pStandardProperty == NULL)
         {
             _DWFCORE_THROW( DWFMemoryException, /*NOXLATE*/L"Failed to allocate property" );
@@ -1268,7 +1268,7 @@ throw( DWFException )
 
     if (zSourceProductName.bytes() > 0)
     {
-        pStandardProperty = DWFCORE_ALLOC_OBJECT( DWFProperty(DWFXML::kzDWFProperty_SourceProductName, zSourceProductName) );
+        pStandardProperty = DWFCORE_ALLOC_OBJECT( DWFProperty(_pPackageManifest->pthreadDataTable(), DWFXML::kzDWFProperty_SourceProductName, zSourceProductName) );
         if (pStandardProperty == NULL)
         {
             _DWFCORE_THROW( DWFMemoryException, /*NOXLATE*/L"Failed to allocate property" );
@@ -1279,7 +1279,7 @@ throw( DWFException )
 
     if (zSourceProductVersion.bytes() > 0)
     {
-        pStandardProperty = DWFCORE_ALLOC_OBJECT( DWFProperty(DWFXML::kzDWFProperty_SourceProductVersion, zSourceProductVersion) );
+        pStandardProperty = DWFCORE_ALLOC_OBJECT( DWFProperty(_pPackageManifest->pthreadDataTable(), DWFXML::kzDWFProperty_SourceProductVersion, zSourceProductVersion) );
         if (pStandardProperty == NULL)
         {
             _DWFCORE_THROW( DWFMemoryException, /*NOXLATE*/L"Failed to allocate property" );
@@ -1290,7 +1290,7 @@ throw( DWFException )
 
     if (zDWFProductVendor.bytes() > 0)
     {
-        pStandardProperty = DWFCORE_ALLOC_OBJECT( DWFProperty(DWFXML::kzDWFProperty_DWFProductVendor, zDWFProductVendor) );
+        pStandardProperty = DWFCORE_ALLOC_OBJECT( DWFProperty(_pPackageManifest->pthreadDataTable(), DWFXML::kzDWFProperty_DWFProductVendor, zDWFProductVendor) );
         if (pStandardProperty == NULL)
         {
             _DWFCORE_THROW( DWFMemoryException, /*NOXLATE*/L"Failed to allocate property" );
@@ -1301,15 +1301,14 @@ throw( DWFException )
 
     if (zDWFProductVersion.bytes() > 0)
     {
-        pStandardProperty = DWFCORE_ALLOC_OBJECT( DWFProperty(DWFXML::kzDWFProperty_DWFProductVersion, zDWFProductVersion) );
+        pStandardProperty = DWFCORE_ALLOC_OBJECT( DWFProperty(_pPackageManifest->pthreadDataTable(), DWFXML::kzDWFProperty_DWFProductVersion, zDWFProductVersion) );
         if (pStandardProperty == NULL)
         {
             _DWFCORE_THROW( DWFMemoryException, /*NOXLATE*/L"Failed to allocate property" );
         }
         _pPackageManifest->addProperty( pStandardProperty, true );
     }
-
-    pStandardProperty = DWFCORE_ALLOC_OBJECT( DWFProperty(DWFXML::kzDWFProperty_DWFToolkitVersion, _DWFTK_VERSION_STRING) );
+    pStandardProperty = DWFCORE_ALLOC_OBJECT( DWFProperty(_pPackageManifest->pthreadDataTable(), DWFXML::kzDWFProperty_DWFToolkitVersion, _DWFTK_VERSION_STRING) );
     if (pStandardProperty == NULL)
     {
         _DWFCORE_THROW( DWFMemoryException, /*NOXLATE*/L"Failed to allocate property" );

@@ -919,8 +919,7 @@ throw( DWFException )
     {
         _DWFCORE_THROW( DWFUnexpectedException, /*NOXLATE*/L"Segment must be open" );
     }
-
-    DWFProperty* pProperty = DWFCORE_ALLOC_OBJECT( DWFProperty( zName, zValue, zCategory, zType, zUnits ) );
+    DWFProperty* pProperty = DWFCORE_ALLOC_OBJECT( DWFProperty(this->pthreadDataTablePropertyContainer(), zName, zValue, zCategory, zType, zUnits ) );
 
         //
         // pass along to the published object

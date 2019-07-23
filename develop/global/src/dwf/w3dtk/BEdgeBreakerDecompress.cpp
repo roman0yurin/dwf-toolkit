@@ -1507,6 +1507,7 @@ int show_edgebreaker_decompress_size( int stream_len, void const *stream,
 
 } 
 
+pthread_mutex_t decompress_mutex;
 
 int edgebreaker_decompress( int stream_len, void const *stream, 
             int alter *pcount_in_out, float alter *points_out, float alter *normals_out,
@@ -1531,6 +1532,8 @@ int edgebreaker_decompress( int stream_len, void const *stream,
     int *tristrips = NULL;
 
     UNREFERENCED(stream_len);
+
+    pthread_mutex_lock(&decompress_mutex);
 
     init_actions_table( configs );
     mtable_info_init( &mtable );
@@ -1724,7 +1727,7 @@ int edgebreaker_decompress( int stream_len, void const *stream,
         EA_FREE( quantized_normals );
     mtable_info_free( &mtable );
     EA_FREE( actions );
-
+    pthread_mutex_unlock(&decompress_mutex);
     return status;
 
 } 

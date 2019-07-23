@@ -175,7 +175,7 @@ throw( DWFException )
     //
     // Create the property and add using the base class call.
     //
-    DWFProperty* pProperty = DWFCORE_ALLOC_OBJECT( DWFProperty( zName, zValue, zCategory, zType, zUnits ) );
+    DWFProperty* pProperty = DWFCORE_ALLOC_OBJECT( DWFProperty( this->_pthreadDataTablePropertyContainer, zName, zValue, zCategory, zType, zUnits ) );
     addProperty( pProperty, true );
 
     return pProperty;

@@ -263,7 +263,8 @@ throw( DWFException )
             //
         if (pReference->zName.bytes() > 0)
         {
-            pReferenceInstance->addProperty( DWFCORE_ALLOC_OBJECT(DWFProperty(kz_PropName_Published_Object,
+            pReferenceInstance->addProperty( DWFCORE_ALLOC_OBJECT(DWFProperty(pReferenceInstance->pthreadDataTablePropertyContainer(),
+                                                                              kz_PropName_Published_Object,
                                                                               pReference->zName,
                                                                               kz_PropCategory_Hidden)),
                                              true );
@@ -332,7 +333,8 @@ throw( DWFException )
     // name the object with a hidden property
     // this will show up in the model navigator as browseable object
     //
-    (*ppDefinedObject)->addProperty( DWFCORE_ALLOC_OBJECT(DWFProperty(kz_PropName_Published_Object,
+    (*ppDefinedObject)->addProperty( DWFCORE_ALLOC_OBJECT(DWFProperty((*ppDefinedObject)->pthreadDataTablePropertyContainer(),
+                                                                      kz_PropName_Published_Object,
                                                                       rPublishedObject.name(),
                                                                       kz_PropCategory_Hidden)),
                                      true );

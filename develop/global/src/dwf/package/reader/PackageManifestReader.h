@@ -329,8 +329,15 @@ public:
                               int         nLength ) 
         throw();
 
+    _DWFTK_API
+    DWFStringTable * pthreadDataTable()
+        throw()
+   {
+       return _pthreadDataTable;
+   }
 protected:
-
+    ///  
+    DWFStringTable * _pthreadDataTable;
     ///
     ///         DWF package content source.
     ///

@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 14)
 #Настройка Warning-ов
 add_definitions(-Wno-deprecated -Wno-write-strings -Wno-narrowing -Wno-trigraphs)
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-pointer-to-int-cast -Wno-int-to-pointer-cast") #Только для C
+#SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-sanitize-recover -fstack-protector") # проверка на утечку памяти
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-sanitize-recover -fstack-protector") # проверка на утечку памяти
 #Предопределения -DDWFCORE_BUILD_ZLIB  -DDWFCORE_BUILD_EXPAT
 add_definitions(-DDWFCORE_STATIC -DDWFTK_STATIC -DWHIP_USE_WCHAR_STRINGS -DSTDC -D_DWFCORE_X64_SYSTEM -DSQLITE_OMIT_LOAD_EXTENSION)
 

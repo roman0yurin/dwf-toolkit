@@ -465,6 +465,18 @@ public:
     {
         return (std::find( _oReferences.begin(), _oReferences.end(), pContainer ) != _oReferences.end());
     }
+    _DWFTK_API
+    void pthreadDataTablePropertyContainer(DWFStringTable * pthreadDataTable)
+        throw() 
+    {
+        _pthreadDataTablePropertyContainer = pthreadDataTable;
+    }
+    _DWFTK_API
+    DWFStringTable * pthreadDataTablePropertyContainer()
+        throw() 
+    { 
+        return _pthreadDataTablePropertyContainer;
+    }
 
 #ifndef DWFTK_READ_ONLY
 
@@ -536,8 +548,9 @@ protected:
     virtual void notifyOwnableDeletion( DWFOwnable& rOwnable )
         throw( DWFException );
 
-#ifndef DWFTK_READ_ONLY
+    DWFStringTable * _pthreadDataTablePropertyContainer;
 
+#ifndef DWFTK_READ_ONLY
 private:
 
     //
@@ -611,7 +624,6 @@ protected:
 private:
 
     DWFString                   _zID;
-
 private:
 
     DWFPropertyContainer( const DWFPropertyContainer& );

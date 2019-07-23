@@ -246,6 +246,12 @@ public:
     void notifyCharacterData( const char* zCData, 
                               int         nLength ) 
         throw();
+    _DWFTK_API
+    DWFXMLElementBuilder * PElementBuilder( ) 
+        throw() 
+    { 
+        return _pElementBuilder;
+    }
 
 protected:
 

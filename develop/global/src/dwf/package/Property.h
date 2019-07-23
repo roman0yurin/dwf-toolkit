@@ -107,7 +107,7 @@ public:
     ///\throw   None
     ///
     _DWFTK_API
-    DWFProperty()
+    DWFProperty(DWFStringTable * kpDataTable)
         throw();
 
     ///
@@ -121,7 +121,8 @@ public:
     ///\throw   None
     ///
     _DWFTK_API
-    DWFProperty( const DWFString& zName,
+    DWFProperty( DWFStringTable * kpDataTable,
+                 const DWFString& zName,
                  const DWFString& zValue,
                  const DWFString& zCategory = /*NOXLATE*/L"",
                  const DWFString& zType = /*NOXLATE*/L"",
@@ -167,7 +168,7 @@ public:
     const DWFString& name() const
         throw()
     {
-		return *oPropertyContent->_pszName;
+        return *oPropertyContent._pszName;
     }
 
     ///
@@ -190,7 +191,7 @@ public:
     const DWFString& value() const
         throw()
     {
-		return *oPropertyContent->_pszValue;
+        return *oPropertyContent._pszValue;
     }
 
     ///
@@ -213,7 +214,7 @@ public:
     const DWFString& category() const
         throw()
     {
-		return *oPropertyContent->_pszCategory;
+        return *oPropertyContent._pszCategory;
     }
 
     ///
@@ -236,7 +237,7 @@ public:
     const DWFString& type() const
         throw()
     {
-		return *oPropertyContent->_pszType;
+        return *oPropertyContent._pszType;
     }
 
     ///
@@ -259,7 +260,7 @@ public:
     const DWFString& units() const
         throw()
     {
-		return *oPropertyContent->_pszUnits;
+        return *oPropertyContent._pszUnits;
     }
 
     ///
@@ -377,7 +378,7 @@ private:
 		tPropertyContent();
 
 		tPropertyContent(const tPropertyContent& rhs);
-
+		~tPropertyContent();
 		tPropertyContent& operator=(const tPropertyContent& rhs);
 
 		const DWFString* _pszName;    
@@ -453,11 +454,15 @@ private:
 	DWFOwnable& _toOwnable();	///here is a hack, but it's safe
 
 	//specify the Archive type with tPropertyArchive instead of DWFArchive
+#if 0 // выключен шаблон серилизации 
 	typedef DWFProxy<tPropertyContent, std::allocator<tPropertyContent>, tPropertyArchive> tImpType;
 	tImpType oPropertyContent;
+#else
+	tPropertyContent  oPropertyContent;
+#endif
 
 	static const DWFString _koEmpty;
-	static DWFStringTable* _kpDataTable;
+	DWFStringTable* _kpDataTable;
 };
 
 }

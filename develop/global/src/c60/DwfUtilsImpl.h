@@ -36,6 +36,29 @@ namespace c60 {
 		/**вектор с семантикой узлов дерева**/
 		typedef std::vector<dgn::SemanticValue> OBJ_SEMANTIC;
 
+		/**Перемножить матрицы 4x4 m1 на m2**/
+		static vector<float> multiply(vector<float> m1, vector<float> m2){
+			vector<float> res;
+			res.push_back(m1[0]*m2[0]+m1[1]*m2[4]+m1[2]*m2[8]+m1[3]*m2[12]);
+			res.push_back(m1[0]*m2[1]+m1[1]*m2[5]+m1[2]*m2[9]+m1[3]*m2[13]);
+			res.push_back(m1[0]*m2[2]+m1[1]*m2[6]+m1[2]*m2[10]+m1[3]*m2[14]);
+			res.push_back(m1[0]*m2[3]+m1[1]*m2[7]+m1[2]*m2[11]+m1[3]*m2[15]);
+			res.push_back(m1[4]*m2[0]+m1[5]*m2[4]+m1[6]*m2[8]+m1[7]*m2[12]);
+			res.push_back(m1[4]*m2[1]+m1[5]*m2[5]+m1[6]*m2[9]+m1[7]*m2[13]);
+			res.push_back(m1[4]*m2[2]+m1[5]*m2[6]+m1[6]*m2[10]+m1[7]*m2[14]);
+			res.push_back(m1[4]*m2[3]+m1[5]*m2[7]+m1[6]*m2[11]+m1[7]*m2[15]);
+			res.push_back(m1[8]*m2[0]+m1[9]*m2[4]+m1[10]*m2[8]+m1[11]*m2[12]);
+			res.push_back(m1[8]*m2[1]+m1[9]*m2[5]+m1[10]*m2[9]+m1[11]*m2[13]);
+			res.push_back(m1[8]*m2[2]+m1[9]*m2[6]+m1[10]*m2[10]+m1[11]*m2[14]);
+			res.push_back(m1[8]*m2[3]+m1[9]*m2[7]+m1[10]*m2[11]+m1[11]*m2[15]);
+			res.push_back(m1[12]*m2[0]+m1[13]*m2[4]+m1[14]*m2[8]+m1[15]*m2[12]);
+			res.push_back(m1[12]*m2[1]+m1[13]*m2[5]+m1[14]*m2[9]+m1[15]*m2[13]);
+			res.push_back(m1[12]*m2[2]+m1[13]*m2[6]+m1[14]*m2[10]+m1[15]*m2[14]);
+			res.push_back(m1[12]*m2[3]+m1[13]*m2[7]+m1[14]*m2[11]+m1[15]*m2[15]);
+			return res;
+		}
+
+		/**стиль с уровнем**/
 		class LevelRGB{
 		public:
 				int level;
@@ -47,9 +70,7 @@ namespace c60 {
 					this->rgb[1] = ar[1];
 					this->rgb[2] = ar[2];
 				}
-				~LevelRGB(){
-					;
-				}
+				~LevelRGB(){ }
 		};
 
 		/*стили файла DWF*/
@@ -144,9 +165,7 @@ namespace c60 {
 		public:
 				StyleDWF(){}
 
-				~StyleDWF(){
-					;
-				}
+				~StyleDWF(){}
 
 				void addDiffuse(int level, float rgb[3]){
 					int size = this->_diffuse.size();
@@ -251,20 +270,6 @@ namespace c60 {
 					return NULL;
 				}
 
-				/*
-				void addDiffuse(int32_t level, float red, float green, float blue){
-					int r = (int)red*256;
-					int g = 0 << (int)green*256;
-					int b = 0 << 0 << (int)blue*256;
-					int result = r+g+b;
-					this->_diffuse[level] = result;
-				}
-				int getDiffuse(){
-					if (this->_diffuse.size() > 0)
-						return this->_diffuse.end().operator*().second;
-					return -1;
-				}
-				 */
 				void deleteLevel(int level){
 					this->deleteDiffuse(level);
 					this->deleteSpecular(level);
@@ -272,46 +277,13 @@ namespace c60 {
 					this->deleteEmissive(level);
 					this->deleteGloss(level);
 					this->deleteTransparence(level);
-					/*
-					bool log = true;
-					while (log){
-						log = this->deleteDiffuse(level);
-					}
-					log = true;
-					while (log){
-						log = this->deleteSpecular(level);
-					}
-					log = true;
-					while (log){
-						log = this->deleteMirror(level);
-					}
-					log = true;
-					while (log){
-						log = this->deleteEmissive(level);
-					}
-					log = true;
-					while (log){
-						log = this->deleteGloss(level);
-					}
-					log = true;
-					while (log){
-						log = this->deleteTransparence(level);
-					}
-					 /*
-					/*
-					int size = this->_diffuse.size();
-					if (size > 0){
-						LevelRGB ob = this->_diffuse.at(size - 1);
-						if (ob.level == level)
-							this->_diffuse.pop_back();
-					}
-					 */
 				}
 
+				/**передаёт текущий стиль в SCALA**/
 				void send(std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler);
 		};
 
-
+		/*матрица с уровнем*/
 		class LevelMatrix{
 		public:
 				int level;
@@ -328,34 +300,12 @@ namespace c60 {
 		private:
 				/*матрицы с уровнем*/
 				std::vector<LevelMatrix> _parts;
-
-				/**Перемножить матрицы 4x4 m1 на m2**/
-				vector<float> multiply(vector<float> m1, vector<float> m2){
-					vector<float> res;
-					res.push_back(m1[0]*m2[0]+m1[1]*m2[4]+m1[2]*m2[8]+m1[3]*m2[12]);
-					res.push_back(m1[0]*m2[1]+m1[1]*m2[5]+m1[2]*m2[9]+m1[3]*m2[13]);
-					res.push_back(m1[0]*m2[2]+m1[1]*m2[6]+m1[2]*m2[10]+m1[3]*m2[14]);
-					res.push_back(m1[0]*m2[3]+m1[1]*m2[7]+m1[2]*m2[11]+m1[3]*m2[15]);
-					res.push_back(m1[4]*m2[0]+m1[5]*m2[4]+m1[6]*m2[8]+m1[7]*m2[12]);
-					res.push_back(m1[4]*m2[1]+m1[5]*m2[5]+m1[6]*m2[9]+m1[7]*m2[13]);
-					res.push_back(m1[4]*m2[2]+m1[5]*m2[6]+m1[6]*m2[10]+m1[7]*m2[14]);
-					res.push_back(m1[4]*m2[3]+m1[5]*m2[7]+m1[6]*m2[11]+m1[7]*m2[15]);
-					res.push_back(m1[8]*m2[0]+m1[9]*m2[4]+m1[10]*m2[8]+m1[11]*m2[12]);
-					res.push_back(m1[8]*m2[1]+m1[9]*m2[5]+m1[10]*m2[9]+m1[11]*m2[13]);
-					res.push_back(m1[8]*m2[2]+m1[9]*m2[6]+m1[10]*m2[10]+m1[11]*m2[14]);
-					res.push_back(m1[8]*m2[3]+m1[9]*m2[7]+m1[10]*m2[11]+m1[11]*m2[15]);
-					res.push_back(m1[12]*m2[0]+m1[13]*m2[4]+m1[14]*m2[8]+m1[15]*m2[12]);
-					res.push_back(m1[12]*m2[1]+m1[13]*m2[5]+m1[14]*m2[9]+m1[15]*m2[13]);
-					res.push_back(m1[12]*m2[2]+m1[13]*m2[6]+m1[14]*m2[10]+m1[15]*m2[14]);
-					res.push_back(m1[12]*m2[3]+m1[13]*m2[7]+m1[14]*m2[11]+m1[15]*m2[15]);
-					return res;
-				}
-
 		public:
 				MatrixDWF(){}
 
 				~MatrixDWF(){}
 
+				/**добавляет текущую матрицу**/
 				bool add(int level, vector<float> m){
 					int size = this->_parts.size();
 					if (size == 0){
@@ -364,10 +314,11 @@ namespace c60 {
 					}
 					if (_parts.at(size - 1).level >= level) return false;
 
-					this->_parts.emplace_back(level, this->multiply(m, _parts.at(size - 1).matrix));
+					this->_parts.emplace_back(level, multiply(m, _parts.at(size - 1).matrix));
 					return true;
 				}
 
+				/**возращает ссылку на матрицу с уровнем**/
 				LevelMatrix* get(){
 					if (this->_parts.size() > 0)
 						return &this->_parts.at(this->_parts.size()-1);
@@ -375,6 +326,7 @@ namespace c60 {
 					return NULL;
 				}
 
+				/**удаляет текущую матрицу**/
 				bool remove(int level){
 					int size = this->_parts.size();
 					if (size > 0){
@@ -387,117 +339,77 @@ namespace c60 {
 					return false;
 				}
 
+				/**передаёт текущую матрицу в SCALA**/
 				void send(std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler) {
 					int	size = this->_parts.size();
 					if (size > 0){
 						javaHandler->handleMatrix(this->_parts.at(size - 1).matrix);
 					}
 				}
+
+				/**возращает актуальную матрицу 4х4**/
+				vector<float> getMatrix(){
+					int	size = this->_parts.size();
+					if (size > 0)
+						return this->_parts.at(size - 1).matrix;
+
+					vector<float> v = { 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
+					return v;
+				}
 		};
 
-		/*
-		class SectionDWF;
-
-		class CurrentSemantic{
+		/**базовый экземпляр сегмента для ссылок**/
+		class RefSegDWF{
 		private:
-				void setName(){
-					for (auto const &semv : semantic){
-						if (semv.propName.compare(L"_name") == 0)
-						{
-							this->name = semv.propValue;
-							return;
-						}
-					}
-				}
+				/**матрица экземпляра**/
+				vector<float> _m;
 		public:
-				int level;
-				std::wstring name = L"";
-				OBJ_SEMANTIC semantic;
+				/**название экземпляра(ключ)**/
+				wstring name;
+				/**координаты меша**/
+				vector<float> xyz;
+				/**индексы меша**/
+				vector<int> indexes;
 
-				CurrentSemantic(){};
-				CurrentSemantic(int level, OBJ_SEMANTIC semantic){
-					this->level = level;
-					this->semantic = semantic;
-					this->setName();
-				};
 
-				vector<wstring> getValues(){
-					vector<wstring> result;
-					for (auto const &semv : semantic){
-						result.push_back(semv.propValue);
-					}
+				RefSegDWF (){}
 
-					return result;
+				RefSegDWF (const std::wstring& name) : name(name) {}
+
+				~RefSegDWF(){}
+
+				/**устанавливает значение матрицы**/
+				void SetMatrix(vector<float> m){
+					if (_m.size() == 0)
+						_m = m;
+					else
+						_m = multiply(m, _m);
+				}
+
+				/**возращает матрицу экземпляра**/
+				vector<float> GetMatrix(){
+					if (_m.size() > 0)
+						return _m;
+
+					vector<float> v = { 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
+					return v;
 				}
 		};
-		/*
-
-		/**семантика текущего уровня**/
-		//class CurrentSemantic{
-		//public:
-		//		std::map<std::wstring, std::wstring> items;
-				/**семантика родителя**/
-		//		CurrentSemantic *parent = NULL;
-
-		//		CurrentSemantic (void){};
-
-		//		vector<wstring> getValues(){
-		//			vector<wstring> result;
-		//			for (auto pos = this->items.begin(); pos != this->items.end(); ++pos) {
-		//				result.push_back(pos->second);
-		//			}
-
-		//			return result;
-		//		}
-
-		//		void SetSemantic(std::map<std::wstring, std::wstring> fields, OBJ_SEMANTIC semantic){
-		//			for (auto pos = fields.begin(); pos != fields.end(); ++pos) {
-		//				this->items[pos->first] = pos->second;
-		//			}
-
-		//			for (auto const &semv : semantic){
-		//				if (this->items[semv.propName] == L"")
-		//					this->items[semv.propName] = semv.propValue;
-		//				else
-		//					this->items[semv.propName] += L" $$$ " + semv.propValue;
-		//			}
-		//		};
-		//};
 
 		/**слой для вызова метода doImportNextLayer**/
 		class LayerDWF{
 		private:
-		//		CurrentSemantic *_semantic = NULL;
 				/**секции файла DWF**/
 				std::vector<int> _levels;
 		public:
-				/**Секция которой принадлежит слой**/
-				//SectionDWF *section;
 				/**семантика дочерних узлов слоя**/
 				std::map<std::wstring, OBJ_SEMANTIC> semantics;
-				//**Поток с деревом геометрии**//
-				//DWFCore::DWFInputStream *pW3DStream;
 				/**название слоя**/
 				wstring name;
 				/**название колонок**/
-				//std::vector<wstring> fields;
 				std::map<std::wstring, std::wstring> fields;
-				/**Глубина в структуре узлов, на которой находится нижняя семантика**/
-				//int32_t bottomLevel = 0;
-				/**Глубина в структуре узлов, на которой находится семантика**/
-				//int32_t semanticLevel = -1;
-				//**Позиция начала слоя**//
-				//int begin = -1;
-				//**Позиция конца слоя**/
-				//int end = -1;
-				/**Количество объектов**/
-				//int32_t countNode;
 				/*Глубина в структуре узлов, на которой находится геометрия нового объекта*/
 				int32_t geomLevel = -1;
-				/*Семантика текущего узла дерева*/
-				//std::vector<CurrentSemantic> semantic;
-				/**Глубина в структуре узлов, на которой находится нижняя семантика**/
-				//int32_t semLevel = -1;
 
 				LayerDWF (){}
 
@@ -507,72 +419,25 @@ namespace c60 {
 					name = L"";
 				}
 
-				//bool GetSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
+				/**чтение семантики слоя**/
 				bool ReadSemantic(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
-				//void SetFields(DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
-				//void SetBottomLevel(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
-				//bool SetFields();
+
+				/**чистит текущие значения семантики**/
 				void clearValue(){
 					for (auto &keyVal: this->fields) {
 						keyVal.second = L"";
 					}
 				}
 
-				/*
-				bool deleteSemantic(int level){
-					int size = this->semantic.size();
-					if (size > 0){
-						//CurrentSemantic ob = this->semantic.at(size - 1);
-						if (this->semantic.at(size - 1).level > level) {
-							//JLogger::info(L"name= %S", this->semantic.at(size - 1).name.c_str());
-							this->semantic.pop_back();
-							return true;
-						}
-					}
-
-					return false;
-				}
-
-				wstring getBottomName(){
-					int size = this->semantic.size();
-					if (size > 0){
-						return this->semantic.at(size - 1).name;
-					}
-
-					return L"";
-				}
-
-				vector<wstring> getBottomSem(){
-					vector<wstring> result;
-					int size = this->semantic.size();
-					if (size > 0){
-						return this->semantic.at(size - 1).getValues();
-					}
-
-					return result;
-				}
-				*/
-
+				/**устанавливает текущие значения семантики**/
 				void setValues(OBJ_SEMANTIC sem){
 					this->clearValue();
 					for (auto const &semv : sem){
-						//if (this->fields[semv.propName] == L"")
-							this->fields[semv.propName] = semv.propValue;
-						//else
-						//	this->fields[semv.propName] += L"\\" + semv.propValue;
+						this->fields[semv.propName] = semv.propValue;
 					}
 				}
 
-				/*
-				void setValues(){
-					this->clearValue();
-					for (auto pos = this->semantic.begin(); pos != this->semantic.end(); ++pos) {
-						OBJ_SEMANTIC sem = pos.base()->semantic;
-						this->setValues(sem);
-					}
-				}
-				 */
-
+				/**возращает список значений семантики**/
 				vector<wstring> getValues(){
 					vector<wstring> result;
 					for (auto pos = this->fields.begin(); pos != this->fields.end(); ++pos) {
@@ -580,20 +445,7 @@ namespace c60 {
 					}
 
 					return result;
-					//return _semantic->getValues();
 				}
-
-				/**возращает имена родительских узлов текущего объекта(до названия слоя)**/
-				/*
-				vector<wstring> getNames(){
-					vector<wstring> result;
-					for (auto pos = this->semantic.begin(); pos != this->semantic.end(); ++pos) {
-						result.push_back(pos.base()->name);
-					}
-
-					return result;
-				}
-				 */
 
 				/**возращает название колонок**/
 				vector<wstring> getFields(){
@@ -605,6 +457,7 @@ namespace c60 {
 					return result;
 				}
 
+				/**возращает семантику узла дерева**/
 				OBJ_SEMANTIC getOBJ_SEMANTIC(){
 					OBJ_SEMANTIC result;
 					for (auto pos = this->fields.begin(); pos != this->fields.end(); ++pos) {
@@ -631,75 +484,41 @@ namespace c60 {
 
 					return false;
 				}
-
-				/*
-				void setCurrentSemantic(OBJ_SEMANTIC semantic){
-					CurrentSemantic *ob = new CurrentSemantic();
-					ob->parent = this->_semantic;
-					if (ob->parent == NULL)
-						ob->SetSemantic(this->fields, semantic);
-					else
-						ob->SetSemantic(ob->parent->items, semantic);
-					this->_semantic = ob;
-				}
-
-				void setTopSemantic(){
-					CurrentSemantic *ob = this->_semantic;
-					if (ob) {
-						this->_semantic = ob->parent;
-					}
-				}
-				 */
 		};
 
 		/**секция файла DWF**/
 		class SectionDWF{
 		public:
-				//**семантика всех узлов секции**//
-				//std::map<std::wstring, OBJ_SEMANTIC> semantics;
-				//**потоки с геометрией**//
-				//std::vector<std::shared_ptr<DWFInputStream>> pW3DStreams;
-				/**Текущий поток с деревом геометрии**/
-				//DWFCore::DWFInputStream *pW3DStream;
-				/**Структура с семантикой объектов**/
-				//DWFObjectDefinition *pDef;
-
-
 				/**Глубина в структуре узлов, на которой находятся слои**/
 				int32_t levelLayers = -1;
 				/**слои секции**/
 				std::map<std::wstring, LayerDWF> layers;
 				/**Текущий обрабатываемый слой**/
-				LayerDWF *layer;
+				LayerDWF *layer = NULL;
 				/**Текущий стиль**/
 				StyleDWF styleDWF;
 				/**матрицы файла DWF**/
 				MatrixDWF matrixDWF;
+				/**экземпляры возможных примитивов геометрии**/
+				std::map<std::wstring, RefSegDWF> references;
+				/**Текущий обрабатываемый базовый экземпляр**/
+				RefSegDWF *reference = NULL;
 
-				SectionDWF(){
-					//this->styleDWF = new StyleDWF();
-					//this->matrixDWF = new MatrixDWF();
-				};
+				SectionDWF(){ };
 
-				~SectionDWF(){
-					this->layer = NULL;
-					//delete this->styleDWF;
-					//delete this->matrixDWF;
-				}
-				//bool SetLevelLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
+				~SectionDWF(){ }
+
+				/**предворительное чтение структуры и семантики**/
 				bool SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
-				//bool SetLayers(int32_t level, DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst, const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler);
-				//void AddSemantic(DWFObjectDefinition *pDef, DWFDefinedObjectInstance *pInst);
 		};
 
 
 		/**реализация синглтона утилит для вызова из Java**/
 		class DwfUtilsImpl : public dgn::DwfUtils {
 		private:
+				/**предворительное чтение структуры(порядок и название слоёв)**/
 				void readTreeStructureFromGraphics(const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler, DWFSection *pSection);
 		protected:
-				/**Открытый на чтение файл DWF**/
-				//DWFToolkit::DWFPackageReader oReader;
 				/**Содержит информацию о файле DWF**/
 				DWFToolkit::DWFPackageReader::tPackageInfo tInfo;
 
@@ -713,38 +532,28 @@ namespace c60 {
 				std::vector<SectionDWF> sections;
 				/**Текущая секция**/
 				SectionDWF *section;
-				/**слои для вызова метода doImportNextLayer**/
-				//std::vector<LayerDWF> layers;
-				/**Текущий обрабатываемый слой текущей DWFSection**/
-				//LayerDWF *layer;
-				/**Количество слоёв**/
-				//int32_t countLayer;
-				/**Количество объектов**/
-				//int32_t countNode;
 
 				DwfUtilsImpl(const std::wstring & dwfFile, int32_t layerDepth);
 
-				~DwfUtilsImpl() override {
-					this->section = NULL;
-				}
+				~DwfUtilsImpl() override { }
 
 
-				/*
-				 *
-				 */
+				/**предворительное чтение структуры**/
 				void readTreeStructure(const std::shared_ptr<dgn::DwfLayerStructureStreamHandler> &handler) override;
+				/**загрузка файла в базу**/
 				void readAllLayers(const std::shared_ptr<dgn::DwfLayersFillStreamHandler> &handler) override;
 
+				/**конвертор строки**/
 				static DWFString toDwfString(std::wstring str){
 					DWFString name;
 					name.append(str.c_str());
 					return name;
 				}
-
+				/**конвертор строки**/
 				static std::wstring toStdString(const DWFString &str){
 					return std::wstring((const wchar_t *)str, str.chars());
 				}
-
+				/**получение имени слоя из значений семантики**/
 				static std::wstring getName(OBJ_SEMANTIC sem){
 					for (auto const &s : sem){
 						if (s.propName.compare(L"_name") == 0)
@@ -753,7 +562,7 @@ namespace c60 {
 
 					return L"";
 				}
-
+				/**разделение семантики на названия колонок**/
 				static std::pair<vector<wstring>, vector<wstring>> getPair(OBJ_SEMANTIC sem){
 					vector<wstring> fields;
 					vector<wstring> values;
@@ -764,30 +573,6 @@ namespace c60 {
 
 					return {fields, values};
 				}
-
-				/**Возращает значение колонки с именем _name**/
-				/*
-				static wstring getName(OBJ_SEMANTIC semantic){
-					for (auto const &semv : semantic){
-						if (semv.propName.compare(L"_name") == 0)
-							return semv.propValue;
-					}
-
-					return L"";
-				}
-				 */
-
-				/**Возращает семантику текущего узла**/
-				/*
-				static vector<wstring> getValues(OBJ_SEMANTIC semantic){
-					vector<wstring> result;
-					for (auto const &semv : semantic){
-						result.push_back(semv.propValue);
-					}
-
-					return result;
-				}
-				 */
 		};
 
 

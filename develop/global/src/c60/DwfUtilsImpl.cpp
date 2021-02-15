@@ -97,7 +97,7 @@ public:
 									/**читаем базовый экземпляр для ссылок**/
 									string str = string(this->m_string, this->m_length);
 									wstring wstr(str.begin(), str.end());
-									JLogger::info(L"nameRef= %S", wstr.c_str());
+									//JLogger::info(L"nameRef= %S", wstr.c_str());
 									auto pair = this->section->references.emplace(std::piecewise_construct, std::forward_as_tuple(wstr),
 																																std::forward_as_tuple(wstr));
 									bool inserted = pair.second;
@@ -148,7 +148,7 @@ public:
 					this->section->styleDWF.deleteLevel(level);
 					this->section->matrixDWF.remove(level);
 				} else {
-					JLogger::info(L"BodyNum= %i", this->section->reference->indexes.size());
+					//JLogger::info(L"BodyNum= %i", this->section->reference->meshes.size());
 					this->section->reference = NULL;
 				}
 			}
@@ -175,6 +175,17 @@ public:
 					if (this->section->reference == NULL)
 						JLogger::info(L"Попалась геометрия Shell выше уровня слоя, level= %u", parser.getNestingLevel());
 					else{
+						c60::MeshDWF* mesh = new c60::MeshDWF();
+						mesh->xyz.assign(this->mp_points, this->mp_points + this->mp_pointcount*3);
+						assert(this->m_flistlen % 4 == 0); //все грани должны быть треугольниками
+						for(int pt_idx = 0; pt_idx < this->m_flistlen; pt_idx+=4){
+							assert(this->m_flist[pt_idx] == 3);
+							for (int i = 1; i < 4; ++i ) {
+								mesh->indexes.push_back(this->m_flist[i + pt_idx]);
+							}
+						}
+						this->section->reference->meshes.push_back(*mesh);
+						/*
 						this->section->reference->xyz.assign(this->mp_points, this->mp_points + this->mp_pointcount * 3);
 						assert(this->m_flistlen % 4 == 0); //все грани должны быть треугольниками
 						for(int pt_idx = 0; pt_idx < this->m_flistlen; pt_idx+=4){
@@ -182,7 +193,7 @@ public:
 							for (int i = 1; i < 4; ++i ) {
 								this->section->reference->indexes.push_back(this->m_flist[i + pt_idx]);
 							}
-						}
+						}*/
 					}
 				}else {
 					/**находимся внутри слоя**/
@@ -230,7 +241,9 @@ public:
 						//this->section->matrixDWF.send(this->javaHandler);
 						javaHandler->handleMatrix(c60::multiply(this->section->reference->GetMatrix(), this->section->matrixDWF.getMatrix()));
 						this->section->styleDWF.send(this->javaHandler);
-						this->javaHandler->handleMesh(dgn::Mesh(this->section->reference->xyz, this->section->reference->indexes));
+						for (c60::MeshDWF ob : this->section->reference->meshes) {
+							this->javaHandler->handleMesh(dgn::Mesh(ob.xyz, ob.indexes));
+						}
 						this->javaHandler->closeNode();
 						this->section->reference = NULL;
 					} else
@@ -316,7 +329,6 @@ protected:
 		std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler;
 public:
 		ColorHandler(std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler,  c60::SectionDWF *section) : TK_Color() {
-		//ColorHandler(std::shared_ptr<dgn::DwfLayersFillStreamHandler> javaHandler) : TK_Color() {
 			this->javaHandler = javaHandler;
 			this->section = section;
 		}
@@ -326,46 +338,17 @@ public:
 		TK_Status Execute(BStreamFileToolkit &rW3DParser) {
 			TK_Status eStatus = TK_Color::Execute(rW3DParser);
 			if (eStatus == TK_Normal) {
-				//clock_t time = clock();
-				//JLogger::info(L"Color time= %d", time);
 				dgn::DwfColor* dwfColor;
 				int level = rW3DParser.getNestingLevel();
-				//if (level > this->section->levelLayers) {
-					if ((this->m_channels & (1 << TKO_Channel_Diffuse)) != 0) {
-						this->section->styleDWF.addDiffuse(level, this->m_diffuse.m_rgb);
-						/*
-						if (level > this->section->levelLayers) {
-							dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1],
-											this->m_diffuse.m_rgb[2], 0);
-							//if (level == this->section->layer->geomLevel) {
-							this->javaHandler->handleColor(dgn::ColorType::DIFFUSE, *dwfColor);
-							//} else{
-							//	this->javaHandler->handleColor(dgn::ColorType::AMBIENT, *dwfColor);
-							//}
-						}
-						 */
-					}
-					if ((m_channels & (1 << TKO_Channel_Specular)) != 0) {
-						this->section->styleDWF.addSpecular(level, this->m_specular.m_rgb);
-						/*
-						if (level > this->section->levelLayers) {
-							dwfColor = new dgn::DwfColor(this->m_specular.m_rgb[0], this->m_specular.m_rgb[1],
-											this->m_specular.m_rgb[2], 0);
-							this->javaHandler->handleColor(dgn::ColorType::SPECULAR, *dwfColor);
-						}
-						 */
-					}
-					if ((m_channels & (1 << TKO_Channel_Transmission)) != 0) {
-						this->section->styleDWF.addTransparence(level, this->m_transmission.m_rgb);
-						/*
-						if (level > this->section->levelLayers) {
-							dwfColor = new dgn::DwfColor(this->m_transmission.m_rgb[0], this->m_transmission.m_rgb[1],
-											this->m_transmission.m_rgb[2], 0);
-							this->javaHandler->handleColor(dgn::ColorType::OPACITY, *dwfColor);
-						}
-						 */
-					}
-
+				if ((this->m_channels & (1 << TKO_Channel_Diffuse)) != 0) {
+					this->section->styleDWF.addDiffuse(level, this->m_diffuse.m_rgb);
+				}
+				if ((m_channels & (1 << TKO_Channel_Specular)) != 0) {
+					this->section->styleDWF.addSpecular(level, this->m_specular.m_rgb);
+				}
+				if ((m_channels & (1 << TKO_Channel_Transmission)) != 0) {
+					this->section->styleDWF.addTransparence(level, this->m_transmission.m_rgb);
+				}
 				if ((m_channels & (1 << TKO_Channel_Emission)) != 0) {
 					this->section->styleDWF.addEmissive(level, this->m_emission.m_rgb);
 				}
@@ -375,11 +358,6 @@ public:
 				if ((m_channels & (1 << TKO_Channel_Gloss)) != 0) {
 					this->section->styleDWF.addGloss(level, this->m_gloss);
 				}
-				//} else{
-				//	dwfColor = new dgn::DwfColor(this->m_diffuse.m_rgb[0], this->m_diffuse.m_rgb[1], this->m_diffuse.m_rgb[2], 0);
-				//}
-				//time = clock() - time;
-				//JLogger::info(L"DClolor time= %d", time);
 			}
 			return eStatus;
 		}

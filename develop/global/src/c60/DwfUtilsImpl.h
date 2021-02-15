@@ -358,6 +358,19 @@ namespace c60 {
 				}
 		};
 
+		/**3D-сегмент**/
+		class MeshDWF{
+		public:
+				/**координаты меша**/
+				vector<float> xyz;
+				/**индексы меша**/
+				vector<int> indexes;
+
+				MeshDWF() {}
+
+				~MeshDWF(){}
+		};
+
 		/**базовый экземпляр сегмента для ссылок**/
 		class RefSegDWF{
 		private:
@@ -366,10 +379,8 @@ namespace c60 {
 		public:
 				/**название экземпляра(ключ)**/
 				wstring name;
-				/**координаты меша**/
-				vector<float> xyz;
-				/**индексы меша**/
-				vector<int> indexes;
+				/**части геометрии**/
+				vector<MeshDWF> meshes;
 
 
 				RefSegDWF (){}
